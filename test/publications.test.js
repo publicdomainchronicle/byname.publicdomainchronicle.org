@@ -137,7 +137,7 @@ tape('DELETE /publications/{nonexistent}', function (test) {
   })
 })
 
-tape('GET /publications', function (test) {
+tape('GET /publications CSV', function (test) {
   server(function (port, done) {
     var location
     runSeries([
@@ -179,6 +179,59 @@ tape('GET /publications', function (test) {
             test.assert(
               body.toString().indexOf(digest) !== -1,
               'body contains digest'
+            )
+            done()
+          }))
+        })
+      }
+    ], function () {
+      done()
+      test.end()
+    })
+  })
+})
+
+tape('GET /publications HTML', function (test) {
+  server(function (port, done) {
+    var location
+    runSeries([
+      function (done) {
+        var form = makeValidPublication()
+        form.pipe(
+          http.request({
+            method: 'POST',
+            path: '/publish',
+            port: port,
+            headers: form.getHeaders()
+          })
+            .once('response', function (response) {
+              test.equal(
+                response.statusCode, 201,
+                'responds 201'
+              )
+              test.assert(
+                response.headers.location.startsWith('/publications/'),
+                'sets Location'
+              )
+              location = response.headers.location
+              done()
+            })
+        )
+      },
+      function (done) {
+        http.get({
+          path: '/publications/',
+          port: port,
+          headers: {accept: 'text/html'}
+        }, function (response) {
+          test.equal(
+            response.statusCode, 200,
+            'responds 200'
+          )
+          response.pipe(concat(function (body) {
+            test.assert(
+              body.toString().indexOf('href=' + location) !== -1,
+              'body contains link to publication'
             )
             done()
           }))
