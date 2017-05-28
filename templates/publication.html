@@ -7,7 +7,7 @@
   <body>
     <header>
       <h1 class=title>{{title}}</h1>
-      <p class=digest>Cryptographic Digest: {{digest}}</p>
+      <p class=digest>Cryptographic Digest: <code>{{{digest}}}</code></p>
       <p class=date>Published {{date}}</p>
     </header>
 
@@ -27,6 +27,9 @@
 
       <h2>Safety Notes</h2>
       <pre>{{{safety}}}</pre>
+
+      <h2>Publisher&rsquo;s Cryptographic Signature</h2>
+      <p><code>{{{signature}}}</code></p>
     </main>
 
     <footer></footer>

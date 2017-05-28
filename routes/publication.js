@@ -29,9 +29,10 @@ module.exports = function (request, response, directory) {
         response.statusCode = 415
         response.end()
       } else {
-        var json = path.join(
-          directory, 'publications', digest + '.json'
+        var pathPrefix = path.join(
+          directory, 'publications', digest
         )
+        var json = pathPrefix + '.json'
         /* istanbul ignore else */
         if (type === 'application/json') {
           send(request, json)
@@ -44,6 +45,8 @@ module.exports = function (request, response, directory) {
         } else if (type === 'text/html') {
           var template
           var data
+          var signature
+          var sig = pathPrefix + '.sig'
           runParallel([
             function (done) {
               fs.readFile(TEMPLATE, 'utf8', ecb(done, function (read) {
@@ -57,6 +60,12 @@ module.exports = function (request, response, directory) {
                   data = parsed
                   done()
                 }))
+              }))
+            },
+            function (done) {
+              fs.readFile(sig, 'utf8', ecb(done, function (read) {
+                signature = read
+                done()
               }))
             }
           ], function (error) {
@@ -73,6 +82,7 @@ module.exports = function (request, response, directory) {
                 }
               data.date = formattedDate(data.date)
               data.digest = digest
+              data.signature = signature
               response.end(
                 mustache.render(template, data)
               )
