@@ -8,13 +8,13 @@ table {
 }
 
 .good {
-  color: darkgreen;
+  background-color: rgb(200,255, 200);
 }
 
 .medium {
-  color: darkorange;
+  background-color: rgb(255, 255, 170);
 }
 
 .bad {
-  color: darkred;
+  background-color: rgb(255, 200, 200);
 }
