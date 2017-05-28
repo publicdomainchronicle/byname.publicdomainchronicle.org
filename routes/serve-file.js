@@ -6,7 +6,7 @@ module.exports = function (name) {
   return function (request, response) {
     if (request.method === 'GET') {
       send(request, path.join(__dirname, name))
-        .on('error', function (error) {
+        .on('error', /* istanbul ignore next */ function (error) {
           response.statusCode = error.status || 500
           response.end(error.message)
         })

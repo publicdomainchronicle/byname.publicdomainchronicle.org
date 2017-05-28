@@ -46,3 +46,23 @@ tape('POST /publish with valid', function (test) {
     )
   })
 })
+
+tape('DELETE /publish', function (test) {
+  server(function (port, done) {
+    http.request({
+      method: 'DELETE',
+      path: '/publish',
+      port: port
+    })
+      .once('response', function (response) {
+        test.equal(
+          response.statusCode, 405,
+          'responds 405'
+        )
+        done()
+        test.end()
+      })
+      .end()
+  })
+})
+

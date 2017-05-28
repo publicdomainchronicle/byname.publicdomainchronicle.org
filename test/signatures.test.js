@@ -85,3 +85,37 @@ tape('GET /publication/{created}/signature', function (test) {
     })
   })
 })
+
+tape('GET /publication/{nonexistent}/signature', function (test) {
+  server(function (port, done) {
+    http.get({
+      path: '/publications/nonexistent/signature',
+      port: port
+    }, function (response) {
+      test.equal(
+        response.statusCode, 404,
+        'responds 404'
+      )
+      done()
+      test.end()
+    })
+  })
+})
+
+tape('NOT-GET /publication/{nonexistent}/signature', function (test) {
+  server(function (port, done) {
+    http.get({
+      method: 'DELETE',
+      path: '/publications/nonexistent/signature',
+      port: port
+    }, function (response) {
+      test.equal(
+        response.statusCode, 405,
+        'responds 405'
+      )
+      done()
+      test.end()
+    })
+  })
+})
+

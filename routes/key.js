@@ -4,6 +4,7 @@ var readKeypair = require('../read-keypair')
 module.exports = function (request, response, directory) {
   if (request.method === 'GET') {
     readKeypair(directory, function (error, keypair) {
+      /* istanbul ignore if */
       if (error) {
         request.log.error(error)
         response.statusCode = 500

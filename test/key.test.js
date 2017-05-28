@@ -26,3 +26,17 @@ tape('GET /key', function (test) {
     })
   })
 })
+
+tape('NOT-GET /key', function (test) {
+  server(function (port, done) {
+    var request = {method: 'POST', path: '/key', port: port}
+    http.get(request, function (response) {
+      test.equal(
+        response.statusCode, 405,
+        'responds 405'
+      )
+      done()
+      test.end()
+    })
+  })
+})

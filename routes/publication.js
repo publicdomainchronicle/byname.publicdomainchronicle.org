@@ -20,12 +20,13 @@ module.exports = function (request, response, directory) {
         response.statusCode = 415
         response.end()
       } else {
+        /* istanbul ignore else */
         if (type === 'application/json') {
           var json = path.join(
             directory, 'publications', digest + '.json'
           )
           send(request, json)
-            .on('error', function (error) {
+            .on('error', /* istanbul ignore next */ function (error) {
               request.log.error(error)
               response.statusCode = error.status || 500
               response.end()

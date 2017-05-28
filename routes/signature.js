@@ -14,7 +14,7 @@ module.exports = function (request, response, directory) {
         directory, 'publications', digest + '.sig'
       )
       send(request, file)
-        .on('error', function (error) {
+        .on('error', /* istanbul ignore next */ function (error) {
           request.log.error(error)
           response.statusCode = error.status || 500
           response.end()

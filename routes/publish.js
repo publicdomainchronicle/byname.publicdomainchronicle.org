@@ -1,5 +1,6 @@
 var Busboy = require('busboy')
 var fs = require('fs')
+var methodNotAllowed = require('./method-not-allowed')
 var path = require('path')
 var readKeypair = require('../read-keypair')
 var runSeries = require('run-series')
@@ -11,6 +12,7 @@ var get = serveFile('publish.html')
 
 function post (request, response, directory) {
   readPostBody(request, function (error, fields) {
+    /* istanbul ignore if */
     if (error) {
       request.log.error(error)
       response.statusCode = 500
@@ -20,6 +22,7 @@ function post (request, response, directory) {
         event: 'parsed fields'
       })
       readKeypair(directory, function (error, keypair) {
+        /* istanbul ignore if */
         if (error) {
           response.statusCode = 500
           response.end()
@@ -39,6 +42,7 @@ function post (request, response, directory) {
               fs.writeFile(pathPrefix + '.sig', signature, done)
             }
           ], function (error) {
+            /* istanbul ignore if */
             if (error) {
               response.log.error(error)
               response.statusCode = 500
@@ -58,6 +62,7 @@ function post (request, response, directory) {
 function readPostBody (request, callback) {
   var fields = {}
   var parser
+  /* istanbul ignore next */
   try {
     parser = new Busboy({headers: request.headers})
   } catch (error) {
@@ -87,5 +92,7 @@ module.exports = function (request, response, directory) {
     get(request, response)
   } else if (request.method === 'POST') {
     post(request, response, directory)
+  } else {
+    methodNotAllowed(response)
   }
 }
