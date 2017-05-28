@@ -1,5 +1,4 @@
 var http = require('http')
-var leveldown = require('leveldown')
 var levelup = require('levelup')
 var makeHandler = require('./')
 var pino = require('pino')
@@ -7,17 +6,22 @@ var pino = require('pino')
 var NAME = require('./package.json').name
 var VERSION = require('./package.json').version
 
-var log = pino({name: NAME + '@' + VERSION})
-
 var ENV = process.env
-var LEVEL_PATH = ENV.LEVELDB || NAME + '.leveldb'
 var PORT = ENV.PORT || 8080
 var TIMEOUT = ENV.TIMEOUT ? parseInt(ENV.TIMEOUT) : 5000
 
-var levelOptions = {
-  db: leveldown,
-  valueEncoding: 'json'
+var LEVEL_PATH
+var levelOptions = {valueEncoding: 'json'}
+
+if (ENV.LEVELDB && ENV.LEVELDB.toLowerCase() === 'memory') {
+  levelOptions.db = require('memdown')
+  LEVEL_PATH = 'memdown'
+} else {
+  levelOptions.db = require('leveldown')
+  LEVEL_PATH = ENV.LEVELDB || NAME + '.leveldb'
 }
+
+var log = pino({name: NAME + '@' + VERSION})
 
 levelup(LEVEL_PATH, levelOptions, function (error, level) {
   if (error) {
