@@ -9,7 +9,9 @@ var path = require('path')
 var runParallel = require('run-parallel')
 var send = require('send')
 
-var TEMPLATE = path.join(__dirname, 'publication.html')
+var TEMPLATE = path.join(
+  __dirname, '..', 'templates', 'publication.html'
+)
 
 module.exports = function (request, response, directory) {
   if (request.method === 'GET') {

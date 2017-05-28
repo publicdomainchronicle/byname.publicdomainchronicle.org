@@ -7,7 +7,9 @@ var split2 = require('split2')
 var through2 = require('through2')
 var trumpet = require('trumpet')
 
-var TEMPLATE = path.join(__dirname, 'publications.html')
+var TEMPLATE = path.join(
+  __dirname, '..', 'templates', 'publications.html'
+)
 
 module.exports = function (request, response, directory) {
   if (request.method === 'GET') {
