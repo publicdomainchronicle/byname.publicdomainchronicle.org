@@ -1,7 +1,12 @@
+var fs = require('fs')
 var http = require('http')
-var levelup = require('levelup')
 var makeHandler = require('./')
+var mkdirp = require('mkdirp')
+var path = require('path')
 var pino = require('pino')
+var runParallel = require('run-parallel')
+var touch = require('touch')
+var writeKeypair = require('./write-keypair')
 
 var NAME = require('./package.json').name
 var VERSION = require('./package.json').version
@@ -10,30 +15,44 @@ var ENV = process.env
 var PORT = ENV.PORT || 8080
 var TIMEOUT = ENV.TIMEOUT ? parseInt(ENV.TIMEOUT) : 5000
 
-var LEVEL_PATH
-var levelOptions = {valueEncoding: 'json'}
-
-if (ENV.LEVELDB && ENV.LEVELDB.toLowerCase() === 'memory') {
-  levelOptions.db = require('memdown')
-  LEVEL_PATH = 'memdown'
-} else {
-  levelOptions.db = require('leveldown')
-  LEVEL_PATH = ENV.LEVELDB || NAME + '.leveldb'
-}
+var DIRECTORY = ENV.DATA || NAME
+var ACCESSIONS = path.join(DIRECTORY, 'accessions')
+var PUBLICATIONS = path.join(DIRECTORY, 'publications')
+var KEYPAIR = path.join(DIRECTORY, 'keys')
 
 var log = pino({name: NAME + '@' + VERSION})
 
-levelup(LEVEL_PATH, levelOptions, function (error, level) {
+runParallel([
+  mkdirp.bind(null, PUBLICATIONS),
+  function (done) {
+    touch(ACCESSIONS, {force: true}, done)
+  },
+  function (done) {
+    fs.access(KEYPAIR, fs.constants.R_OK, function (error) {
+      if (error) {
+        if (error.code === 'ENOENT') {
+          log.info({event: 'generating keypair'})
+          writeKeypair(DIRECTORY, done)
+        } else {
+          done(error)
+        }
+      } else {
+        done()
+      }
+    })
+  }
+], function (error) {
   if (error) {
-    log.fatal({event: 'level'}, error)
+    log.fatal({event: 'data'}, error)
     process.exit(1)
   } else {
-    log.info({event: 'level', path: LEVEL_PATH})
-    var requestHandler = makeHandler(VERSION, TIMEOUT, log, level)
+    log.info({event: 'data', directory: DIRECTORY})
+    var requestHandler = makeHandler(VERSION, TIMEOUT, DIRECTORY, log)
     var server = http.createServer(requestHandler)
     if (module.parent) {
       module.exports = server
     } else {
+      // Trap signals.
       process
         .on('SIGTERM', logSignalAndShutDown)
         .on('SIGQUIT', logSignalAndShutDown)
@@ -42,6 +61,7 @@ levelup(LEVEL_PATH, levelOptions, function (error, level) {
           log.error(exception)
           shutDown()
         })
+      // Start server.
       server.listen(PORT, function () {
         var boundPort = this.address().port
         log.info({event: 'listening', port: boundPort})
@@ -55,12 +75,10 @@ levelup(LEVEL_PATH, levelOptions, function (error, level) {
   }
 
   function shutDown () {
-    level.close(function () {
-      log.info({event: 'closed level'})
-      server.close(function () {
-        log.info({event: 'closed server'})
-        process.exit()
-      })
+    log.info({event: 'closed level'})
+    server.close(function () {
+      log.info({event: 'closed server'})
+      process.exit()
     })
   }
 })

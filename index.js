@@ -3,7 +3,7 @@ var url = require('url')
 var routes = require('./routes')
 var notFound = require('./routes/not-found')
 
-module.exports = function (VERSION, TIMEOUT, log, level) {
+module.exports = function (VERSION, TIMEOUT, DIRECTORY, log) {
   log = pinoHTTP({logger: log})
   return function (request, response) {
     log(request, response)
@@ -15,10 +15,10 @@ module.exports = function (VERSION, TIMEOUT, log, level) {
     })
     var parsed = url.parse(request.url, true)
     request.query = parsed.query
-    request.params = parsed.params
     var route = routes.get(parsed.pathname)
     if (route.handler) {
-      route.handler(request, response, log, level)
+      request.params = route.params
+      route.handler(request, response, DIRECTORY)
     } else {
       notFound(request, response)
     }

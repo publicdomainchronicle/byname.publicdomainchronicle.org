@@ -8,10 +8,58 @@
     <header>
       <h1>DBOS</h1>
     </header>
+
     <main>
-      <form method=post action=/disclosures>
+      <form method=post action=/publish>
+        <section>
+          <h1>Scientist</h1>
+
+          <p>
+            <input name=anonymous type=checkbox>
+            <label for=anonymous>anonymous</label>
+          </p>
+
+          <p>
+            <label for=name>name</label>
+            <input name=name type=text>
+          </p>
+
+          <p>
+            <input name=independent type=checkbox>
+            <label for=independent>independent</label>
+          </p>
+
+          <p>
+            <label for=institution>institution</label>
+            <input name=institution type=text>
+          </p>
+        </section>
+
+        <section>
+          <h1>Finding</h1>
+
+          <p>
+            <label for=title>title</label>
+            <input name=title type=text>
+          </p>
+
+          <p>
+            <label for=description>description</label>
+            <textarea name=description></textarea>
+          </p>
+
+          <p>
+            <label for=safety>safety</label>
+            <textarea name=safety></textarea>
+          </p>
+        </section>
+
+        <section>
+          <p><input type=submit value="Preview Publication"></p>
+        </section>
       </form>
     </main>
+
     <footer></footer>
   </body>
 </html>

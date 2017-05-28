@@ -1,4 +1,5 @@
 var http = require('http')
+var makeValidPublication = require('./make-valid-publication')
 var server = require('./server')
 var tape = require('tape')
 
@@ -17,5 +18,31 @@ tape('GET /publish', function (test) {
       done()
       test.end()
     })
+  })
+})
+
+tape('POST /publish with valid', function (test) {
+  server(function (port, done) {
+    var form = makeValidPublication()
+    form.pipe(
+      http.request({
+        method: 'POST',
+        path: '/publish',
+        port: port,
+        headers: form.getHeaders()
+      })
+        .once('response', function (response) {
+          test.equal(
+            response.statusCode, 201,
+            'responds 201'
+          )
+          test.assert(
+            response.headers.location.startsWith('/publications/'),
+            'sets Location'
+          )
+          done()
+          test.end()
+        })
+    )
   })
 })
