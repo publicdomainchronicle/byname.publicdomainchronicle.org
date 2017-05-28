@@ -1,5 +1,6 @@
 var Negotiator = require('negotiator')
 var ecb = require('ecb')
+var englishMonths = require('english-months')
 var fs = require('fs')
 var isDigest = require('is-sha-256-hex-digest')
 var methodNotAllowed = require('./method-not-allowed')
@@ -70,7 +71,7 @@ module.exports = function (request, response, directory) {
                   name: data.name,
                   institution: data.institution
                 }
-              data.date = new Date(parseInt(data.time))
+              data.date = formattedDate(data.date)
               data.digest = digest
               response.end(
                 mustache.render(template, data)
@@ -83,4 +84,13 @@ module.exports = function (request, response, directory) {
   } else {
     methodNotAllowed(response)
   }
+}
+
+function formattedDate (string) {
+  var date = new Date(string)
+  return (
+    englishMonths[date.getMonth()] +
+    ' ' + date.getDate() +
+    ', ' + date.getFullYear()
+  )
 }

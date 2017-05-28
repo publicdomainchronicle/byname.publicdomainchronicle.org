@@ -28,7 +28,7 @@ function post (request, response, directory) {
           response.end()
         } else {
           var secretKey = keypair.secret
-          fields.time = currentTime()
+          fields.date = currentDate()
           var record = Buffer.from(stringify(fields), 'utf8')
           var digest = sodium.crypto_hash_sha256(record).toString('hex')
           var signature = sodium.crypto_sign_detached(record, secretKey)
@@ -44,7 +44,7 @@ function post (request, response, directory) {
             function (done) {
               fs.appendFile(
                 path.join(directory, 'accessions'),
-                fields.time + ',' + digest + '\n',
+                fields.date + ',' + digest + '\n',
                 done
               )
             }
@@ -87,10 +87,10 @@ function readPostBody (request, callback) {
   )
 }
 
-function currentTime () {
+function currentDate () {
   return new Date()
-    .getTime()
-    .toString()
+    .toISOString()
+    .substring(0, 10)
 }
 
 module.exports = function (request, response, directory) {
