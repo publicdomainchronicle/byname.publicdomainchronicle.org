@@ -118,4 +118,3 @@ tape('NOT-GET /publication/{nonexistent}/signature', function (test) {
     })
   })
 })
-

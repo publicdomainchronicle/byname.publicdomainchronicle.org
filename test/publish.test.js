@@ -65,4 +65,3 @@ tape('DELETE /publish', function (test) {
       .end()
   })
 })
-
