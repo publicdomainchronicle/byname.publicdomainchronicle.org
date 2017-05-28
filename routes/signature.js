@@ -1,5 +1,6 @@
 var isDigest = require('is-sha-256-hex-digest')
 var methodNotAllowed = require('./method-not-allowed')
+var notFound = require('./not-found')
 var path = require('path')
 var send = require('send')
 
@@ -7,8 +8,7 @@ module.exports = function (request, response, directory) {
   if (request.method === 'GET') {
     var digest = request.params.digest
     if (!isDigest(digest)) {
-      response.statusCode = 404
-      response.end()
+      notFound(request, response)
     } else {
       var file = path.join(
         directory, 'publications', digest + '.sig'
