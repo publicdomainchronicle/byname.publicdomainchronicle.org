@@ -4,7 +4,7 @@ var runSeries = require('run-series')
 var server = require('./server')
 var tape = require('tape')
 
-tape('GET /publication/{nonexistent}', function (test) {
+tape('GET /publications/{nonexistent}', function (test) {
   server(function (port, done) {
     http.get({
       path: '/publications/nonexistent',
@@ -23,7 +23,7 @@ tape('GET /publication/{nonexistent}', function (test) {
   })
 })
 
-tape('GET /publication/{created}', function (test) {
+tape('GET /publications/{created}', function (test) {
   server(function (port, done) {
     var location
     runSeries([
@@ -70,7 +70,7 @@ tape('GET /publication/{created}', function (test) {
   })
 })
 
-tape('GET /publication/{created} XML', function (test) {
+tape('GET /publications/{created} XML', function (test) {
   server(function (port, done) {
     var location
     runSeries([
@@ -117,7 +117,7 @@ tape('GET /publication/{created} XML', function (test) {
   })
 })
 
-tape('DELETE /publication/{nonexistent}', function (test) {
+tape('DELETE /publications/{nonexistent}', function (test) {
   server(function (port, done) {
     http.request({
       method: 'DELETE',
