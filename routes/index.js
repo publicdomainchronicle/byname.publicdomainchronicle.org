@@ -5,6 +5,8 @@ var routes = module.exports = require('http-hash')()
 routes.set('/', serveFile('homepage.html'))
 routes.set('/styles.css', serveFile('styles.css'))
 
+routes.set('/about', serveFile('about.html'))
+
 routes.set('/guide', serveFile('guide.html'))
 routes.set('/guide.js', serveFile('guide.js'))
 
