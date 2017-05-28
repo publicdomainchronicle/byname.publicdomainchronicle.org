@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang=en>
+  <head>
+    <title>DBOS Publication</title>
+    <link href=/styles.css rel=stylesheet>
+  </head>
+  <body>
+    <header>
+      <h1 class=title>{{title}}</h1>
+      <p class=digest>Cryptographic Digest: {{digest}}</p>
+      <p class=date>Published {{date}}</p>
+    </header>
+
+    <main>
+      {{#scientist}}
+      <h2>Scientist</h2>
+      <p class=name>{{name}}</p>
+      <p class=institution>{{institution}}</p>
+      {{/scientist}}
+
+      {{^scientist}}
+      <p class=anonymous>published anonymously</p>
+      {{/scientist}}
+
+      <h2>Description</h2>
+      <pre>{{{description}}}</pre>
+
+      <h2>Safety Notes</h2>
+      <pre>{{{safety}}}</pre>
+    </main>
+
+    <footer></footer>
+  </body>
+</html>
