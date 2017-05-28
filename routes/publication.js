@@ -1,6 +1,6 @@
 var Negotiator = require('negotiator')
 var ecb = require('ecb')
-var englishMonths = require('english-months')
+var formatDate = require('../format-date')
 var fs = require('fs')
 var isDigest = require('is-sha-256-hex-digest')
 var methodNotAllowed = require('./method-not-allowed')
@@ -82,7 +82,7 @@ module.exports = function (request, response, directory, hostname) {
               data.safety = data.safety
                 ? {text: data.safety}
                 : false
-              data.date = formattedDate(data.date)
+              data.date = formatDate(data.date)
               data.digest = formattedDigest(digest)
               data.signature = formattedSignature(signature)
               data.hostname = hostname
@@ -116,14 +116,5 @@ function formattedSignature (signature) {
     signature.slice(64, 96) +
     '<wbr>' +
     signature.slice(96)
-  )
-}
-
-function formattedDate (string) {
-  var date = new Date(string)
-  return (
-    englishMonths[date.getMonth()] +
-    ' ' + date.getDate() +
-    ', ' + date.getFullYear()
   )
 }
