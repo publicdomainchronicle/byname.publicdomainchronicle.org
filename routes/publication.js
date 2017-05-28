@@ -15,7 +15,7 @@ var TEMPLATE = path.join(
   __dirname, '..', 'templates', 'publication.html'
 )
 
-module.exports = function (request, response, directory) {
+module.exports = function (request, response, directory, hostname) {
   if (request.method === 'GET') {
     var digest = request.params.digest
     if (!isDigest(digest)) {
@@ -86,6 +86,7 @@ module.exports = function (request, response, directory) {
               data.date = formattedDate(data.date)
               data.digest = formattedDigest(digest)
               data.signature = formattedSignature(signature)
+              data.hostname = hostname
               response.end(
                 mustache.render(template, data)
               )

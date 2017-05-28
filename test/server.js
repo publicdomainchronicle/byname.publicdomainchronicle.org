@@ -24,7 +24,7 @@ module.exports = function (callback) {
     ], function (_) {
       var server = http.createServer(
         makeHandler(
-          VERSION, 5000, directory,
+          VERSION, 'testserver', 5000, directory,
           pino({}, devNull())
         )
       )

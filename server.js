@@ -16,6 +16,7 @@ var ENV = process.env
 var PORT = ENV.PORT || 8080
 var TIMEOUT = ENV.TIMEOUT ? parseInt(ENV.TIMEOUT) : 5000
 
+var HOSTNAME = ENV.HOSTNAME || require('os').hostname()
 var DIRECTORY = ENV.DATA || NAME
 var ACCESSIONS = path.join(DIRECTORY, 'accessions')
 var PUBLICATIONS = path.join(DIRECTORY, 'publications')
@@ -52,7 +53,9 @@ runSeries([
     process.exit(1)
   } else {
     log.info({event: 'data', directory: DIRECTORY})
-    var requestHandler = makeHandler(VERSION, TIMEOUT, DIRECTORY, log)
+    var requestHandler = makeHandler(
+      VERSION, HOSTNAME, TIMEOUT, DIRECTORY, log
+    )
     var server = http.createServer(requestHandler)
     if (module.parent) {
       module.exports = server
