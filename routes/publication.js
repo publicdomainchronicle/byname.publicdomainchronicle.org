@@ -23,7 +23,6 @@ module.exports = function (request, response, directory, hostname) {
     } else {
       var type = new Negotiator(request).mediaType([
         'application/json', 'text/html'
-        // TODO: text/plain
       ])
       if (!type) {
         response.statusCode = 415
