@@ -81,11 +81,11 @@ module.exports = function (request, response, directory) {
                   institution: data.institution
                 }
               data.safety = data.safety
-                ? { text: data.safety }
+                ? {text: data.safety}
                 : false
               data.date = formattedDate(data.date)
-              data.digest = digest
-              data.signature = signature
+              data.digest = formattedDigest(digest)
+              data.signature = formattedSignature(signature)
               response.end(
                 mustache.render(template, data)
               )
@@ -97,6 +97,26 @@ module.exports = function (request, response, directory) {
   } else {
     methodNotAllowed(response)
   }
+}
+
+function formattedDigest (digest) {
+  return (
+    digest.slice(0, 32) +
+    '<wbr>' +
+    digest.slice(32)
+  )
+}
+
+function formattedSignature (signature) {
+  return (
+    signature.slice(0, 32) +
+    '<wbr>' +
+    signature.slice(32, 64) +
+    '<wbr>' +
+    signature.slice(64, 96) +
+    '<wbr>' +
+    signature.slice(96)
+  )
 }
 
 function formattedDate (string) {
