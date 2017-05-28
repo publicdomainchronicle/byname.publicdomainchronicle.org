@@ -23,10 +23,12 @@
       {{/scientist}}
 
       <h2>Description</h2>
-      <pre>{{{description}}}</pre>
+      <pre>{{description}}</pre>
 
+      {{#safety}}
       <h2>Safety Notes</h2>
-      <pre>{{{safety}}}</pre>
+      <pre>{{text}}</pre>
+      {{/safety}}
 
       <h2>Publisher&rsquo;s Cryptographic Signature</h2>
       <p><code>{{{signature}}}</code></p>

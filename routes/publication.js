@@ -80,6 +80,9 @@ module.exports = function (request, response, directory) {
                   name: data.name,
                   institution: data.institution
                 }
+              data.safety = data.safety
+                ? { text: data.safety }
+                : false
               data.date = formattedDate(data.date)
               data.digest = digest
               data.signature = signature
