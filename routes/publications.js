@@ -19,7 +19,7 @@ module.exports = function (request, response, directory) {
         fs.createReadStream(
           path.join(directory, 'accessions')
         )
-          .once('error', function (error) {
+          .once('error', /* istanbul ignore next */ function (error) {
             request.log.error(error)
             response.statusCode = 500
             response.end()
