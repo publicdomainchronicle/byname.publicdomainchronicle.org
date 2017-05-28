@@ -40,6 +40,13 @@ function post (request, response, directory) {
             },
             function (done) {
               fs.writeFile(pathPrefix + '.sig', signature, done)
+            },
+            function (done) {
+              fs.appendFile(
+                path.join(directory, 'accessions'),
+                fields.time + ',' + digest + '\n',
+                done
+              )
             }
           ], function (error) {
             /* istanbul ignore if */
