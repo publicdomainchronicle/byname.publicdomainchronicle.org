@@ -5,6 +5,7 @@ var mkdirp = require('mkdirp')
 var path = require('path')
 var pino = require('pino')
 var runParallel = require('run-parallel')
+var runSeries = require('run-series')
 var touch = require('touch')
 var writeKeypair = require('./write-keypair')
 
@@ -22,24 +23,28 @@ var KEYPAIR = path.join(DIRECTORY, 'keys')
 
 var log = pino({name: NAME + '@' + VERSION})
 
-runParallel([
+runSeries([
   mkdirp.bind(null, PUBLICATIONS),
   function (done) {
-    touch(ACCESSIONS, {force: true}, done)
-  },
-  function (done) {
-    fs.access(KEYPAIR, fs.constants.R_OK, function (error) {
-      if (error) {
-        if (error.code === 'ENOENT') {
-          log.info({event: 'generating keypair'})
-          writeKeypair(DIRECTORY, done)
-        } else {
-          done(error)
-        }
-      } else {
-        done()
+    runParallel([
+      function (done) {
+        touch(ACCESSIONS, {force: true}, done)
+      },
+      function (done) {
+        fs.access(KEYPAIR, fs.constants.R_OK, function (error) {
+          if (error) {
+            if (error.code === 'ENOENT') {
+              log.info({event: 'generating keypair'})
+              writeKeypair(DIRECTORY, done)
+            } else {
+              done(error)
+            }
+          } else {
+            done()
+          }
+        })
       }
-    })
+    ], done)
   }
 ], function (error) {
   if (error) {
@@ -75,7 +80,6 @@ runParallel([
   }
 
   function shutDown () {
-    log.info({event: 'closed level'})
     server.close(function () {
       log.info({event: 'closed server'})
       process.exit()
