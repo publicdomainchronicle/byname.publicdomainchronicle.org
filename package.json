@@ -2,6 +2,7 @@
   "name": "dbos",
   "version": "0.0.0",
   "dependencies": {
+    "ajv": "^5.1.5",
     "busboy": "^0.2.14",
     "ecb": "^1.0.0",
     "english-months": "^1.0.3",
