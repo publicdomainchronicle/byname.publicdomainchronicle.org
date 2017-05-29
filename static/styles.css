@@ -22,3 +22,10 @@ table {
 .bad {
   background-color: rgb(255, 200, 200);
 }
+
+.listOfCheckBoxes {
+  height: 10rem;
+  list-style-type: none;
+  overflow-y: scroll;
+  padding: 0;
+}
