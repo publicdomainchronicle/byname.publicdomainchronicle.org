@@ -1,15 +1,18 @@
 <!doctype html>
 <html lang=en>
   <head>
-    <title>DBOS</title>
+    <title>Distributed Bulletin of Open Science / Publish</title>
     <link href=styles.css rel=stylesheet>
   </head>
   <body>
     <header>
-      <h1>DBOS</h1>
+      <h1>Publish in the Distributed Bulletin of Open Science</h1>
     </header>
 
     <main>
+      <p>Use this form to publish an invention to the Distributed Bullet of Science.</p>
+      <p>Review the brief <a href=/guide>users guide</a> before submitting for publication.</p>
+      <p>For more about DBOS generally, see the <a href=/about>about page</a>.</p>
       <form method=post action=/publish>
         <input type=hidden name=dbos value=1.0.0-pre1>
 
@@ -31,45 +34,55 @@
         <section>
           <h1>Metadata</h1>
 
-          <p><label for=journals[]>journals</label></p>
-          <ul id=journals class=listOfCheckBoxes>
-            {{#journals}}
-            <li>
-              <label>
-                <input name=journals[] type=checkbox value="{{.}}">
-                {{.}}
-              </label>
-            </li>
-            {{/journals}}
-          </ul>
+          <p>&ldquo;Metadata&rsquo;, or data about data, help researchers and computer programs catalog, index, and search digital records like your publication.  Taking a few seconds to add metadata to your publication transforms it from a needle in a haystack into a useful record for reseachers.</p>
 
-          <p><label for=classifications[]>classifications</label></p>
-          <ul id=classifications>
-            <li>
-              <input name=classifications[] type=text pattern="[ABCDEFGH][0-9][0-9][A-Z] [0-9]{1,3}/[0-9]{2,}">
-            </li>
-          </ul>
+          <section>
+            <h2>Journals</h2>
+            <p>Which journals do other scientists interested in the area of your invention publish in and read?  Tick the boxes next to the journals most relevant to the field of your invention.  Usually, two or three journals are enough.</p>
+            <ul id=journals class=listOfCheckBoxes>
+              {{#journals}}
+              <li>
+                <label>
+                  <input name=journals[] type=checkbox value="{{.}}">
+                  {{.}}
+                </label>
+              </li>
+              {{/journals}}
+            </ul>
+            <p>If you believe another journal should appear on this list, please <a href=mailto:legal@biobricks.org?subject=Journal%20for%20the%20List>send a note with a link to its website</a>.</p>
+          </section>
 
-          <p><label for=publications[]>publications</label></p>
-          <ul id=publications></ul>
+          <section>
+            <h2>Patent Classifications</h2>
+            <p><label for=classifications[]>classifications</label></p>
+            <ul id=classifications>
+              <li>
+                <input name=classifications[] type=text pattern="[ABCDEFGH][0-9][0-9][A-Z] [0-9]{1,3}/[0-9]{2,}">
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Other DBOS Publications</h2>
+            <p><label for=publications[]>publications</label></p>
+            <ul id=publications></ul>
+          </section>
         </section>
 
         <section>
-          <h1>Finding</h1>
+          <h2>Title</h2>
+          <input name=title type=text maxlength=256 spellcheck required>
+        </section>
 
-          <p>
-            <label for=title>title</label>
-            <input name=title type=text maxlength=256 spellcheck required>
-          </p>
+        <section>
+          <h2>Description</h2>
+          <textarea name=description rows=20 maxlength=28000 spellcheck required></textarea>
+        </section>
 
-          <p>
-            <label for=description>description</label>
-            <textarea name=description maxlength=28000 spellcheck required></textarea>
-          </p>
-
-          <p>
+        <section>
+          <h2>Safety Notes</h2>
             <label for=safety>safety</label>
-            <textarea name=safety spellcheck></textarea>
+            <textarea name=safety rows=10 spellcheck></textarea>
           </p>
         </section>
 

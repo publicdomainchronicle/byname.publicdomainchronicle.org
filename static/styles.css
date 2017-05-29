@@ -29,3 +29,23 @@ table {
   overflow-y: scroll;
   padding: 0;
 }
+
+form section {
+  border: 1px solid #777;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+form section section {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+input[type=text], textarea {
+  width: 100%;
+}
