@@ -21,6 +21,7 @@ var TEMPLATE = path.join(
 var get = function (request, response) {
   response.setHeader('Content-Type', 'text/html; charset=UTF-8')
   fs.readFile(TEMPLATE, 'utf8', function (error, template) {
+    /* istanbul ignore if */
     if (error) {
       response.statusCode = 500
       response.end()
