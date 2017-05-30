@@ -21,3 +21,6 @@ routes.set('/publications/:digest/signature', require('./signature'))
 routes.set('/accessions/:number', require('./accession'))
 
 routes.set('/robots.txt', serveFile('robots.txt'))
+
+routes.set('/declaration', serveFile('declaration.txt'))
+routes.set('/license', serveFile('license.txt'))

@@ -27,7 +27,9 @@ tape('schema', function (suite) {
               '1094aa01ef2335fd02e8d1346be39ddd' +
               '40847ca749d0d6dbb29ad03610342231'
           }
-        ]
+        ],
+        commitment: '1.0.0',
+        license: '1.0.0'
       })
     )
     test.end()
