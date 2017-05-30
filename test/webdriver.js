@@ -28,5 +28,5 @@ process
 
 function cleanup () {
   webdriver.end()
-  chromedriver.kill()
+  chromedriver.kill('SIGKILL')
 }
