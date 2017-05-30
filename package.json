@@ -27,6 +27,7 @@
     "trumpet": "^1.7.2"
   },
   "devDependencies": {
+    "chromedriver": "^2.29.0",
     "concat-stream": "^1.6.0",
     "depcheck": "^0.6.7",
     "dev-null": "^0.1.1",
@@ -35,7 +36,8 @@
     "nsp": "^2.6.3",
     "rimraf": "^2.6.1",
     "standard": "^10.0.2",
-    "tape": "^4.6.3"
+    "tape": "^4.6.3",
+    "webdriverio": "^4.2.3"
   },
   "private": true,
   "scripts": {
