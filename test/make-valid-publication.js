@@ -6,6 +6,7 @@ module.exports = function (title) {
   form.append('affiliation', 'BioBricks Foundation')
   form.append('title', title || 'Made-Up Discovery')
   form.append('description', 'Pat head. Rub stomach. Eureka!')
+  form.append('journals[]', 'Nature')
   form.append('safety', 'Watch your elbows.')
   form.append('commitment', '0.0.0')
   form.append('license', '0.0.0')
