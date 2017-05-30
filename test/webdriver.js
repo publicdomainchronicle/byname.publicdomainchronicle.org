@@ -7,11 +7,6 @@ var CHROMEDRIVER = path.join(
 
 var chromedriver = spawn(CHROMEDRIVER, ['--url-base=/wd/hub'])
 
-require('tape').onFinish(function () {
-  webdriver.end()
-  chromedriver.kill()
-})
-
 var webdriver = module.exports = require('webdriverio')
   .remote({
     host: 'localhost',
@@ -23,3 +18,15 @@ var webdriver = module.exports = require('webdriverio')
   .init()
   .timeouts('script', 1000)
   .timeouts('implicit', 1000)
+
+require('tape').onFinish(cleanup)
+process
+  .on('SIGTERM', cleanup)
+  .on('SIGQUIT', cleanup)
+  .on('SIGINT', cleanup)
+  .on('uncaughtException', cleanup)
+
+function cleanup () {
+  webdriver.end()
+  chromedriver.kill()
+}
