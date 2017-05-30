@@ -10,10 +10,10 @@ var BYTES_PER_LINE = (
   1 // newline
 )
 
-module.exports = function (request, response, directory) {
+module.exports = function (request, response, configuration) {
   if (request.method === 'GET') {
     var number = parseInt(request.params.number)
-    var file = path.join(directory, 'accessions')
+    var file = path.join(configuration.directory, 'accessions')
 
     // Get a file descriptor.
     fs.open(file, 'r', function (error, fd) {

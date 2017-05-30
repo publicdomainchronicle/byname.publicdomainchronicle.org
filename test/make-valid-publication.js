@@ -10,5 +10,6 @@ module.exports = function (title) {
   form.append('safety', 'Watch your elbows.')
   form.append('commitment', '0.0.0')
   form.append('license', '0.0.0')
+  form.append('g-recaptcha-response', 'test')
   return form
 }

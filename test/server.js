@@ -23,12 +23,19 @@ module.exports = function (callback) {
       mkdirp.bind(null, path.join(directory, 'tmp')),
       writeKeypair.bind(null, directory)
     ], function (_) {
-      var server = http.createServer(
-        makeHandler(
-          VERSION, 'testserver', 5000, directory,
-          pino({}, devNull())
-        )
-      )
+      var configuration = {
+        version: VERSION,
+        hostname: 'testserver',
+        timeout: 5000,
+        directory: directory,
+        recaptcha: {
+          // Use the test keys from reCAPTCHA FAQ.
+          public: '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
+          secret: '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'
+        }
+      }
+      var log = pino({}, devNull())
+      var server = http.createServer(makeHandler(configuration, log))
       server.listen(RANDOM_HIGH_PORT, function () {
         callback(this.address().port, function () {
           server.close(function () {

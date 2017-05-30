@@ -5,7 +5,7 @@ var notFound = require('./not-found')
 var path = require('path')
 var send = require('send')
 
-module.exports = function (request, response, directory) {
+module.exports = function (request, response, configuration) {
   if (request.method === 'GET') {
     var publication = request.params.digest
     var attachment = request.params.attachment
@@ -13,7 +13,7 @@ module.exports = function (request, response, directory) {
       notFound(request, response)
     } else {
       var file = path.join(
-        directory, 'publications', publication, attachment
+        configuration.directory, 'publications', publication, attachment
       )
       fs.readFile(file + '.type', function (error, header) {
         /* istanbul ignore if */

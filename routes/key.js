@@ -1,9 +1,9 @@
 var methodNotAllowed = require('./method-not-allowed')
 var readKeypair = require('../read-keypair')
 
-module.exports = function (request, response, directory) {
+module.exports = function (request, response, configuration) {
   if (request.method === 'GET') {
-    readKeypair(directory, function (error, keypair) {
+    readKeypair(configuration.directory, function (error, keypair) {
       /* istanbul ignore if */
       if (error) {
         request.log.error(error)

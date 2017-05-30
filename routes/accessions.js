@@ -12,7 +12,7 @@ var TEMPLATE = path.join(
   __dirname, '..', 'templates', 'publications.html'
 )
 
-module.exports = function (request, response, directory) {
+module.exports = function (request, response, configuration) {
   if (request.method === 'GET') {
     var type = new Negotiator(request).mediaType([
       'text/csv', 'text/html'
@@ -21,7 +21,7 @@ module.exports = function (request, response, directory) {
       response.statusCode = 415
       response.end()
     } else {
-      var accessions = path.join(directory, 'accessions')
+      var accessions = path.join(configuration.directory, 'accessions')
       /* istanbul ignore else */
       if (type === 'text/csv') {
         response.setHeader('Content-Type', 'text/csv; charset=ASCII')

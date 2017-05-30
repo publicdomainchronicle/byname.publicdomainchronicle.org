@@ -16,6 +16,16 @@ var ENV = process.env
 var PORT = ENV.PORT || 8080
 var TIMEOUT = ENV.TIMEOUT ? parseInt(ENV.TIMEOUT) : 5000
 
+var RECAPTCHA_SECRET = ENV.RECAPTCHA_SECRET
+if (!RECAPTCHA_SECRET) {
+  throw new Error('Missing RECAPTCHA_SECRET env var.')
+}
+
+var RECAPTCHA_PUBLIC = ENV.RECAPTCHA_PUBLIC
+if (!RECAPTCHA_PUBLIC) {
+  throw new Error('Missing RECAPTCHA_PUBLIC env var.')
+}
+
 var HOSTNAME = ENV.HOSTNAME || require('os').hostname()
 var DIRECTORY = ENV.DATA || NAME
 var ACCESSIONS = path.join(DIRECTORY, 'accessions')
@@ -55,9 +65,17 @@ runSeries([
     process.exit(1)
   } else {
     log.info({event: 'data', directory: DIRECTORY})
-    var requestHandler = makeHandler(
-      VERSION, HOSTNAME, TIMEOUT, DIRECTORY, log
-    )
+    var configuration = {
+      version: VERSION,
+      hostname: HOSTNAME,
+      timeout: TIMEOUT,
+      directory: DIRECTORY,
+      recaptcha: {
+        public: RECAPTCHA_PUBLIC,
+        secret: RECAPTCHA_SECRET
+      }
+    }
+    var requestHandler = makeHandler(configuration, log)
     var server = http.createServer(requestHandler)
     if (module.parent) {
       module.exports = server

@@ -15,7 +15,7 @@ var TEMPLATE = path.join(
   __dirname, '..', 'templates', 'publication.html'
 )
 
-module.exports = function (request, response, directory, hostname) {
+module.exports = function (request, response, configuration) {
   if (request.method === 'GET') {
     var digest = request.params.digest
     if (!isDigest(digest)) {
@@ -29,7 +29,7 @@ module.exports = function (request, response, directory, hostname) {
         response.end()
       } else {
         var pathPrefix = path.join(
-          directory, 'publications', digest
+          configuration.directory, 'publications', digest
         )
         var json = pathPrefix + '.json'
         /* istanbul ignore else */
@@ -85,7 +85,7 @@ module.exports = function (request, response, directory, hostname) {
               data.date = formatDate(data.date)
               data.digest = formattedDigest(digest)
               data.signature = formattedSignature(signature)
-              data.hostname = hostname
+              data.hostname = configuration.hostname
               response.end(
                 mustache.render(template, data)
               )
