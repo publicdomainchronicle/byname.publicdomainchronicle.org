@@ -14,15 +14,16 @@ routes.set('/publish', require('./publish'))
 routes.set('/publish.js', serveFile('publish.js'))
 
 routes.set('/key', require('./key'))
-routes.set('/publications', require('./publications'))
+
+routes.set('/accessions', require('./accessions'))
+routes.set('/accessions/:number', require('./accession'))
+
 routes.set('/publications/:digest', require('./publication'))
 routes.set('/publications/:digest/signature', require('./signature'))
 routes.set(
   '/publications/:digest/attachments/:attachment',
   require('./attachment')
 )
-
-routes.set('/accessions/:number', require('./accession'))
 
 routes.set('/robots.txt', serveFile('robots.txt'))
 

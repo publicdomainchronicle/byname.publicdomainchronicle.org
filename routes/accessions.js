@@ -1,4 +1,5 @@
 var Negotiator = require('negotiator')
+var formatDate = require('../format-date')
 var fs = require('fs')
 var methodNotAllowed = require('./method-not-allowed')
 var path = require('path')
@@ -36,23 +37,27 @@ module.exports = function (request, response, directory) {
         var html = trumpet()
         pump(html, response)
         pump(fs.createReadStream(TEMPLATE), html)
+        var counter = 0
         pump(
           fs.createReadStream(accessions),
           split2(),
           through2.obj(function (line, _, done) {
             var split = line.split(',')
-            var date = new Date(parseInt(split[0]))
+            var date = new Date(split[0])
             this.push(`
-              <li>
-                <span class=date>${date.toISOString()}</span>:
-                <a href=/publications/${split[1]}>
-                  ${split[1]}
-                </a>
-              </li>
+              <tr>
+                <td>${++counter}</td>
+                <td>${formatDate(date)}</td>
+                <td>
+                  <a href=/publications/${split[1]}>
+                    ${split[1]}
+                  </a>
+                </td>
+              </tr>
             `)
             done()
           }),
-          html.select('#publications').createWriteStream()
+          html.select('tbody').createWriteStream()
         )
       }
     }
