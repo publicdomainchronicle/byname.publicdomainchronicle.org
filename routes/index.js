@@ -17,6 +17,10 @@ routes.set('/key', require('./key'))
 routes.set('/publications', require('./publications'))
 routes.set('/publications/:digest', require('./publication'))
 routes.set('/publications/:digest/signature', require('./signature'))
+routes.set(
+  '/publications/:digest/attachments/:attachment',
+  require('./attachment')
+)
 
 routes.set('/accessions/:number', require('./accession'))
 

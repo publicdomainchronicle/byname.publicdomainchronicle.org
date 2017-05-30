@@ -1,6 +1,7 @@
 var http = require('http')
 var makeValidPublication = require('./make-valid-publication')
 var server = require('./server')
+var stringToStream = require('string-to-stream')
 var tape = require('tape')
 
 tape('GET /publish', function (test) {
@@ -24,6 +25,41 @@ tape('GET /publish', function (test) {
 tape('POST /publish with valid', function (test) {
   server(function (port, done) {
     var form = makeValidPublication()
+    form.pipe(
+      http.request({
+        method: 'POST',
+        path: '/publish',
+        port: port,
+        headers: form.getHeaders()
+      })
+        .once('response', function (response) {
+          test.equal(
+            response.statusCode, 201,
+            'responds 201'
+          )
+          test.assert(
+            response.headers.location.startsWith('/publications/'),
+            'sets Location'
+          )
+          done()
+          test.end()
+        })
+    )
+  })
+})
+
+tape('POST /publish with attachment', function (test) {
+  server(function (port, done) {
+    var form = makeValidPublication()
+    var attachmentText = 'This is a test attachment.'
+    form.append('attachments[]',
+      stringToStream(attachmentText),
+      {
+        filename: 'attachment.txt',
+        contentType: 'text/plain',
+        knownLength: attachmentText.length
+      }
+    )
     form.pipe(
       http.request({
         method: 'POST',

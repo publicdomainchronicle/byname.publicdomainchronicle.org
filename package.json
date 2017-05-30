@@ -24,7 +24,8 @@
     "split2": "^2.1.1",
     "through2": "^2.0.3",
     "touch": "^1.0.0",
-    "trumpet": "^1.7.2"
+    "trumpet": "^1.7.2",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "chromedriver": "^2.29.0",
@@ -36,6 +37,7 @@
     "nsp": "^2.6.3",
     "rimraf": "^2.6.1",
     "standard": "^10.0.2",
+    "string-to-stream": "^1.1.0",
     "tape": "^4.6.3",
     "webdriverio": "^4.2.3"
   },

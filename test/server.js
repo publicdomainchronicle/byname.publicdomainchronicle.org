@@ -20,6 +20,7 @@ module.exports = function (callback) {
         null, path.join(directory, 'accessions'), {force: true}
       ),
       mkdirp.bind(null, path.join(directory, 'publications')),
+      mkdirp.bind(null, path.join(directory, 'tmp')),
       writeKeypair.bind(null, directory)
     ], function (_) {
       var server = http.createServer(

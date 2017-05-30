@@ -20,12 +20,14 @@ var HOSTNAME = ENV.HOSTNAME || require('os').hostname()
 var DIRECTORY = ENV.DATA || NAME
 var ACCESSIONS = path.join(DIRECTORY, 'accessions')
 var PUBLICATIONS = path.join(DIRECTORY, 'publications')
+var TMP = path.join(DIRECTORY, 'tmp')
 var KEYPAIR = path.join(DIRECTORY, 'keys')
 
 var log = pino({name: NAME + '@' + VERSION})
 
 runSeries([
   mkdirp.bind(null, PUBLICATIONS),
+  mkdirp.bind(null, TMP),
   function (done) {
     runParallel([
       function (done) {

@@ -2,10 +2,6 @@
   "$schema": "http://json-schema.org/draft-06/schema#",
   "type": "object",
   "properties": {
-    "dbos": {
-      "type": "string",
-      "const": "1.0.0-pre1"
-    },
     "name": {
       "type": "string",
       "maxLength": 256,
@@ -41,7 +37,7 @@
       "items": {
         "type": "object",
         "properties": {
-          "format": {
+          "type": {
             "type": "string",
             "minLength": 1,
             "maxLength": 256
@@ -52,7 +48,7 @@
         },
         "additionalProperties": false,
         "required": [
-          "format",
+          "type",
           "digest"
         ]
       },
@@ -84,14 +80,19 @@
       "uniqueItems": true
     },
     "commitment": {
-      "$ref": "#/definitions/version"
+      "type": "string",
+      "enum": [
+        "0.0.0"
+      ]
     },
     "license": {
-      "$ref": "#/definitions/version"
+      "type": "string",
+      "enum": [
+        "0.0.0"
+      ]
     }
   },
   "required": [
-    "dbos",
     "title",
     "description",
     "safety",
@@ -106,15 +107,6 @@
       "description": "hex-encoded SHA256 digest",
       "examples": [
         "cf23943371264f7ffa7590f5a8758f61fbe35ce834e5ee1f826cf16ea34fc8a4"
-      ]
-    },
-    "version": {
-      "type": "string",
-      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
-      "description": "version triple",
-      "examples": [
-        "0.0.0",
-        "1.0.0"
       ]
     }
   }
