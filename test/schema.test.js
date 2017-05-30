@@ -10,7 +10,7 @@ tape('schema', function (suite) {
       validate({
         dbos: '1.0.0-pre1',
         name: 'Kyle Evan Mitchell',
-        organization: 'BioBricks Foundation',
+        affiliation: 'BioBricks Foundation',
         journals: ['Nature'],
         classifications: ['G06F 3/00'],
         publications: [

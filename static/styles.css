@@ -31,10 +31,11 @@ table {
 }
 
 form section {
+  position: relative;
   border: 1px solid #777;
   margin-bottom: 1rem;
-  margin-top: 1rem;
-  padding: 1rem;
+  margin-top: 0;
+  padding: 0 1rem 1rem 1rem;
 }
 
 form section section {
@@ -48,4 +49,52 @@ form section section {
 
 input[type=text], textarea {
   width: 100%;
+}
+
+ul.inputs {
+  list-style-type: none;
+  padding: 0;
+}
+
+ul.inputs li {
+  margin: 1rem 0;
+}
+
+.wordCount {
+  color: #777;
+  font-size: 75%;
+  text-align: right;
+}
+
+.legal {
+  background: lightyellow;
+  font-size: 80%;
+  margin: 1rem;
+  padding: 1rem;
+}
+
+.legal:before {
+  content: 'Legal Note: ';
+  font-style: italic;
+}
+
+.required:after,
+.optional:after,
+.recommended:after {
+  display: block;
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+}
+
+.required:after {
+  content: '(required)';
+}
+
+.optional:after {
+  content: '(optional)';
+}
+
+.recommended:after {
+  content: '(strongly recommended)';
 }

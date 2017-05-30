@@ -14,7 +14,7 @@
         "Jane Scientist"
       ]
     },
-    "organization": {
+    "affiliation": {
       "type": "string",
       "maxLength": 256,
       "examples": [
