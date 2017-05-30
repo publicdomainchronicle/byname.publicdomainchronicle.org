@@ -93,6 +93,7 @@ function post (request, response, directory) {
           fs.createWriteStream(temporaryFile),
           function (error, done) {
             // TODO:  Fix this error handler.  Need more cleanup.
+            /* istanbul ignore next */
             if (error) {
               response.statusCode = 400
               response.end()
