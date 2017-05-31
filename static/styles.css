@@ -98,3 +98,7 @@ ul.inputs li {
 .recommended:after {
   content: '(strongly recommended)';
 }
+
+dt {
+  margin-top: 1rem;
+}
