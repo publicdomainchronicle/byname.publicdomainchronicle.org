@@ -27,6 +27,7 @@ module.exports = function (name) {
         response.end()
       } else {
         var json = path.join(documents, name + '.json')
+        /* istanbul ignore else */
         if (type === 'application/json') {
           send(request, json)
             .on('error', /* istanbul ignore next */ function (error) {
@@ -36,11 +37,13 @@ module.exports = function (name) {
             .pipe(response)
         } else if (type === 'text/plain') {
           fs.readFile(json, 'utf8', function (error, json) {
+            /* istanbul ignore if */
             if (error) {
               response.statusCode = 404
               response.end()
             } else {
               parse(json, function (error, data) {
+                /* istanbul ignore if */
                 if (error) {
                   response.statusCode = 500
                   response.end()
@@ -77,6 +80,7 @@ module.exports = function (name) {
               }))
             }
           ], function (error) {
+            /* istanbul ignore if */
             if (error) {
               response.statusCode = 500
               response.end()

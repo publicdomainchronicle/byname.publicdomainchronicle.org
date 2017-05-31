@@ -134,9 +134,11 @@ function post (request, response, configuration) {
         verifyCatpcha(
           captchaResponse, configuration.recaptcha.secret,
           function (error, success) {
+            /* istanbul ignore if */
             if (error) {
               response.statusCode = 500
               response.end()
+            /* istanbul ignore next */
             } else if (success === false) {
               response.statusCode = 400
               response.end('invalid captcha')
@@ -244,7 +246,7 @@ function post (request, response, configuration) {
                       function appendToAccessions (done) {
                         fs.appendFile(
                           path.join(directory, 'accessions'),
-                          fields.date + ',' + digest + '\n',
+                          time + ',' + digest + '\n',
                           done
                         )
                       }
@@ -274,6 +276,7 @@ function post (request, response, configuration) {
   )
 }
 
+/* istanbul ignore next */
 function verifyCatpcha (response, secret, callback) {
   if (process.env.NODE_ENV === 'test') {
     process.nextTick(function () {
@@ -302,12 +305,6 @@ function verifyCatpcha (response, secret, callback) {
       callback(null, false)
     })
   }
-}
-
-function currentDate () {
-  return new Date()
-    .toISOString()
-    .substring(0, 10)
 }
 
 module.exports = function (request, response, configuration) {

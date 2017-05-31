@@ -263,6 +263,22 @@ tape('GET /accessions/{number}', function (test) {
   })
 })
 
+tape('GET /accessions/{too-high}', function (test) {
+  server(function (port, done) {
+    http.get({
+      path: '/accessions/100',
+      port: port
+    }, function (response) {
+      test.equal(
+        response.statusCode, 404,
+        'responds 404'
+      )
+      done()
+      test.end()
+    })
+  })
+})
+
 tape('NOT-GET /accessions/{number}', function (test) {
   server(function (port, done) {
     http.get({

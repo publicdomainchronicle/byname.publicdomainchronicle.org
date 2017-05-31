@@ -13,6 +13,7 @@ module.exports = function (request, response, configuration) {
     } else {
       var directory = configuration.directory
       readKeypair(directory, function (error, keypair) {
+        /* istanbul ignore if */
         if (error) {
           response.statusCode = 500
           response.end()

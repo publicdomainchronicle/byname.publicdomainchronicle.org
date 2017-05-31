@@ -4,8 +4,8 @@ var notFound = require('./not-found')
 var path = require('path')
 
 var BYTES_PER_LINE = (
-  10 + // YYYY-MM-DD
-  1 + // space
+  24 + // YYYY-MM-DD
+  1 + // comma
   64 + // digest
   1 // newline
 )
@@ -47,7 +47,6 @@ module.exports = function (request, response, configuration) {
               fs.read(
                 fd, buffer, 0, buffer.byteLength, offset,
                 function (error) {
-                  fs.close(fd)
                   /* istanbul ignore if */
                   if (error) {
                     request.log.error(error)
@@ -64,6 +63,9 @@ module.exports = function (request, response, configuration) {
                     )
                     response.end()
                   }
+                  fs.close(fd, function () {
+                    // pass
+                  })
                 }
               )
             }
