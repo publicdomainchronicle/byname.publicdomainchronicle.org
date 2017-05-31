@@ -4,9 +4,9 @@ var routes = require('./routes')
 var notFound = require('./routes/not-found')
 
 module.exports = function (configuration, log) {
-  log = pinoHTTP({logger: log})
+  var pino = pinoHTTP({logger: log})
   return function (request, response) {
-    log(request, response)
+    pino(request, response)
     response.setTimeout(
       configuration.timeout,
       /* istanbul ignore next */ function () {

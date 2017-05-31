@@ -32,10 +32,32 @@
       {{^safety}}<p>No safety notes.</p>{{/safety}}
       {{#safety}}<p>{{.}}</p>{{/safety}}
 
+      <h2>Attachments</h2>
+
+      <ul>
+      {{#attachments}}
+        <li>
+          <a href="/publications/{{digest}}/attachments/{{.}}">
+            {{.}}
+          </a>
+        </li>
+      {{/attachments}}
+      </ul>
+
+      {{^attachments}}
+      <p>No attachments</p>
+      {{/attachments}}
+
+      <h2>Declaration</h2>
+      <p>Version {{declaration}}</p>
+
+      <h2>License</h2>
+      <p>Version {{license}}</p>
+
       <h2>Cryptographic Information</h2>
       <dl>
         <dt>Publication Digest</dt>
-        <dd><code>{{{digest}}}</code></dd>
+        <dd><code>{{{formattedDigest}}}</code></dd>
 
         <dt>Publisher&rsquo;s Signature</dt>
         <dd><code>{{{signature}}}</code></dd>

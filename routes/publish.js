@@ -78,7 +78,8 @@ function post (request, response, configuration) {
       })
       .on('file', function (field, file, filename, encoding, mimetype) {
         // Save to ./tmp/{UUID}.
-        var temporaryFile = path.join(directory, 'tmp', uuid())
+        var id = uuid()
+        var temporaryFile = path.join(directory, 'tmp', id)
         var attachment = {
           stream: file,
           temporaryFile: temporaryFile,
@@ -86,12 +87,20 @@ function post (request, response, configuration) {
             mimetype + '; charset=' + encoding
           )
         }
+        request.log.info('attachment', {
+          uuid: id,
+          filename: filename,
+          encoding: encoding,
+          mimetype: mimetype
+        })
         attachments.push(attachment)
         var hash = crypto.createHash('sha256')
+        var size = 0
         pump(
           file,
           // Compute SHA256 as we write to disk.
           through2(function (chunk, encoding, done) {
+            size += chunk.length
             hash.update(chunk, encoding)
             this.push(chunk, encoding)
             done()
@@ -104,7 +113,12 @@ function post (request, response, configuration) {
               response.statusCode = 400
               response.end()
             } else {
-              attachment.digest = hash.digest('hex')
+              if (size === 0) {
+                var index = attachments.indexOf(attachment)
+                attachments.splice(index, 1)
+              } else {
+                attachment.digest = hash.digest('hex')
+              }
             }
           }
         )
@@ -132,12 +146,11 @@ function post (request, response, configuration) {
                   fields.date = currentDate()
                   fields.attachments = attachments
                     .map(function (attachment) {
-                      return {
-                        type: attachment.type,
-                        digest: attachment.digest
-                      }
+                      return attachment.digest
                     })
                     .sort()
+                  request.log.info('fields', fields)
+                  normalize(fields)
                   var record = Buffer.from(stringify(fields), 'utf8')
                   var digest = sodium
                     .crypto_hash_sha256(record)
@@ -162,9 +175,10 @@ function post (request, response, configuration) {
                             attachments.reduce(
                               function (tasks, attachment) {
                                 var file = path.join(
-                                  pathPrefix, attachment.digest
+                                  directory, 'publications', digest,
+                                  attachment.digest
                                 )
-                                return tasks.concat(
+                                return tasks.concat([
                                   function writeTypeFile (done) {
                                     fs.writeFile(
                                       file + '.type',
@@ -179,7 +193,7 @@ function post (request, response, configuration) {
                                       done
                                     )
                                   }
-                                )
+                                ])
                               },
                               []
                             ),
@@ -284,4 +298,40 @@ function redirectTo (location) {
       </body>
     </html>
   `
+}
+
+var DELETE_IF_EMPTY = [
+  'name', 'affiliation',
+  'journals', 'classifications', 'publications',
+  'safety'
+]
+
+var ARRAYS = [
+  'journals', 'classifications', 'publications'
+]
+
+var NORMALIZE_LINES = [
+  'description', 'safety'
+]
+
+function normalize (record) {
+  ARRAYS.forEach(function (key) {
+    if (!record.hasOwnProperty(key)) {
+      record[key] = []
+    }
+  })
+  DELETE_IF_EMPTY.forEach(function (key) {
+    if (Array.isArray(record[key])) {
+      record[key] = record[key].filter(function (element) {
+        return element !== ''
+      })
+    } else if (record[key] === '') {
+      delete record[key]
+    }
+  })
+  NORMALIZE_LINES.forEach(function (key) {
+    if (typeof record[key] === 'string') {
+      record[key] = record[key].replace(/\r/g, '')
+    }
+  })
 }

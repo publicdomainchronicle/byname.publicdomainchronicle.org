@@ -74,7 +74,8 @@ module.exports = function (request, response, configuration) {
               response.end()
             } else {
               data.date = formatDate(data.date)
-              data.digest = formattedDigest(digest)
+              data.digest = digest
+              data.formattedDigest = formattedDigest(digest)
               data.signature = formattedSignature(signature)
               data.hostname = configuration.hostname
               if (data.description) {
