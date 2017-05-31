@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "type": "object",
+  "properties": {
+    "digest": {
+      "$ref": "#/definitions/digest"
+    },
+    "uri": {
+      "type": "string",
+      "format": "uri"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "datetime"
+    },
+    "priors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "uri"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "signature": {
+            "$ref": "#/definitions/signature"
+          }
+        },
+        "required": [
+          "uri",
+          "timestamp",
+          "siganture"
+        ],
+        "additionalProperties": false
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "timestamp",
+    "digest",
+    "uri"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[abcdef0-9]{64}$",
+      "description": "hex-encoded SHA256 digest",
+      "examples": [
+        "cf23943371264f7ffa7590f5a8758f61fbe35ce834e5ee1f826cf16ea34fc8a4"
+      ]
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[abcdef0-9]{128}$",
+      "description": "hex-encoded Ed25519 signature"
+    }
+  }
+}
