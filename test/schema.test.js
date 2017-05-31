@@ -5,7 +5,7 @@ var validator = new AJV({
   allErrors: true,
   verbose: true
 })
-var validate = validator.compile(require('../schema.json'))
+var validate = validator.compile(require('../schemas/publication.json'))
 
 tape('schema', function (suite) {
   suite.test('simple, valid example', function (test) {
