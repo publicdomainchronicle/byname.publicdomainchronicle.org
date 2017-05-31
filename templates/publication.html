@@ -7,7 +7,7 @@
   <body>
     <header>
       <h1 class=title>{{title}}</h1>
-      <p class=date>Published on {{hostname}} on {{date}} (UTC)</p>
+      <p class=digest><code>{{{formattedDigest}}}</code></p>
     </header>
 
     <main>
@@ -54,14 +54,20 @@
       <h2>License</h2>
       <p>Version {{license}}</p>
 
-      <h2>Cryptographic Information</h2>
-      <dl>
-        <dt>Publication Digest</dt>
-        <dd><code>{{{formattedDigest}}}</code></dd>
+      <h2>Timetstamps</h2>
 
-        <dt>Publisher&rsquo;s Signature</dt>
-        <dd><code>{{{signature}}}</code></dd>
-      </dl>
+      <ul>
+      {{#timestamps}}
+        <dl>
+          <dt>Published<dt>
+          <dd>{{timestamp}}</dd>
+          <dt>URL</dt>
+          <dd><a href="{{uri}}">{{uri}}</a></p>
+          <dt><a href=https://ed25519.cr.yp.to/>Ed25519</a> Signature</dt>
+          <dd><code>{{{signature}}}</code></dd>
+        </dl>
+      {{/timestamps}}
+      </ul>
     </main>
 
     <footer></footer>

@@ -1,13 +1,14 @@
-var Negotiator = require('negotiator')
 var ecb = require('ecb')
 var formatDate = require('../format-date')
 var fs = require('fs')
 var isDigest = require('is-sha-256-hex-digest')
 var methodNotAllowed = require('./method-not-allowed')
 var mustache = require('mustache')
+var Negotiator = require('negotiator')
 var notFound = require('./not-found')
 var parse = require('json-parse-errback')
 var path = require('path')
+var readKeypair = require('../read-keypair')
 var runParallel = require('run-parallel')
 var send = require('send')
 
@@ -28,8 +29,9 @@ module.exports = function (request, response, configuration) {
         response.statusCode = 415
         response.end()
       } else {
+        var directory = configuration.directory
         var pathPrefix = path.join(
-          configuration.directory, 'publications', digest
+          directory, 'publications', digest
         )
         var json = pathPrefix + '.json'
         /* istanbul ignore else */
@@ -44,16 +46,15 @@ module.exports = function (request, response, configuration) {
         } else if (type === 'text/html') {
           var template
           var data
-          var signature
-          var sig = pathPrefix + '.sig'
+          var timestamps = []
           runParallel([
-            function (done) {
+            function readTemplate (done) {
               fs.readFile(TEMPLATE, 'utf8', ecb(done, function (read) {
                 template = read
                 done()
               }))
             },
-            function (done) {
+            function readPublication (done) {
               fs.readFile(json, 'utf8', ecb(done, function (read) {
                 parse(read, ecb(done, function (parsed) {
                   data = parsed
@@ -61,10 +62,24 @@ module.exports = function (request, response, configuration) {
                 }))
               }))
             },
-            function (done) {
-              fs.readFile(sig, 'utf8', ecb(done, function (read) {
-                signature = read
-                done()
+            function readTimestamps (done) {
+              readKeypair(directory, ecb(done, function (keypair) {
+                var publicKey = keypair.public.toString('hex')
+                var sig = path.join(
+                  pathPrefix, publicKey + '.json'
+                )
+                fs.readFile(sig, 'utf8', ecb(done, function (json) {
+                  parse(json, ecb(done, function (data) {
+                    var timestamp = data.timestamp
+                    timestamp.timestamp = new Date(timestamp.timestamp)
+                      .toLocaleString()
+                    timestamp.signature = formattedSignature(
+                      data.signature
+                    )
+                    timestamps.push(timestamp)
+                    done()
+                  }))
+                }))
               }))
             }
           ], function (error) {
@@ -76,7 +91,7 @@ module.exports = function (request, response, configuration) {
               data.date = formatDate(data.date)
               data.digest = digest
               data.formattedDigest = formattedDigest(digest)
-              data.signature = formattedSignature(signature)
+              data.timestamps = timestamps
               data.hostname = configuration.hostname
               if (data.description) {
                 data.description = splitIntoParagraphs(data.description)

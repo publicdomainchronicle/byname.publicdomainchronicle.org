@@ -148,7 +148,8 @@ function post (request, response, configuration) {
                   response.end()
                 } else {
                   var secretKey = keypair.secret
-                  fields.date = currentDate()
+                  var publicKey = keypair.public
+                  var time = new Date().toISOString()
                   fields.attachments = attachments
                     .map(function (attachment) {
                       return attachment.digest
@@ -168,8 +169,20 @@ function post (request, response, configuration) {
                     var digest = sodium
                       .crypto_hash_sha256(record)
                       .toString('hex')
+                    var uri = (
+                      'https://' + configuration.hostname +
+                      '/publications/' + digest
+                    )
+                    var timestamp = {
+                      digest: digest,
+                      uri: uri,
+                      timestamp: time
+                    }
                     var signature = sodium
-                      .crypto_sign_detached(record, secretKey)
+                      .crypto_sign_detached(
+                        Buffer.from(stringify(timestamp)),
+                        secretKey
+                      )
                       .toString('hex')
                     var pathPrefix = path.join(
                       directory, 'publications', digest
@@ -178,43 +191,52 @@ function post (request, response, configuration) {
                       function writeJSONFile (done) {
                         fs.writeFile(pathPrefix + '.json', record, done)
                       },
-                      function writeSignatureFile (done) {
+                      function createDirectory (done) {
+                        mkdirp(pathPrefix, done)
+                      },
+                      function writeTimestampFile (done) {
                         fs.writeFile(
-                          pathPrefix + '.sig', signature, done
+                          path.join(
+                            pathPrefix,
+                            publicKey.toString('hex') + '.json'
+                          ),
+                          stringify({
+                            timestamp: timestamp,
+                            signature: signature
+                          }),
+                          done
                         )
                       },
                       function writeAttachments (done) {
                         if (attachments.length > 0) {
-                          mkdirp(pathPrefix, ecb(done, function () {
-                            runParallel(
-                              attachments.reduce(
-                                function (tasks, attachment) {
-                                  var file = path.join(
-                                    directory, 'publications', digest,
-                                    attachment.digest
-                                  )
-                                  return tasks.concat([
-                                    function writeTypeFile (done) {
-                                      fs.writeFile(
-                                        file + '.type',
-                                        attachment.type,
-                                        'utf8',
-                                        done
-                                      )
-                                    },
-                                    function moveFile (done) {
-                                      fs.rename(
-                                        attachment.temporaryFile, file,
-                                        done
-                                      )
-                                    }
-                                  ])
-                                },
-                                []
-                              ),
-                              done
-                            )
-                          }))
+                          runParallel(
+                            attachments.reduce(
+                              function (tasks, attachment) {
+                                var file = path.join(
+                                  directory, 'publications', digest,
+                                  attachment.digest
+                                )
+                                return tasks.concat([
+                                  function writeTypeFile (done) {
+                                    fs.writeFile(
+                                      file + '.type',
+                                      attachment.type,
+                                      'utf8',
+                                      done
+                                    )
+                                  },
+                                  function moveFile (done) {
+                                    fs.rename(
+                                      attachment.temporaryFile, file,
+                                      done
+                                    )
+                                  }
+                                ])
+                              },
+                              []
+                            ),
+                            done
+                          )
                         } else {
                           done()
                         }

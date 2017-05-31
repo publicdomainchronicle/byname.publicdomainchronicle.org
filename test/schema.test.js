@@ -10,7 +10,6 @@ var validate = validator.compile(require('../schemas/publication.json'))
 tape('schema', function (suite) {
   suite.test('simple, valid example', function (test) {
     validate({
-      date: '2017-05-30',
       name: 'Kyle Evan Mitchell',
       affiliation: 'BioBricks Foundation',
       journals: ['Nature'],
