@@ -1,16 +1,17 @@
+var Negotiator = require('negotiator')
 var ecb = require('ecb')
 var formatDate = require('../format-date')
 var fs = require('fs')
 var isDigest = require('is-sha-256-hex-digest')
 var methodNotAllowed = require('./method-not-allowed')
 var mustache = require('mustache')
-var Negotiator = require('negotiator')
 var notFound = require('./not-found')
 var parse = require('json-parse-errback')
 var path = require('path')
 var readKeypair = require('../read-keypair')
 var runParallel = require('run-parallel')
 var send = require('send')
+var url = require('url')
 
 var TEMPLATE = path.join(
   __dirname, '..', 'templates', 'publication.html'
@@ -73,6 +74,8 @@ module.exports = function (request, response, configuration) {
                     var timestamp = data.timestamp
                     timestamp.timestamp = new Date(timestamp.timestamp)
                       .toLocaleString()
+                    timestamp.hostname = url.parse(timestamp.uri)
+                      .hostname
                     timestamp.signature = formattedSignature(
                       data.signature
                     )

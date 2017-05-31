@@ -58,14 +58,16 @@
 
       <ul>
       {{#timestamps}}
-        <dl>
-          <dt>Published<dt>
-          <dd>{{timestamp}}</dd>
-          <dt>URL</dt>
-          <dd><a href="{{uri}}">{{uri}}</a></p>
-          <dt><a href=https://ed25519.cr.yp.to/>Ed25519</a> Signature</dt>
-          <dd><code>{{{signature}}}</code></dd>
-        </dl>
+        <li>
+          <dl>
+            <dt>Published<dt>
+            <dd>{{timestamp}}</dd>
+            <dt>Host</dt>
+            <dd><a href="{{uri}}">{{hostname}}</a></p>
+            <dt>Signature</dt>
+            <dd><code>{{{signature}}}</code></dd>
+          </dl>
+        </li>
       {{/timestamps}}
       </ul>
     </main>
