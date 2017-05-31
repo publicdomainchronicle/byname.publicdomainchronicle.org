@@ -1,3 +1,4 @@
+var serveDocument = require('./serve-document')
 var serveFile = require('./serve-file')
 
 var routes = module.exports = require('http-hash')()
@@ -27,5 +28,5 @@ routes.set(
 
 routes.set('/robots.txt', serveFile('robots.txt'))
 
-routes.set('/declaration', serveFile('declaration.txt'))
-routes.set('/license', serveFile('license.txt'))
+routes.set('/declaration', serveDocument('declaration'))
+routes.set('/license', serveDocument('license'))

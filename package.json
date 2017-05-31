@@ -4,9 +4,9 @@
   "dependencies": {
     "ajv": "^5.1.5",
     "busboy": "^0.2.14",
+    "concat-stream": "^1.6.0",
     "ecb": "^1.0.0",
     "english-months": "^1.0.3",
-    "concat-stream": "^1.6.0",
     "http-hash": "^2.0.0",
     "is-sha-256-hex-digest": "^1.0.0",
     "json-parse-errback": "^2.0.1",
@@ -23,10 +23,12 @@
     "send": "^0.15.3",
     "sodium-prebuilt": "^1.0.22",
     "split2": "^2.1.1",
+    "straighten-quotes": "^0.1.0",
     "through2": "^2.0.3",
     "touch": "^1.0.0",
     "trumpet": "^1.7.2",
-    "uuid": "^3.0.1"
+    "uuid": "^3.0.1",
+    "wordwrap": "^1.0.0"
   },
   "devDependencies": {
     "chromedriver": "^2.29.0",

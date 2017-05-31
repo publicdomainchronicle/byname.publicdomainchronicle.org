@@ -7,6 +7,11 @@ header, main, footer {
   max-width: 40rem;
 }
 
+footer {
+  border-top: 1px solid #777;
+  font-size: 80%;
+}
+
 table {
   text-align: left;
 }
@@ -31,11 +36,11 @@ table {
 }
 
 form section {
-  position: relative;
   border: 1px solid #777;
   margin-bottom: 1rem;
   margin-top: 0;
   padding: 0 1rem 1rem 1rem;
+  position: relative;
 }
 
 form section section {
@@ -101,4 +106,9 @@ ul.inputs li {
 
 dt {
   margin-top: 1rem;
+}
+
+li {
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
 }

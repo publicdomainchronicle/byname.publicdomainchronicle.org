@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang=en>
+  <head>
+    <meta charset=utf-8>
+    <title>{{title}}</title>
+    <link href=/styles.css rel=stylesheet>
+  </head>
+  <body>
+    <header>
+      <h1 class=title>{{title}}</h1>
+      <p class=version>Version {{version}}</p>
+    </header>
+    <main>
+      <p class=premable>{{preamble}}</p>
+      <ol>
+      {{#items}}
+        <li>{{.}}</li>
+      {{/items}}
+      </ol>
+    </main>
+    <footer>
+      <p class=copyright>{{copyright}}</p>
+      <p class=license>{{license}}</p>
+    </footer>
+  </body>
+</html>
