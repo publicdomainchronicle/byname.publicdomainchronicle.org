@@ -11,24 +11,26 @@
     </header>
 
     <main>
-      {{#scientist}}
-      <h2>Scientist</h2>
-      <p class=name>{{name}}</p>
-      <p class=institution>{{institution}}</p>
-      {{/scientist}}
+      {{#name}}
+      <h2>Name</h2>
+      <p class=name>{{.}}</p>
+      {{/name}}
 
-      {{^scientist}}
-      <p class=anonymous>published anonymously</p>
-      {{/scientist}}
+      {{^name}}
+      <p>Published anonymously.</p>
+      {{/name}}
+
+      {{#affiliation}}
+      <h2>Affiliation</h2>
+      <p class=affiliation>{{.}}</p>
+      {{/affiliation}}
 
       <h2>Description</h2>
+      {{#description}}<p>{{.}}</p>{{/description}}
 
-      <pre>{{description}}</pre>
-
-      {{#safety}}
       <h2>Safety Notes</h2>
-      <pre>{{text}}</pre>
-      {{/safety}}
+      {{^safety}}<p>No safety notes.</p>{{/safety}}
+      {{#safety}}<p>{{.}}</p>{{/safety}}
 
       <h2>Cryptographic Information</h2>
       <dl>

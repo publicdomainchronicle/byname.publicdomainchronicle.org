@@ -73,19 +73,16 @@ module.exports = function (request, response, configuration) {
               response.statusCode = 500
               response.end()
             } else {
-              data.scientist = data.anonymous
-                ? false
-                : {
-                  name: data.name,
-                  institution: data.institution
-                }
-              data.safety = data.safety
-                ? {text: data.safety}
-                : false
               data.date = formatDate(data.date)
               data.digest = formattedDigest(digest)
               data.signature = formattedSignature(signature)
               data.hostname = configuration.hostname
+              if (data.description) {
+                data.description = splitIntoParagraphs(data.description)
+              }
+              if (data.safety) {
+                data.safety = splitIntoParagraphs(data.safety)
+              }
               response.end(
                 mustache.render(template, data)
               )
@@ -97,6 +94,10 @@ module.exports = function (request, response, configuration) {
   } else {
     methodNotAllowed(response)
   }
+}
+
+function splitIntoParagraphs (string) {
+  return string.split(/\n+/)
 }
 
 function formattedDigest (digest) {
