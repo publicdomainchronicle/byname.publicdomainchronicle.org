@@ -1,5 +1,6 @@
 var Negotiator = require('negotiator')
 var formatDate = require('../format-date')
+var formatHex = require('../format-hex')
 var fs = require('fs')
 var methodNotAllowed = require('./method-not-allowed')
 var path = require('path')
@@ -9,7 +10,7 @@ var through2 = require('through2')
 var trumpet = require('trumpet')
 
 var TEMPLATE = path.join(
-  __dirname, '..', 'templates', 'publications.html'
+  __dirname, '..', 'templates', 'accessions.html'
 )
 
 module.exports = function (request, response, configuration) {
@@ -43,14 +44,14 @@ module.exports = function (request, response, configuration) {
           split2(),
           through2.obj(function (line, _, done) {
             var split = line.split(',')
-            var date = new Date(split[0])
+            var timestamp = formatDate(new Date(split[0]))
             this.push(`
               <tr>
                 <td>${++counter}</td>
-                <td>${formatDate(date)}</td>
+                <td>${timestamp}</td>
                 <td>
                   <a href=/publications/${split[1]}>
-                    ${split[1]}
+                    <code>${formatHex(split[1])}</code>
                   </a>
                 </td>
               </tr>

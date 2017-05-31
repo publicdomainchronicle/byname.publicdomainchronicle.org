@@ -37,7 +37,7 @@
       <ul>
       {{#attachments}}
         <li>
-          <a href="/publications/{{digest}}/attachments/{{.}}">
+          <a href="/publications/{{{digest}}}/attachments/{{{.}}}">
             {{.}}
           </a>
         </li>
@@ -63,7 +63,7 @@
             <dt>Published<dt>
             <dd>{{timestamp}}</dd>
             <dt>Host</dt>
-            <dd><a href="{{uri}}">{{hostname}}</a></p>
+            <dd><a href="{{{uri}}}">{{hostname}}</a></p>
             <dt>Signature</dt>
             <dd><code>{{{signature}}}</code></dd>
           </dl>

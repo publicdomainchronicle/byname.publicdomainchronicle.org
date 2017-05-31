@@ -5,6 +5,17 @@ module.exports = function (string) {
   return (
     englishMonths[date.getMonth()] +
     ' ' + date.getDate() +
-    ', ' + date.getFullYear()
+    ', ' + date.getFullYear() +
+    ' at ' +
+    date.getHours() +
+    ':' +
+    date.getMinutes() +
+    ':' +
+    (
+      date.getSeconds() < 10
+        ? '0' + date.getSeconds()
+        : date.getSeconds()
+    ) +
+    ' GMT'
   )
 }

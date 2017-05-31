@@ -10,10 +10,16 @@ header, main, footer {
 footer {
   border-top: 1px solid #777;
   font-size: 80%;
+  margin: 1rem auto;
+  padding: 1rem 0;
 }
 
 table {
   text-align: left;
+}
+
+td {
+  vertical-align: top;
 }
 
 .good {

@@ -1,6 +1,7 @@
 var Negotiator = require('negotiator')
 var ecb = require('ecb')
 var formatDate = require('../format-date')
+var formatHex = require('../format-hex')
 var fs = require('fs')
 var isDigest = require('is-sha-256-hex-digest')
 var methodNotAllowed = require('./method-not-allowed')
@@ -76,9 +77,7 @@ module.exports = function (request, response, configuration) {
                       .toLocaleString()
                     timestamp.hostname = url.parse(timestamp.uri)
                       .hostname
-                    timestamp.signature = formattedSignature(
-                      data.signature
-                    )
+                    timestamp.signature = formatHex(data.signature)
                     timestamps.push(timestamp)
                     done()
                   }))
@@ -93,7 +92,7 @@ module.exports = function (request, response, configuration) {
             } else {
               data.date = formatDate(data.date)
               data.digest = digest
-              data.formattedDigest = formattedDigest(digest)
+              data.formattedDigest = formatHex(digest)
               data.timestamps = timestamps
               data.hostname = configuration.hostname
               if (data.description) {
@@ -117,24 +116,4 @@ module.exports = function (request, response, configuration) {
 
 function splitIntoParagraphs (string) {
   return string.split(/\n+/)
-}
-
-function formattedDigest (digest) {
-  return (
-    digest.slice(0, 32) +
-    '<wbr>' +
-    digest.slice(32)
-  )
-}
-
-function formattedSignature (signature) {
-  return (
-    signature.slice(0, 32) +
-    '<wbr>' +
-    signature.slice(32, 64) +
-    '<wbr>' +
-    signature.slice(64, 96) +
-    '<wbr>' +
-    signature.slice(96)
-  )
 }
