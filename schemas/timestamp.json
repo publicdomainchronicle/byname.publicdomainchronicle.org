@@ -12,32 +12,6 @@
     "timestamp": {
       "type": "string",
       "format": "datetime"
-    },
-    "priors": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "uri": {
-            "type": "string",
-            "format": "uri"
-          },
-          "timestamp": {
-            "type": "string",
-            "format": "datetime"
-          },
-          "signature": {
-            "$ref": "#/definitions/signature"
-          }
-        },
-        "required": [
-          "uri",
-          "timestamp",
-          "siganture"
-        ],
-        "additionalProperties": false
-      },
-      "uniqueItems": true
     }
   },
   "required": [
