@@ -2,6 +2,10 @@
   "$schema": "http://json-schema.org/draft-06/schema#",
   "type": "object",
   "properties": {
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
     "name": {
       "type": "string",
       "maxLength": 256,
@@ -35,22 +39,7 @@
     "attachments": {
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 256
-          },
-          "digest": {
-            "$ref": "#/definitions/digest"
-          }
-        },
-        "additionalProperties": false,
-        "required": [
-          "type",
-          "digest"
-        ]
+        "$ref": "#/definitions/digest"
       },
       "uniqueItems": true
     },
@@ -79,7 +68,7 @@
       },
       "uniqueItems": true
     },
-    "commitment": {
+    "declaration": {
       "type": "string",
       "enum": [
         "0.0.0"
@@ -93,11 +82,11 @@
     }
   },
   "required": [
+    "date",
     "title",
     "description",
-    "safety",
-    "license",
-    "commitment"
+    "declaration",
+    "license"
   ],
   "additionalProperties": false,
   "definitions": {

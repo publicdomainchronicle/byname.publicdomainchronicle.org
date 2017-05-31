@@ -10,6 +10,7 @@ var validate = validator.compile(require('../schema.json'))
 tape('schema', function (suite) {
   suite.test('simple, valid example', function (test) {
     validate({
+      date: '2017-05-30',
       name: 'Kyle Evan Mitchell',
       affiliation: 'BioBricks Foundation',
       journals: ['Nature'],
@@ -20,16 +21,11 @@ tape('schema', function (suite) {
       ],
       title: 'Distributed Digital Prior Art Publication',
       description: 'Blah blah blah blah blah...',
-      safety: '',
       attachments: [
-        {
-          type: 'application/javascript; charset=UTF-8',
-          digest:
-            '1094aa01ef2335fd02e8d1346be39ddd' +
-            '40847ca749d0d6dbb29ad03610342231'
-        }
+        '1094aa01ef2335fd02e8d1346be39ddd' +
+        '40847ca749d0d6dbb29ad03610342231'
       ],
-      commitment: '0.0.0',
+      declaration: '0.0.0',
       license: '0.0.0'
     })
     test.equal(validate.errors, null)

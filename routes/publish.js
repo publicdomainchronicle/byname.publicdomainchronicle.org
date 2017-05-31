@@ -1,3 +1,4 @@
+var AJV = require('ajv')
 var Busboy = require('busboy')
 var FormData = require('form-data')
 var concat = require('concat-stream')
@@ -14,10 +15,13 @@ var pump = require('pump')
 var readKeypair = require('../read-keypair')
 var runParallel = require('run-parallel')
 var runSeries = require('run-series')
+var schema = require('../schema.json')
 var sodium = require('sodium-prebuilt').api
 var stringify = require('json-stable-stringify')
 var through2 = require('through2')
 var uuid = require('uuid/v4')
+
+var validate = new AJV({allErrors: true}).compile(schema)
 
 var JOURNALS = require('pct-minimum-documentation')
   .map(function (element) {
@@ -29,7 +33,7 @@ var TEMPLATE = path.join(
   __dirname, '..', 'templates', 'publish.html'
 )
 
-var get = function (request, response, configuration) {
+function get (request, response, configuration, errors) {
   response.setHeader('Content-Type', 'text/html; charset=UTF-8')
   fs.readFile(TEMPLATE, 'utf8', function (error, template) {
     /* istanbul ignore if */
@@ -40,7 +44,8 @@ var get = function (request, response, configuration) {
       response.end(
         mustache.render(template, {
           journals: JOURNALS,
-          RECAPTCHA_PUBLIC: configuration.recaptcha.public
+          RECAPTCHA_PUBLIC: configuration.recaptcha.public,
+          errors: errors
         })
       )
     }
@@ -151,82 +156,93 @@ function post (request, response, configuration) {
                     .sort()
                   request.log.info('fields', fields)
                   normalize(fields)
-                  var record = Buffer.from(stringify(fields), 'utf8')
-                  var digest = sodium
-                    .crypto_hash_sha256(record)
-                    .toString('hex')
-                  var signature = sodium
-                    .crypto_sign_detached(record, secretKey)
-                    .toString('hex')
-                  var pathPrefix = path.join(
-                    directory, 'publications', digest
-                  )
-                  runSeries([
-                    function writeJSONFile (done) {
-                      fs.writeFile(pathPrefix + '.json', record, done)
-                    },
-                    function writeSignatureFile (done) {
-                      fs.writeFile(pathPrefix + '.sig', signature, done)
-                    },
-                    function writeAttachments (done) {
-                      if (attachments.length > 0) {
-                        mkdirp(pathPrefix, ecb(done, function () {
-                          runParallel(
-                            attachments.reduce(
-                              function (tasks, attachment) {
-                                var file = path.join(
-                                  directory, 'publications', digest,
-                                  attachment.digest
-                                )
-                                return tasks.concat([
-                                  function writeTypeFile (done) {
-                                    fs.writeFile(
-                                      file + '.type',
-                                      attachment.type,
-                                      'utf8',
-                                      done
-                                    )
-                                  },
-                                  function moveFile (done) {
-                                    fs.rename(
-                                      attachment.temporaryFile, file,
-                                      done
-                                    )
-                                  }
-                                ])
-                              },
-                              []
-                            ),
-                            done
-                          )
-                        }))
-                      } else {
-                        done()
+                  validate(fields)
+                  var validationErrors = validate.errors
+                  request.log.info('validationErrors', validationErrors)
+                  if (validationErrors) {
+                    get(
+                      request, response, configuration, validationErrors
+                    )
+                  } else {
+                    var record = Buffer.from(stringify(fields), 'utf8')
+                    var digest = sodium
+                      .crypto_hash_sha256(record)
+                      .toString('hex')
+                    var signature = sodium
+                      .crypto_sign_detached(record, secretKey)
+                      .toString('hex')
+                    var pathPrefix = path.join(
+                      directory, 'publications', digest
+                    )
+                    runSeries([
+                      function writeJSONFile (done) {
+                        fs.writeFile(pathPrefix + '.json', record, done)
+                      },
+                      function writeSignatureFile (done) {
+                        fs.writeFile(
+                          pathPrefix + '.sig', signature, done
+                        )
+                      },
+                      function writeAttachments (done) {
+                        if (attachments.length > 0) {
+                          mkdirp(pathPrefix, ecb(done, function () {
+                            runParallel(
+                              attachments.reduce(
+                                function (tasks, attachment) {
+                                  var file = path.join(
+                                    directory, 'publications', digest,
+                                    attachment.digest
+                                  )
+                                  return tasks.concat([
+                                    function writeTypeFile (done) {
+                                      fs.writeFile(
+                                        file + '.type',
+                                        attachment.type,
+                                        'utf8',
+                                        done
+                                      )
+                                    },
+                                    function moveFile (done) {
+                                      fs.rename(
+                                        attachment.temporaryFile, file,
+                                        done
+                                      )
+                                    }
+                                  ])
+                                },
+                                []
+                              ),
+                              done
+                            )
+                          }))
+                        } else {
+                          done()
+                        }
+                      },
+                      function appendToAccessions (done) {
+                        fs.appendFile(
+                          path.join(directory, 'accessions'),
+                          fields.date + ',' + digest + '\n',
+                          done
+                        )
                       }
-                    },
-                    function appendToAccessions (done) {
-                      fs.appendFile(
-                        path.join(directory, 'accessions'),
-                        fields.date + ',' + digest + '\n',
-                        done
-                      )
-                    }
-                  ], function (error) {
-                    /* istanbul ignore if */
-                    if (error) {
-                      response.log.error(error)
-                      response.statusCode = 500
-                      response.end()
-                    } else {
-                      var location = '/publications/' + digest
-                      response.statusCode = 201
-                      response.setHeader(
-                        'Content-Type', 'text/html; charset=UTF-8'
-                      )
-                      response.setHeader('Location', location)
-                      response.end(redirectTo(location))
-                    }
-                  })
+                    ], function (error) {
+                      /* istanbul ignore if */
+                      if (error) {
+                        response.log.error(error)
+                        response.statusCode = 500
+                        response.end()
+                      } else {
+                        var location = '/publications/' + digest
+                        response.statusCode = 201
+                        response.setHeader(
+                          'Content-Type', 'text/html; charset=UTF-8'
+                        )
+                        response.setHeader('Location', location)
+                        response.end(redirectTo(location))
+                      }
+                    })
+                  }
                 }
               })
             }
