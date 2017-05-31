@@ -204,11 +204,13 @@ function post (request, response, configuration) {
                       response.statusCode = 500
                       response.end()
                     } else {
+                      var location = '/publications/' + digest
                       response.statusCode = 201
                       response.setHeader(
-                        'Location', '/publications/' + digest
+                        'Content-Type', 'text/html; charset=UTF-8'
                       )
-                      response.end()
+                      response.setHeader('Location', location)
+                      response.end(redirectTo(location))
                     }
                   })
                 }
@@ -265,4 +267,21 @@ module.exports = function (request, response, configuration) {
   } else {
     methodNotAllowed(response)
   }
+}
+
+function redirectTo (location) {
+  return `
+    <!doctype html>
+    <html>
+      <head>
+        <title>Redirecting&hellip;</title>
+        <meta http-equiv=refresh content="0;URL='${location}'">
+      </head>
+      <body>
+        <p>
+          Redirecting to <a href=${location}>${location}</a>&hellip;
+        </p>
+      </body>
+    </html>
+  `
 }

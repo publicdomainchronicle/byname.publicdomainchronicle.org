@@ -44,6 +44,7 @@ function addSubmitSafety () {
   var section = document.getElementById('submit')
   var submit = section.getElementsByTagName('input')[0]
   var safety = document.createElement('button')
+  safety.className = 'safety'
   safety.appendChild(
     document.createTextNode('Enable the Publish Button')
   )
