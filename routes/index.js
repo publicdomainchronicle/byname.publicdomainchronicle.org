@@ -9,7 +9,6 @@ routes.set('/styles.css', serveFile('styles.css'))
 routes.set('/about', serveFile('about.html'))
 
 routes.set('/guide', serveFile('guide.html'))
-routes.set('/guide.js', serveFile('guide.js'))
 
 routes.set('/publish', require('./publish'))
 routes.set('/publish.js', serveFile('publish.js'))
