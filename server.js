@@ -1,5 +1,6 @@
 var fs = require('fs')
 var http = require('http')
+var initialize = require('./initialize-directory')
 var makeHandler = require('./')
 var mkdirp = require('mkdirp')
 var path = require('path')
@@ -28,38 +29,10 @@ if (!RECAPTCHA_PUBLIC) {
 
 var HOSTNAME = ENV.HOSTNAME || require('os').hostname()
 var DIRECTORY = ENV.DATA || NAME
-var ACCESSIONS = path.join(DIRECTORY, 'accessions')
-var PUBLICATIONS = path.join(DIRECTORY, 'publications')
-var TMP = path.join(DIRECTORY, 'tmp')
-var KEYPAIR = path.join(DIRECTORY, 'keys')
 
 var log = pino({name: NAME + '@' + VERSION})
 
-runSeries([
-  mkdirp.bind(null, PUBLICATIONS),
-  mkdirp.bind(null, TMP),
-  function (done) {
-    runParallel([
-      function (done) {
-        touch(ACCESSIONS, {force: true}, done)
-      },
-      function (done) {
-        fs.access(KEYPAIR, fs.constants.R_OK, function (error) {
-          if (error) {
-            if (error.code === 'ENOENT') {
-              log.info({event: 'generating keypair'})
-              writeKeypair(DIRECTORY, done)
-            } else {
-              done(error)
-            }
-          } else {
-            done()
-          }
-        })
-      }
-    ], done)
-  }
-], function (error) {
+initialize(DIRECTORY, function (error) {
   if (error) {
     log.fatal({event: 'data'}, error)
     process.exit(1)
