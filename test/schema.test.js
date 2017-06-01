@@ -1,14 +1,13 @@
 var tape = require('tape')
 var AJV = require('ajv')
 
-var validator = new AJV({
-  allErrors: true,
-  verbose: true
-})
-var validate = validator.compile(require('../schemas/publication.json'))
-
 tape('schema', function (suite) {
-  suite.test('simple, valid example', function (test) {
+  suite.test('publication', function (test) {
+    var validate = new AJV({
+      allErrors: true,
+      verbose: true
+    })
+      .compile(require('../schemas/publication.json'))
     validate({
       name: 'Kyle Evan Mitchell',
       affiliation: 'BioBricks Foundation',
@@ -26,6 +25,28 @@ tape('schema', function (suite) {
       ],
       declaration: '0.0.0',
       license: '0.0.0'
+    })
+    test.equal(validate.errors, null)
+    test.end()
+  })
+
+  suite.test('timestamp', function (test) {
+    var validate = new AJV({
+      allErrors: true,
+      verbose: true
+    })
+      .compile(require('../schemas/timestamp.json'))
+    validate({
+      digest: (
+        'ebc72160fa6fcdce751e5d7298c8df58' +
+        '3e6131eec161faf52094159e05c6d350'
+      ),
+      uri: (
+        'https://example.com/publications/' +
+        'ebc72160fa6fcdce751e5d7298c8df58' +
+        '3e6131eec161faf52094159e05c6d350'
+      ),
+      timestamp: new Date().toISOString()
     })
     test.equal(validate.errors, null)
     test.end()
