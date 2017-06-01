@@ -48,6 +48,26 @@
       <p>No attachments</p>
       {{/attachments}}
 
+      <h2>Metadata</h2>
+
+      <ul id=journals>
+      {{#journals}}
+        <li>Related Journal: {{.}}</li>
+      {{/journals}}
+      </ul>
+
+      <ul id=classifications>
+      {{#classifications}}
+        <li>International Patent Classification: {{.}}</li>
+      {{/classifications}}
+      </ul>
+
+      <ul id=publications>
+      {{#publications}}
+        <li>Related DBOS Publication: <a href=/publications/{{{.}}}>{{.}}</a></li>
+      {{/publications}}
+      </ul>
+
       <h2>Declaration</h2>
       <p>Version {{declaration}}</p>
 
