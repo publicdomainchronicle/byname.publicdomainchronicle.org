@@ -3,12 +3,10 @@
   "version": "0.0.0",
   "preamble": "I publicly declare:",
   "items": [
-    "If the publication names an inventor, I am the named inventor. I am not publishing in someone else’s name.",
-    "If the publication names an organization, I was affiliated with that organization when I developed the invention.",
-    "As far as I know, I am the first inventor, or among the first coinventors.",
-    "If I coinvented, I have written permission from all coinventors to dedicate to the public domain.",
-    "Dedication to the public domain is in the best interests of science and society.",
-    "I commit to exercise the legal rights and discretion that I have in the future to ensure the dedication of the invention to the public domain.",
+    "If I’ve named an inventor, I am the named inventor. I’m not submitting in someone else’s name.",
+    "If I’ve named an affiliated organization, I was affiliated with that organization when I developed the invention.",
+    "As far as I know, I am the first inventor, or among the first coinventors. If I coinvented, I have written permission from all my coinventors to dedicate to the public domain.",
+    "I commit to exercise the legal rights and discretion that I have to ensure the dedication of the invention to the public domain.",
     "I commit to publish a warning if I ever become aware of any patent for the invention, as long as I can legally do so."
   ],
   "copyright": "Text of this declaration copyright (C) 2017 BioBricks Foundation",

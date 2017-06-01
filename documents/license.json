@@ -1,9 +1,9 @@
 {
   "title": "DBOS Open Publication License",
   "version": "0.0.0",
-  "preamble": "I grant everyone a license to do everything that would otherwise violate exclusive rights under copyrights, mask rights, database rights, or other intellectual property rights in the written material of the publication, except:",
+  "preamble": "I grant everyone a license to do everything that would otherwise violate exclusive rights under copyrights, mask rights, database rights, or other intellectual property rights in the written material of my submission, except:",
   "items": [
-    "No one may publish or display changed copies of the publication that include my name or affiliation without indication of what has been changed.",
+    "No one may publish or display changed copies of my submission that include my name or affiliation without indication of what has been changed.",
     "No one may use my name or the name of my affiliated organization to endorse or promote anything."
   ],
   "copyright": "Text of this license copyright (C) 2017 BioBricks Foundation",
