@@ -12,6 +12,7 @@ module.exports = function (string) {
     date.getMinutes() +
     ':' +
     (
+      /* istanbul ignore next */
       date.getSeconds() < 10
         ? '0' + date.getSeconds()
         : date.getSeconds()
