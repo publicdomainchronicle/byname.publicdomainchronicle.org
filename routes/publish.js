@@ -21,6 +21,12 @@ var stringify = require('json-stable-stringify')
 var through2 = require('through2')
 var uuid = require('uuid/v4')
 
+var declaration = require('../documents/declaration.json')
+declaration.items = declaration.items.map(function (item) {
+  return Array.isArray(item) ? item.join(' ') : item
+})
+var license = require('../documents/license.json')
+
 var validate = new AJV({allErrors: true}).compile(schema)
 
 var JOURNALS = require('pct-minimum-documentation')
@@ -45,7 +51,9 @@ function get (request, response, configuration, errors) {
         mustache.render(template, {
           journals: JOURNALS,
           RECAPTCHA_PUBLIC: configuration.recaptcha.public,
-          errors: errors
+          errors: errors,
+          license: license,
+          declaration: declaration
         })
       )
     }

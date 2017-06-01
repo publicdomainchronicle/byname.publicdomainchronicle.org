@@ -136,23 +136,39 @@
           </section>
         </section>
 
+        {{#declaration}}
         <section id=declaration class=required>
-          <h2>Declaration</h2>
+          <h2>{{title}}</h2>
+          <p class=version>Version {{version}}</p>
+
+          <p class=preamble>{{preamble}}</p>
+          <ol>
+            {{#items}}<li>{{.}}</li>{{/items}}
+          </ol>
 
           <label>
-            <input name=declaration type=checkbox value=0.0.0 required>
-            Check this box to show that you make the <a href=/declaration target=_blank>DBOS Open Inventor Declaration, Version 1.0.0</a> for the invention described in your responses to this form.
+            <input name=declaration type=checkbox value={{{version}}} required>
+            Check this box to make the declaration above.
           </label>
         </section>
+        {{/declaration}}
 
+        {{#license}}
         <section id=license class=required>
-          <h2>License</h2>
+          <h2>{{title}}</h2>
+          <p class=version>Version {{version}}</p>
+
+          <p class=preamble>{{preamble}}</p>
+          <ol>
+            {{#items}}<li>{{.}}</li>{{/items}}
+          </ol>
 
           <label>
-            <input name=license type=checkbox value=0.0.0 required>
-            Check this box to show that you license your responses to this form, and any files that you have attached, under the terms of the <a href=/license target=_blank>DBOS Open Publication License, Version 1.0.0</a>.
+            <input name=license type=checkbox value={{{version}}} required>
+            Check this box to grant the license above.
           </label>
         </section>
+        {{/license}}
 
         <section id=submit>
           <h2>Publish</h2>
