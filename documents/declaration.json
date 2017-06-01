@@ -3,10 +3,7 @@
   "version": "0.0.0",
   "preamble": "I publicly declare:",
   "items": [
-    [
-      "If the publication names an inventor, I am the named inventor.",
-      "I am not publishing in someone else’s name."
-    ],
+    "If the publication names an inventor, I am the named inventor. I am not publishing in someone else’s name.",
     "If the publication names an organization, I was affiliated with that organization when I developed the invention.",
     "As far as I know, I am the first inventor, or among the first coinventors.",
     "If I coinvented, I have written permission from all coinventors to dedicate to the public domain.",

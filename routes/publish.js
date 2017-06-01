@@ -22,9 +22,6 @@ var through2 = require('through2')
 var uuid = require('uuid/v4')
 
 var declaration = require('../documents/declaration.json')
-declaration.items = declaration.items.map(function (item) {
-  return Array.isArray(item) ? item.join(' ') : item
-})
 var license = require('../documents/license.json')
 
 var validate = new AJV({allErrors: true}).compile(schema)
