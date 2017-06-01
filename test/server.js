@@ -8,7 +8,7 @@ var pino = require('pino')
 var rimraf = require('rimraf')
 var runParallel = require('run-parallel')
 var touch = require('touch')
-var writeKeypair = require('../write-keypair')
+var writeKeypair = require('../keypair/write')
 
 var VERSION = require('../package.json').version
 var RANDOM_HIGH_PORT = 0

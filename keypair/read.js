@@ -1,5 +1,5 @@
 var ecb = require('ecb')
-var encoding = require('./encoding')
+var encoding = require('../encoding')
 var fs = require('fs')
 var parse = require('json-parse-errback')
 var path = require('path')

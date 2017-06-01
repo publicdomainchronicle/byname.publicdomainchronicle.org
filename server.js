@@ -7,7 +7,7 @@ var pino = require('pino')
 var runParallel = require('run-parallel')
 var runSeries = require('run-series')
 var touch = require('touch')
-var writeKeypair = require('./write-keypair')
+var writeKeypair = require('./keypair/write')
 
 var NAME = require('./package.json').name
 var VERSION = require('./package.json').version

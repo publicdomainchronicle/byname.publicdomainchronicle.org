@@ -1,4 +1,4 @@
-var encoding = require('./encoding')
+var encoding = require('../encoding')
 var fs = require('fs')
 var path = require('path')
 var sodium = require('sodium-prebuilt').api

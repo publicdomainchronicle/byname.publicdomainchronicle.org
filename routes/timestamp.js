@@ -2,7 +2,7 @@ var encoding = require('../encoding')
 var methodNotAllowed = require('./method-not-allowed')
 var notFound = require('./not-found')
 var path = require('path')
-var readKeypair = require('../read-keypair')
+var readKeypair = require('../keypair/read')
 var send = require('send')
 
 module.exports = function (request, response, configuration) {
