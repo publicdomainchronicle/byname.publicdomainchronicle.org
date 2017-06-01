@@ -4,6 +4,7 @@ var FormData = require('form-data')
 var concat = require('concat-stream')
 var crypto = require('crypto')
 var ecb = require('ecb')
+var encoding = require('../encoding')
 var fs = require('fs')
 var https = require('https')
 var methodNotAllowed = require('./method-not-allowed')
@@ -15,7 +16,7 @@ var pump = require('pump')
 var readKeypair = require('../read-keypair')
 var runParallel = require('run-parallel')
 var runSeries = require('run-series')
-var schema = require('../schemas/publication.json')
+var schema = require('../schemas/publication')
 var sodium = require('sodium-prebuilt').api
 var stringify = require('json-stable-stringify')
 var through2 = require('through2')
@@ -86,7 +87,7 @@ function post (request, response, configuration) {
           fields[field] = value
         }
       })
-      .on('file', function (field, file, filename, encoding, mimetype) {
+      .on('file', function (field, file, filename, fileEncoding, mimetype) {
         // Save to ./tmp/{UUID}.
         var id = uuid()
         var temporaryFile = path.join(directory, 'tmp', id)
@@ -94,13 +95,13 @@ function post (request, response, configuration) {
           stream: file,
           temporaryFile: temporaryFile,
           type: (
-            mimetype + '; charset=' + encoding
+            mimetype + '; charset=' + fileEncoding
           )
         }
         request.log.info('attachment', {
           uuid: id,
           filename: filename,
-          encoding: encoding,
+          encoding: fileEncoding,
           mimetype: mimetype
         })
         attachments.push(attachment)
@@ -109,10 +110,10 @@ function post (request, response, configuration) {
         pump(
           file,
           // Compute SHA256 as we write to disk.
-          through2(function (chunk, encoding, done) {
+          through2(function (chunk, chunkEncoding, done) {
             size += chunk.length
-            hash.update(chunk, encoding)
-            this.push(chunk, encoding)
+            hash.update(chunk, chunkEncoding)
+            this.push(chunk, chunkEncoding)
             done()
           }),
           fs.createWriteStream(temporaryFile),
@@ -127,7 +128,7 @@ function post (request, response, configuration) {
                 var index = attachments.indexOf(attachment)
                 attachments.splice(index, 1)
               } else {
-                attachment.digest = hash.digest('hex')
+                attachment.digest = encoding.encode(hash.digest())
               }
             }
           }
@@ -173,9 +174,9 @@ function post (request, response, configuration) {
                     )
                   } else {
                     var record = Buffer.from(stringify(fields), 'utf8')
-                    var digest = sodium
-                      .crypto_hash_sha256(record)
-                      .toString('hex')
+                    var digest = encoding.encode(
+                      sodium.crypto_hash_sha256(record)
+                    )
                     var uri = (
                       'https://' + configuration.hostname +
                       '/publications/' + digest
@@ -185,12 +186,12 @@ function post (request, response, configuration) {
                       uri: uri,
                       timestamp: time
                     }
-                    var signature = sodium
-                      .crypto_sign_detached(
+                    var signature = encoding.encode(
+                      sodium.crypto_sign_detached(
                         Buffer.from(stringify(timestamp)),
                         secretKey
                       )
-                      .toString('hex')
+                    )
                     var pathPrefix = path.join(
                       directory, 'publications', digest
                     )
@@ -205,7 +206,7 @@ function post (request, response, configuration) {
                         fs.writeFile(
                           path.join(
                             pathPrefix,
-                            publicKey.toString('hex') + '.json'
+                            encoding.encode(publicKey) + '.json'
                           ),
                           stringify({
                             timestamp: timestamp,

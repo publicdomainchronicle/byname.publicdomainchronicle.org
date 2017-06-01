@@ -1,6 +1,6 @@
 var Negotiator = require('negotiator')
+var encoding = require('../encoding')
 var formatDate = require('../format-date')
-var formatHex = require('../format-hex')
 var fs = require('fs')
 var methodNotAllowed = require('./method-not-allowed')
 var path = require('path')
@@ -51,7 +51,7 @@ module.exports = function (request, response, configuration) {
                 <td>${timestamp}</td>
                 <td>
                   <a href=/publications/${split[1]}>
-                    <code>${formatHex(split[1])}</code>
+                    <code>${encoding.format(split[1])}</code>
                   </a>
                 </td>
               </tr>

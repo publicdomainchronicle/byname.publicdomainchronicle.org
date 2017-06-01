@@ -1,9 +1,8 @@
 var Negotiator = require('negotiator')
 var ecb = require('ecb')
+var encoding = require('../encoding')
 var formatDate = require('../format-date')
-var formatHex = require('../format-hex')
 var fs = require('fs')
-var isDigest = require('is-sha-256-hex-digest')
 var methodNotAllowed = require('./method-not-allowed')
 var mustache = require('mustache')
 var notFound = require('./not-found')
@@ -21,7 +20,7 @@ var TEMPLATE = path.join(
 module.exports = function (request, response, configuration) {
   if (request.method === 'GET') {
     var digest = request.params.digest
-    if (!isDigest(digest)) {
+    if (!encoding.isDigest(digest)) {
       notFound(request, response)
     } else {
       var type = new Negotiator(request).mediaType([
@@ -66,7 +65,7 @@ module.exports = function (request, response, configuration) {
             },
             function readTimestamps (done) {
               readKeypair(directory, ecb(done, function (keypair) {
-                var publicKey = keypair.public.toString('hex')
+                var publicKey = encoding.encode(keypair.public)
                 var sig = path.join(
                   pathPrefix, publicKey + '.json'
                 )
@@ -77,7 +76,7 @@ module.exports = function (request, response, configuration) {
                       .toLocaleString()
                     timestamp.hostname = url.parse(timestamp.uri)
                       .hostname
-                    timestamp.signature = formatHex(data.signature)
+                    timestamp.signature = encoding.format(data.signature)
                     timestamps.push(timestamp)
                     done()
                   }))
@@ -92,7 +91,7 @@ module.exports = function (request, response, configuration) {
             } else {
               data.date = formatDate(data.date)
               data.digest = digest
-              data.formattedDigest = formatHex(digest)
+              data.formattedDigest = encoding.format(digest)
               data.timestamps = timestamps
               data.hostname = configuration.hostname
               if (data.description) {

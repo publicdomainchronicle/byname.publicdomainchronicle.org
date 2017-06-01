@@ -7,7 +7,7 @@ tape('schema', function (suite) {
       allErrors: true,
       verbose: true
     })
-      .compile(require('../schemas/publication.json'))
+      .compile(require('../schemas/publication'))
     validate({
       name: 'Kyle Evan Mitchell',
       affiliation: 'BioBricks Foundation',
@@ -35,7 +35,7 @@ tape('schema', function (suite) {
       allErrors: true,
       verbose: true
     })
-      .compile(require('../schemas/timestamp.json'))
+      .compile(require('../schemas/timestamp'))
     validate({
       digest: (
         'ebc72160fa6fcdce751e5d7298c8df58' +

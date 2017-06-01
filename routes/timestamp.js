@@ -1,4 +1,4 @@
-var isDigest = require('is-sha-256-hex-digest')
+var encoding = require('../encoding')
 var methodNotAllowed = require('./method-not-allowed')
 var notFound = require('./not-found')
 var path = require('path')
@@ -8,7 +8,7 @@ var send = require('send')
 module.exports = function (request, response, configuration) {
   if (request.method === 'GET') {
     var digest = request.params.digest
-    if (!isDigest(digest)) {
+    if (!encoding.isDigest(digest)) {
       notFound(request, response)
     } else {
       var directory = configuration.directory

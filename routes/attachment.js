@@ -1,5 +1,5 @@
 var fs = require('fs')
-var isDigest = require('is-sha-256-hex-digest')
+var encoding = require('../encoding')
 var methodNotAllowed = require('./method-not-allowed')
 var notFound = require('./not-found')
 var path = require('path')
@@ -9,7 +9,10 @@ module.exports = function (request, response, configuration) {
   if (request.method === 'GET') {
     var publication = request.params.digest
     var attachment = request.params.attachment
-    if (!isDigest(publication) || !isDigest(attachment)) {
+    if (
+      !encoding.isDigest(publication) ||
+      !encoding.isDigest(attachment)
+    ) {
       notFound(request, response)
     } else {
       var file = path.join(
