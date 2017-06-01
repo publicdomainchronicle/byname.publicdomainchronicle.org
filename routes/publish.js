@@ -167,8 +167,10 @@ function post (request, response, configuration) {
                   normalize(fields)
                   validate(fields)
                   var validationErrors = validate.errors
-                  request.log.info('validationErrors', validationErrors)
                   if (validationErrors) {
+                    request.log.info(
+                      'validationErrors', validationErrors
+                    )
                     get(
                       request, response, configuration, validationErrors
                     )
