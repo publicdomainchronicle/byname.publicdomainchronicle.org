@@ -3,12 +3,7 @@ var methodNotAllowed = require('./method-not-allowed')
 var notFound = require('./not-found')
 var path = require('path')
 
-var BYTES_PER_LINE = (
-  24 + // YYYY-MM-DD
-  1 + // comma
-  64 + // digest
-  1 // newline
-)
+var BYTES_PER_LINE = require('../bytes-per-accession')
 
 module.exports = function (request, response, configuration) {
   if (request.method === 'GET') {

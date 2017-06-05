@@ -13,6 +13,8 @@ var TEMPLATE = path.join(
   __dirname, '..', 'templates', 'accessions.html'
 )
 
+var BYTES_PER_LINE = require('../bytes-per-accession')
+
 module.exports = function (request, response, configuration) {
   if (request.method === 'GET') {
     var type = new Negotiator(request).mediaType([
@@ -26,7 +28,10 @@ module.exports = function (request, response, configuration) {
       /* istanbul ignore else */
       if (type === 'text/csv') {
         response.setHeader('Content-Type', 'text/csv; charset=ASCII')
-        fs.createReadStream(accessions)
+        var options = request.query.from
+          ? {start: BYTES_PER_LINE * (parseInt(request.query.from) - 1)}
+          : {}
+        fs.createReadStream(accessions, options)
           .once('error', /* istanbul ignore next */ function (error) {
             request.log.error(error)
             response.statusCode = 500

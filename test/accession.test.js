@@ -59,6 +59,73 @@ tape('GET /accessions CSV', function (test) {
   })
 })
 
+tape('GET /accessions?from CSV', function (test) {
+  server(function (port, done) {
+    var digests = []
+    runSeries(
+      ['a', 'b', 'c', 'd'].map(function (title) {
+        return function (done) {
+          var form = makeValidPublication(title)
+          form.pipe(
+            http.request({
+              method: 'POST',
+              path: '/publish',
+              port: port,
+              headers: form.getHeaders()
+            })
+              .once('response', function (response) {
+                test.equal(
+                  response.statusCode, 201,
+                  'responds 201'
+                )
+                test.assert(
+                  response.headers
+                    .location
+                    .startsWith('/publications/'),
+                  'sets Location'
+                )
+                digests.push(
+                  response.headers
+                    .location
+                    .replace('/publications/', '')
+                )
+                done()
+              })
+          )
+        }
+      })
+    , function () {
+      http.get({
+        path: '/accessions?from=3',
+        port: port,
+        headers: {accept: 'text/csv'}
+      }, function (response) {
+        test.equal(
+          response.statusCode, 200,
+          'responds 200'
+        )
+        response.pipe(concat(function (body) {
+          body = body.toString()
+          test.equal(
+            body.match(/[^\n]\n/g).length, 2,
+            'two lines'
+          )
+          digests
+            .slice(2)
+            .forEach(function (digest) {
+              test.assert(
+                body.indexOf(digest) !== -1,
+                'contains digest'
+              )
+            })
+          done()
+          test.end()
+        }))
+      })
+    })
+  })
+})
+
 tape('GET /accessions HTML', function (test) {
   server(function (port, done) {
     var location
