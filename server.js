@@ -2,6 +2,11 @@ var http = require('http')
 var initialize = require('./initialize-directory')
 var makeHandler = require('./')
 var pino = require('pino')
+var replicatePeers = require('./replicate-peers')
+var runParallel = require('run-parallel')
+var runSeries = require('run-series')
+var touch = require('touch')
+var writeKeypair = require('./keypair/write')
 
 var NAME = require('./package.json').name
 var VERSION = require('./package.json').version
@@ -22,6 +27,10 @@ if (!RECAPTCHA_PUBLIC) {
 
 var HOSTNAME = ENV.HOSTNAME || require('os').hostname()
 var DIRECTORY = ENV.DATA || NAME
+
+var REPLICATION_INTERVAL = ENV.REPLICATION_INTERVAL
+  ? parseInt(ENV.REPLICATION_INTERVAL)
+  : 3600000 // hourly
 
 var log = pino({name: NAME + '@' + VERSION})
 
@@ -59,6 +68,13 @@ initialize(DIRECTORY, function (error, keypair) {
         var boundPort = this.address().port
         log.info({event: 'listening', port: boundPort})
       })
+      // Start replicating peers.
+      var replicationLog = log.child({subsystem: 'replication'})
+      setInterval(
+        replicatePeers.bind(null, configuration, replicationLog),
+        REPLICATION_INTERVAL
+      )
+      replicatePeers(configuration, replicationLog)
     }
   }
 
