@@ -7,6 +7,7 @@ var ecb = require('ecb')
 var encoding = require('../encoding')
 var fs = require('fs')
 var https = require('https')
+var latest = require('../latest')
 var methodNotAllowed = require('./method-not-allowed')
 var mkdirp = require('mkdirp')
 var mustache = require('mustache')
@@ -22,8 +23,8 @@ var stringify = require('json-stable-stringify')
 var through2 = require('through2')
 var uuid = require('uuid/v4')
 
-var declaration = require('../documents/declaration.json')
-var license = require('../documents/license.json')
+var declaration = latest(require('../documents/declaration.json'))
+var license = latest(require('../documents/license.json'))
 
 var validate = new AJV({allErrors: true}).compile(schema)
 

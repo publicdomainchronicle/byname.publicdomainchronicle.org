@@ -1,12 +1,10 @@
 var Negotiator = require('negotiator')
-var ecb = require('ecb')
 var fs = require('fs')
+var latest = require('../latest')
 var methodNotAllowed = require('./method-not-allowed')
 var mustache = require('mustache')
 var parse = require('json-parse-errback')
 var path = require('path')
-var runParallel = require('run-parallel')
-var send = require('send')
 var straightenQuotes = require('straighten-quotes')
 var wordwrap = require('wordwrap')
 
@@ -27,66 +25,57 @@ module.exports = function (name) {
         response.end()
       } else {
         var json = path.join(documents, name + '.json')
-        /* istanbul ignore else */
-        if (type === 'application/json') {
-          send(request, json)
-            .on('error', /* istanbul ignore next */ function (error) {
-              response.statusCode = error.status || 500
-              response.end(error.message)
-            })
-            .pipe(response)
-        } else if (type === 'text/plain') {
-          fs.readFile(json, 'utf8', function (error, json) {
-            /* istanbul ignore if */
-            if (error) {
-              response.statusCode = 404
-              response.end()
-            } else {
-              parse(json, function (error, data) {
-                /* istanbul ignore if */
-                if (error) {
-                  response.statusCode = 500
+        fs.readFile(json, 'utf8', function (error, json) {
+          /* istanbul ignore if */
+          if (error) {
+            response.statusCode = 404
+            response.end()
+          } else {
+            parse(json, function (error, data) {
+              /* istanbul ignore if */
+              if (error) {
+                response.statusCode = 500
+                response.end()
+              } else {
+                var requestedVersion = request.query.version
+                  ? data[request.query.version]
+                  : latest(data)
+                if (!requestedVersion) {
+                  response.statusCode = 404
                   response.end()
-                } else {
+                /* istanbul ignore else */
+                } else if (type === 'application/json') {
+                  response.setHeader(
+                    'Content-Type', 'application/json'
+                  )
+                  response.end(JSON.stringify(
+                    latest(data)
+                  ))
+                } else if (type === 'text/plain') {
                   response.setHeader(
                     'Content-Type', 'text/plain; charset=UTF-8'
                   )
-                  response.end(jsonToTXT(data))
+                  response.end(jsonToTXT(latest(data)))
+                } else if (type === 'text/html') {
+                  fs.readFile(TEMPLATE, 'utf8', function (error, t) {
+                    if (error) {
+                      response.statusCode = 500
+                      response.end()
+                    } else {
+                      response.setHeader(
+                        'Content-Type',
+                        'text/html; charset=UTF-8'
+                      )
+                      response.end(
+                        mustache.render(t, latest(data))
+                      )
+                    }
+                  })
                 }
-              })
-            }
-          })
-        } else if (type === 'text/html') {
-          var template
-          var doc
-          runParallel([
-            function (done) {
-              fs.readFile(json, 'utf8', ecb(done, function (json) {
-                parse(json, ecb(done, function (parsed) {
-                  doc = parsed
-                  done()
-                }))
-              }))
-            },
-            function (done) {
-              fs.readFile(TEMPLATE, 'utf8', ecb(done, function (read) {
-                template = read
-                done()
-              }))
-            }
-          ], function (error) {
-            /* istanbul ignore if */
-            if (error) {
-              response.statusCode = 500
-              response.end()
-            } else {
-              response.setHeader(
-                'Content-Type', 'text/html; charset=UTF-8'
-              )
-              response.end(mustache.render(template, doc))
-            }
-          })
-        }
+              }
+            })
+          }
+        })
       }
     } else {
       methodNotAllowed(response)

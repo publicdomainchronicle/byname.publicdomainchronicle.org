@@ -50,6 +50,49 @@ tape('GET /license JSON', function (test) {
   })
 })
 
+tape('GET /license?version={valid} JSON', function (test) {
+  server(function (port, done) {
+    var request = {
+      path: '/license?version=0.0.0',
+      port: port,
+      headers: {
+        accept: 'application/json'
+      }
+    }
+    http.get(request, function (response) {
+      test.equal(
+        response.statusCode, 200,
+        'responds 200'
+      )
+      test.equal(
+        response.headers['content-type'], 'application/json',
+        'Content-Type: application/json'
+      )
+      done()
+      test.end()
+    })
+  })
+})
+
+tape('GET /license?version={invalid} JSON', function (test) {
+  server(function (port, done) {
+    var request = {
+      path: '/license?version=100.100.100',
+      port: port,
+      headers: {
+        accept: 'application/json'
+      }
+    }
+    http.get(request, function (response) {
+      test.equal(
+        response.statusCode, 404,
+        'responds 404'
+      )
+      done()
+      test.end()
+    })
+  })
+})
 tape('GET /license HTML', function (test) {
   server(function (port, done) {
     var request = {
