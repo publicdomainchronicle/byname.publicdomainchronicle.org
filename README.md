@@ -13,3 +13,11 @@ The server reads and stores all information to disk, within the directory specif
   - `{digest}.json` files, deterministically-serialized JSON objects representing publications, with the addition of date stamps.
 
   - `{digest}.sig` files containing hex-encoded, detached libsodium signatures for the corresponding JSON files.
+
+  - a `{digest}` directory per publication that contains:
+
+    - `{public key}.json` files, deterministically-serialized JSON objects containing publication timestamps and cryptographic signatures
+
+    - `{digest}` files, containing attachment data
+
+    - `{digest}.type` files, containing MIME types for attachment data
