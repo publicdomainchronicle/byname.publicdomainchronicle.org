@@ -6,11 +6,11 @@
   </head>
   <body>
     <header>
-      <h1>Publish an Invention in the Distributed Bulletin of Open Science</h1>
+      <h1>Publish in the Distributed Bulletin of Open Science</h1>
     </header>
 
     <main>
-      <p>Use this form to claim a scientific invention for the public domain by publishing it to the Distributed Bullet of Open Science.  For more about DBOS, see the <a href=/about>about page</a>.</p>
+      <p>Use this form to contribute scientific work to the public domain by publishing it to the Distributed Bullet of Open Science.  For more about DBOS, see the <a href=/about>about page</a>.</p>
 
       <aside class=legal>Do not break the law, any institutional policy, or any contract by publishing in DBOS.  Review the brief <a href=/guide>users guide</a> for notes on legal restrictions that may apply to your work.</aside>
 
@@ -20,11 +20,11 @@
 
       <form method=post action=/publish enctype=multipart/form-data>
         <section class=optional>
-          <h1>Inventor</h1>
+          <h1>Contributor</h1>
 
-          <p>Either the inventor or someone helping the inventor to use the computer must write the responses to this form, fill it out, and submit it.</p>
+          <p>Either the investigator or someone helping them to use the computer must fill out this form and submit it.</p>
 
-          <aside class=legal>To publishing in DBOS, you must grant a public copyright license for your publication.  Usually, the author of those materials is the one who has to give the license.  The answers to this form, especially the title, description, and any attachments, should be the inventor&rsquo;s work.</aside>
+          <aside class=legal>To publish in DBOS, you must grant a public copyright license for your submission.  Usually, the one who writes the materials is the one who has to give the license.  The answers to this form, especially the title, description, and any attachments, should be your own work.</aside>
 
           <section>
             <h2>Name</h2>
@@ -50,19 +50,17 @@
         <section class=required>
           <h2>Title</h2>
 
-          <p>Provide a title for your invention, describing what it is and how it is useful, in the terms most natural for you and colleagues in your field.</p>
-
-          <aside class=legal>There&rsquo;s no need to &ldquo;translate&rdquo; your title into legal jargon, as you might for a patent, or into everyday language, as you might for a press release.</aside>
+          <p>Provide a title for your submission, describing what you've found and how it is useful, in the terms most natural for you and colleagues in your field.</p>
 
           <input name=title type=text maxlength=256 spellcheck required>
         </section>
 
         <section id=description class=required>
-          <h2>Description</h2>
+          <h2>Finding</h2>
 
-          <p>Explain the best way that someone in your field can make and use your invention.  Feel free to use multiple paragraphs if necessary.</p>
+          <p>Describe what you&rsquo;ve found, and explain the best way that someone in your field can use it themselves.  Feel free to use multiple paragraphs if necessary.</p>
 
-          <aside class=legal>This is the most important part.  If your description enables others in your field to make and use your invention, publishing it creates &ldquo;prior art&rdquo; that can stop later patent applications for the invention.  If at all possible, have a colleague review your description and tell you if it&rsquo;s missing any nonobvious details.</aside>
+          <aside class=legal>This is the most important part.  If your description enables others in your field to make and use what you've found, publishing it helps secure it for the public domain.  If at all possible, have a colleague review your description and tell you if it&rsquo;s missing anything that isn&rsquo;t obvious.</aside>
 
           <textarea name=description rows=30 maxlength=28000 spellcheck required></textarea>
         </section>
@@ -78,9 +76,7 @@
         <section id=attachments class=optional>
           <h1>Attachments</h1>
 
-          <p>If images or other data files are essential to describing your invention, attach them here.  If the description above is enough to teach others how to use what you&rsquo;ve found, there&rsquo;s no need for any attachments.</p>
-
-          <aside class=legal>If you can describe your invention with a standard-format file, like a <a href=http://zhanglab.ccmb.med.umich.edu/FASTA/>FASTA</a> or <a href=http://sbolstandard.org/>SBOL</a> file for genetic information, please attach it.  Well-structured data will make finding your submission much easier.</aside>
+          <p>If images or other data files help describe your finding or how to use it, attach them here.  Standard-format scientific data files, like <a href=http://zhanglab.ccmb.med.umich.edu/FASTA/ target=_blank>FASTA</a> and <a href=http://sbolstandard.org/ target=_blank>SBOL</a> files for genetic information, for example, are especially important.  Please <em>don&rsquo;t</em> attach a preprint PDF or article.  Those best belong on a preprint server, like <a href=http://biorxiv.org target=_blank>bioR&#x1D712;iv</a>.</p>
 
           <ul class=inputs>
             <li><input name=attachments[] type=file></li>
@@ -97,7 +93,7 @@
           <section>
             <h2>Journals</h2>
 
-            <p>Which journals do other scientists interested in the area of your invention publish in and read?  Tick the boxes next to the journals most relevant to the field of your invention.  Usually, two or three journals are enough.</p>
+            <p>Which journals do others interested in the area of your invention publish in and read?  Tick the boxes next to the journals most relevant to the field of your invention.  Usually, two or three journals are enough.</p>
 
             <ul id=journals class=listOfCheckBoxes>
               {{#journals}}
@@ -116,7 +112,7 @@
           <section id=classifications>
             <h2>Patent Classifications</h2>
 
-            <p>The <a href=http://web2.wipo.int/classifications/ipc/ipcpub>International Patent Classification</a> is a standardized taxonomy of invention classes referred to by codes.  For example, <a href=http://web2.wipo.int/classifications/ipc/ipcpub?notion=scheme&version=20170101&symbol=C12N0009000000&menulang=en&lang=en&viewmode=m&fipcpc=no&showdeleted=yes&indexes=no&headings=yes&notes=yes&direction=o2n&initial=A&cwid=none&tree=no&searchmode=smart><code>C12N 0/900</code></a> denotes <a href=https://en.wikipedia.org/wiki/Oxidoreductase>oxidoreductases</a>.  Patent offices and patent researchers the world over use IPC to categorize patents and patent applications, as well as to find prior art.</p>
+            <p>The <a href=http://web2.wipo.int/classifications/ipc/ipcpub>International Patent Classification</a> is a standardized taxonomy of technologies, referred to by codes.  For example, <a href=http://web2.wipo.int/classifications/ipc/ipcpub?notion=scheme&version=20170101&symbol=C12N0009000000&menulang=en&lang=en&viewmode=m&fipcpc=no&showdeleted=yes&indexes=no&headings=yes&notes=yes&direction=o2n&initial=A&cwid=none&tree=no&searchmode=smart><code>C12N 0/900</code></a> denotes <a href=https://en.wikipedia.org/wiki/Oxidoreductase>oxidoreductases</a>.</p>
 
             <ul class=inputs>
               <li><input name=classifications[] type=text pattern="[ABCDEFGH][0-9][0-9][A-Z] [0-9]{1,3}/[0-9]{2,}" placeholder="IPC Code"></li>
