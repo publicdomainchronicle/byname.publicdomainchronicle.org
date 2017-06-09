@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
   addAnotherInputButton('publications', 'Publication', 25)
   addAnotherInputButton('attachments', 'Attachment', 5)
   addSubmitSafety()
-  addWordCount('description')
+  addWordCount('finding')
   addWordCount('safety')
 })
 

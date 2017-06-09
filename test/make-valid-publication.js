@@ -5,7 +5,7 @@ module.exports = function (title) {
   form.append('name', 'Kyle E. Mitchell')
   form.append('affiliation', 'BioBricks Foundation')
   form.append('title', title || 'Made-Up Discovery')
-  form.append('description', 'Pat head. Rub stomach. Eureka!')
+  form.append('finding', 'Pat head. Rub stomach. Eureka!')
   form.append('journals[]', 'Nature')
   form.append('safety', 'Watch your elbows.')
   form.append('declaration', '0.0.0')

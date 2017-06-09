@@ -23,7 +23,7 @@ module.exports = {
       minLength: 1,
       maxLength: 256
     },
-    description: {
+    finding: {
       type: 'string',
       minLength: 1,
       maxLength: 28000
@@ -79,7 +79,7 @@ module.exports = {
   },
   required: [
     'title',
-    'description',
+    'finding',
     'declaration',
     'license'
   ],

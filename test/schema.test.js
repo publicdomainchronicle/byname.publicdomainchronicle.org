@@ -18,7 +18,7 @@ tape('schema', function (suite) {
         '3e6131eec161faf52094159e05c6d350'
       ],
       title: 'Distributed Digital Prior Art Publication',
-      description: 'Blah blah blah blah blah...',
+      finding: 'Blah blah blah blah blah...',
       attachments: [
         '1094aa01ef2335fd02e8d1346be39ddd' +
         '40847ca749d0d6dbb29ad03610342231'

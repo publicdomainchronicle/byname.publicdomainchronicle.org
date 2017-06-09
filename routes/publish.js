@@ -355,7 +355,7 @@ var ARRAYS = [
 ]
 
 var NORMALIZE_LINES = [
-  'description', 'safety'
+  'finding', 'safety'
 ]
 
 function normalize (record) {

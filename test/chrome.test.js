@@ -9,7 +9,7 @@ tape('chrome', function (suite) {
       webdriver
         .url('http://localhost:' + webServerPort + '/publish')
         .setValue('input[name=title]', 'Test Invention')
-        .setValue('textarea[name=description]', 'Test description')
+        .setValue('textarea[name=finding]', 'Test finding')
         .click('input[name=declaration]')
         .click('input[name=license]')
         .click('button.safety')

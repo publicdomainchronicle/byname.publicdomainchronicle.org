@@ -94,8 +94,8 @@ module.exports = function (request, response, configuration) {
               data.formattedDigest = encoding.format(digest)
               data.timestamps = timestamps
               data.hostname = configuration.hostname
-              if (data.description) {
-                data.description = splitIntoParagraphs(data.description)
+              if (data.finding) {
+                data.findin = splitIntoParagraphs(data.finding)
               }
               if (data.safety) {
                 data.safety = splitIntoParagraphs(data.safety)
