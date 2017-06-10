@@ -1,32 +1,20 @@
-var AJV = require('ajv')
 var Busboy = require('busboy')
 var FormData = require('form-data')
 var concat = require('concat-stream')
-var crypto = require('crypto')
 var ecb = require('ecb')
-var encoding = require('../encoding')
 var fs = require('fs')
 var https = require('https')
 var latest = require('../latest')
 var methodNotAllowed = require('./method-not-allowed')
-var mkdirp = require('mkdirp')
 var mustache = require('mustache')
 var parse = require('json-parse-errback')
 var path = require('path')
+var publish = require('../publish')
 var pump = require('pump')
-var readKeypair = require('../keypair/read')
-var runParallel = require('run-parallel')
-var runSeries = require('run-series')
-var schema = require('../schemas/publication')
-var sodium = require('sodium-prebuilt').api
-var stringify = require('json-stable-stringify')
 var through2 = require('through2')
-var uuid = require('uuid/v4')
 
 var declaration = latest(require('../documents/declaration.json'))
 var license = latest(require('../documents/license.json'))
-
-var validate = new AJV({allErrors: true}).compile(schema)
 
 var JOURNALS = require('pct-minimum-documentation')
   .map(function (element) {
@@ -61,8 +49,6 @@ function get (request, response, configuration, errors) {
 
 // TODO:  Refactor.
 function post (request, response, configuration) {
-  var directory = configuration.directory
-  var fields = {}
   var parser
   /* istanbul ignore next */
   try {
@@ -73,7 +59,25 @@ function post (request, response, configuration) {
     response.end()
     return
   }
-  var attachments = [/* {stream, temporaryFile, digest}, ... */]
+  var fields = {}
+  var through = through2.obj()
+  pump(
+    through,
+    publish(configuration, request.log, function (digest) {
+      var location = '/publications/' + digest
+      response.statusCode = 201
+      response.setHeader('Content-Type', 'text/html; charset=UTF-8')
+      response.setHeader('Location', location)
+      response.end(redirectTo(location))
+    }),
+    function (error) {
+      if (error) {
+        request.log.error(error)
+        response.statusCode = error.statusCode || 500
+        response.end()
+      }
+    }
+  )
   request.pipe(
     parser
       .on('field', function (field, value) {
@@ -88,52 +92,14 @@ function post (request, response, configuration) {
           fields[field] = value
         }
       })
-      .on('file', function (field, file, filename, fileEncoding, mimetype) {
-        // Save to ./tmp/{UUID}.
-        var id = uuid()
-        var temporaryFile = path.join(directory, 'tmp', id)
-        var attachment = {
+      .on('file', function (field, file, filename, encoding, mimetype) {
+        through.write({
+          type: 'attachment',
           stream: file,
-          temporaryFile: temporaryFile,
-          type: (
-            mimetype + '; charset=' + fileEncoding
-          )
-        }
-        request.log.info('attachment', {
-          uuid: id,
           filename: filename,
-          encoding: fileEncoding,
+          encoding: encoding,
           mimetype: mimetype
         })
-        attachments.push(attachment)
-        var hash = crypto.createHash('sha256')
-        var size = 0
-        pump(
-          file,
-          // Compute SHA256 as we write to disk.
-          through2(function (chunk, chunkEncoding, done) {
-            size += chunk.length
-            hash.update(chunk, chunkEncoding)
-            this.push(chunk, chunkEncoding)
-            done()
-          }),
-          fs.createWriteStream(temporaryFile),
-          function (error, done) {
-            // TODO:  Fix this error handler.  Need more cleanup.
-            /* istanbul ignore next */
-            if (error) {
-              response.statusCode = 400
-              response.end()
-            } else {
-              if (size === 0) {
-                var index = attachments.indexOf(attachment)
-                attachments.splice(index, 1)
-              } else {
-                attachment.digest = encoding.encode(hash.digest())
-              }
-            }
-          }
-        )
       })
       .once('finish', function () {
         var captchaResponse = fields['g-recaptcha-response']
@@ -145,139 +111,15 @@ function post (request, response, configuration) {
             if (error) {
               response.statusCode = 500
               response.end()
+              through.end()
             /* istanbul ignore next */
             } else if (success === false) {
               response.statusCode = 400
               response.end('invalid captcha')
+              through.end()
             } else {
-              readKeypair(directory, function (error, keypair) {
-                /* istanbul ignore if */
-                if (error) {
-                  response.statusCode = 500
-                  response.end()
-                } else {
-                  var secretKey = keypair.secret
-                  var publicKey = keypair.public
-                  var time = new Date().toISOString()
-                  fields.attachments = attachments
-                    .map(function (attachment) {
-                      return attachment.digest
-                    })
-                    .sort()
-                  request.log.info('fields', fields)
-                  normalize(fields)
-                  validate(fields)
-                  var validationErrors = validate.errors
-                  if (validationErrors) {
-                    request.log.info(
-                      'validationErrors', validationErrors
-                    )
-                    get(
-                      request, response, configuration, validationErrors
-                    )
-                  } else {
-                    var record = Buffer.from(stringify(fields), 'utf8')
-                    var digest = encoding.encode(
-                      sodium.crypto_hash_sha256(record)
-                    )
-                    var uri = (
-                      'https://' + configuration.hostname +
-                      '/publications/' + digest
-                    )
-                    var timestamp = {
-                      digest: digest,
-                      uri: uri,
-                      timestamp: time
-                    }
-                    var signature = encoding.encode(
-                      sodium.crypto_sign_detached(
-                        Buffer.from(stringify(timestamp)),
-                        secretKey
-                      )
-                    )
-                    var pathPrefix = path.join(
-                      directory, 'publications', digest
-                    )
-                    runSeries([
-                      function writeJSONFile (done) {
-                        fs.writeFile(pathPrefix + '.json', record, done)
-                      },
-                      function createDirectory (done) {
-                        mkdirp(pathPrefix, done)
-                      },
-                      function writeTimestampFile (done) {
-                        fs.writeFile(
-                          path.join(
-                            pathPrefix,
-                            encoding.encode(publicKey) + '.json'
-                          ),
-                          stringify({
-                            timestamp: timestamp,
-                            signature: signature
-                          }),
-                          done
-                        )
-                      },
-                      function writeAttachments (done) {
-                        if (attachments.length > 0) {
-                          runParallel(
-                            attachments.reduce(
-                              function (tasks, attachment) {
-                                var file = path.join(
-                                  directory, 'publications', digest,
-                                  attachment.digest
-                                )
-                                return tasks.concat([
-                                  function writeTypeFile (done) {
-                                    fs.writeFile(
-                                      file + '.type',
-                                      attachment.type,
-                                      'utf8',
-                                      done
-                                    )
-                                  },
-                                  function moveFile (done) {
-                                    fs.rename(
-                                      attachment.temporaryFile, file,
-                                      done
-                                    )
-                                  }
-                                ])
-                              },
-                              []
-                            ),
-                            done
-                          )
-                        } else {
-                          done()
-                        }
-                      },
-                      function appendToAccessions (done) {
-                        fs.appendFile(
-                          path.join(directory, 'accessions'),
-                          time + ',' + digest + '\n',
-                          done
-                        )
-                      }
-                    ], function (error) {
-                      /* istanbul ignore if */
-                      if (error) {
-                        response.log.error(error)
-                        response.statusCode = 500
-                        response.end()
-                      } else {
-                        var location = '/publications/' + digest
-                        response.statusCode = 201
-                        response.setHeader(
-                          'Content-Type', 'text/html; charset=UTF-8'
-                        )
-                        response.setHeader('Location', location)
-                        response.end(redirectTo(location))
-                      }
-                    })
-                  }
-                }
-              })
+              normalize(fields)
+              through.write(fields)
             }
           }
         )
@@ -350,13 +192,9 @@ var DELETE_IF_EMPTY = [
   'safety'
 ]
 
-var ARRAYS = [
-  'journals', 'classifications', 'publications'
-]
+var ARRAYS = ['journals', 'classifications', 'publications']
 
-var NORMALIZE_LINES = [
-  'finding', 'safety'
-]
+var NORMALIZE_LINES = ['finding', 'safety']
 
 function normalize (record) {
   ARRAYS.forEach(function (key) {
