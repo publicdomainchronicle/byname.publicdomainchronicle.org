@@ -1,14 +1,7 @@
-var fs = require('fs')
 var http = require('http')
 var initialize = require('./initialize-directory')
 var makeHandler = require('./')
-var mkdirp = require('mkdirp')
-var path = require('path')
 var pino = require('pino')
-var runParallel = require('run-parallel')
-var runSeries = require('run-series')
-var touch = require('touch')
-var writeKeypair = require('./keypair/write')
 
 var NAME = require('./package.json').name
 var VERSION = require('./package.json').version
