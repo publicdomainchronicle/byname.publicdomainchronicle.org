@@ -179,6 +179,63 @@ tape('GET /accessions HTML', function (test) {
   })
 })
 
+tape('GET /accessions RSS', function (test) {
+  server(function (port, done) {
+    var location
+    runSeries([
+      function (done) {
+        var form = makeValidPublication('Test Title')
+        form.pipe(
+          http.request({
+            method: 'POST',
+            path: '/publish',
+            port: port,
+            headers: form.getHeaders()
+          })
+            .once('response', function (response) {
+              test.equal(
+                response.statusCode, 201,
+                'responds 201'
+              )
+              test.assert(
+                response.headers.location.startsWith('/publications/'),
+                'sets Location'
+              )
+              location = response.headers.location
+              done()
+            })
+        )
+      },
+      function (done) {
+        http.get({
+          path: '/accessions',
+          port: port,
+          headers: {accept: 'application/rss+xml'}
+        }, function (response) {
+          test.equal(
+            response.statusCode, 200,
+            'responds 200'
+          )
+          response.pipe(concat(function (body) {
+            test.assert(
+              body.toString().indexOf('Test Title') !== -1,
+              'body contains title'
+            )
+            test.assert(
+              body.toString().indexOf(location) !== -1,
+              'body contains location'
+            )
+            done()
+          }))
+        })
+      }
+    ], function () {
+      done()
+      test.end()
+    })
+  })
+})
+
 tape('GET /accessions XML', function (test) {
   server(function (port, done) {
     var request = {

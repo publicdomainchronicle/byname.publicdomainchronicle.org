@@ -3,8 +3,10 @@ var encoding = require('../encoding')
 var formatDate = require('../format-date')
 var fs = require('fs')
 var methodNotAllowed = require('./method-not-allowed')
+var parse = require('json-parse-errback')
 var path = require('path')
 var pump = require('pump')
+var rfc822 = require('rfc822-date')
 var split2 = require('split2')
 var through2 = require('through2')
 var trumpet = require('trumpet')
@@ -18,7 +20,7 @@ var BYTES_PER_LINE = require('../bytes-per-accession')
 module.exports = function (request, response, configuration) {
   if (request.method === 'GET') {
     var type = new Negotiator(request).mediaType([
-      'text/csv', 'text/html'
+      'text/csv', 'text/html', 'application/rss+xml'
     ])
     if (!type) {
       response.statusCode = 415
@@ -65,9 +67,80 @@ module.exports = function (request, response, configuration) {
           }),
           html.select('tbody').createWriteStream()
         )
+      } else if (type === 'application/rss+xml') {
+        response.setHeader(
+          'Content-Type', 'application/rss+xml; charset=UTF-8'
+        )
+        var through = through2.obj(
+          function (line, _, done) {
+            var self = this
+            var split = line.split(',')
+            var date = rfc822(new Date(split[0]))
+            var digest = split[1]
+            var link = (
+              configuration.hostname + '/publications/' + digest
+            )
+            var file = path.join(
+              configuration.directory, 'publications', digest + '.json'
+            )
+            fs.readFile(file, 'utf8', function (error, data) {
+              if (error) {
+                request.log.error(error)
+                done()
+              } else {
+                parse(data, function (error, publication) {
+                  if (error) {
+                    request.log.error(error)
+                    done()
+                  } else {
+                    self.push(`
+                      <item>
+                        <title>${escapeXML(publication.title)}</title>
+                        <link>${link}</link>
+                        <guid>${link}</guid>
+                        <pubDate>${date}</pubDate>
+                      </item>
+                    `)
+                    done()
+                  }
+                })
+              }
+            })
+          },
+          function (done) {
+            this.push('</channel></rss>')
+            done()
+          }
+        )
+        through.push(`
+          <?xml version="1.0"?>
+          <rss version="2.0">
+            <channel>
+              <title>Distributed Bulletin of Open Science</title>
+              <link>${configuration.hostname}</link>
+              <description>
+                Distributed Bulletin of Open Science publications
+                from ${configuration.hostname}
+              </description>
+        `)
+        pump(
+          fs.createReadStream(accessions),
+          split2(),
+          through,
+          response
+        )
       }
     }
   } else {
     methodNotAllowed(response)
   }
+}
+
+function escapeXML (string) {
+  return string
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/&/g, '&amp;')
 }
