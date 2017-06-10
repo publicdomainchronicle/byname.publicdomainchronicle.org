@@ -45,7 +45,6 @@ module.exports = function (configuration, log, callback) {
         writeAttachment(object, done)
       } else {
         writePublication(object, ecb(done, function (digest) {
-          console.log('setting digest')
           validPublication = digest
           done()
         }))
