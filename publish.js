@@ -38,16 +38,39 @@ var validate = new AJV({allErrors: true}).compile(schema)
 module.exports = function (configuration, log, callback) {
   var directory = configuration.directory
   var attachments = []
-  return flushWriteStream.obj(function (object, _, done) {
-    if (object.type === 'attachment') {
-      writeAttachment(object, done)
-    } else {
-      writePublication(object, ecb(done, function (digest) {
-        done()
-        callback(digest)
-      }))
+  var validPublication = false
+  return flushWriteStream.obj(
+    function (object, _, done) {
+      if (object.type === 'attachment') {
+        writeAttachment(object, done)
+      } else {
+        writePublication(object, ecb(done, function (digest) {
+          console.log('setting digest')
+          validPublication = digest
+          done()
+        }))
+      }
+    },
+    function (done) {
+      if (validPublication) {
+        callback(validPublication)
+      } else {
+        runParallel(
+          attachments.map(function (attachment) {
+            return function unlinkTemporaryFile (done) {
+              fs.unlink(attachment.temporaryFile, function (error) {
+                log.error(error)
+                done()
+              })
+            }
+          }),
+          function () {
+            done()
+          }
+        )
+      }
     }
-  })
+  )
 
   function writeAttachment (object, callback) {
     // Save to ./tmp/{UUID}.

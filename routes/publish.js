@@ -120,6 +120,7 @@ function post (request, response, configuration) {
             } else {
               normalize(fields)
               through.write(fields)
+              through.end()
             }
           }
         )
