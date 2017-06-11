@@ -25,10 +25,8 @@ var DIRECTORY = ENV.DATA || NAME
 
 var log = pino({name: NAME + '@' + VERSION})
 
-initialize(DIRECTORY, function (error) {
+initialize(DIRECTORY, function (error, keypair) {
   if (error) {
-    log.fatal({event: 'data'}, error)
-    process.exit(1)
   } else {
     log.info({event: 'data', directory: DIRECTORY})
     var configuration = {
@@ -36,6 +34,7 @@ initialize(DIRECTORY, function (error) {
       hostname: HOSTNAME,
       timeout: TIMEOUT,
       directory: DIRECTORY,
+      keypair: keypair,
       recaptcha: {
         public: RECAPTCHA_PUBLIC,
         secret: RECAPTCHA_SECRET

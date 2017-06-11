@@ -7,7 +7,6 @@ var fs = require('fs')
 var mkdirp = require('mkdirp')
 var path = require('path')
 var pump = require('pump')
-var readKeypair = require('./keypair/read')
 var runParallel = require('run-parallel')
 var runSeries = require('run-series')
 var schema = require('./schemas/publication')
@@ -117,123 +116,115 @@ module.exports = function (configuration, log, callback) {
   }
 
   function writePublication (publication, callback) {
-    readKeypair(directory, function (error, keypair) {
-      /* istanbul ignore if */
-      if (error) {
-        error.statusCode = 500
-        callback(error)
-      } else {
-        var secretKey = keypair.secret
-        var publicKey = keypair.public
-        var time = new Date().toISOString()
-        publication.attachments = attachments
-          .map(function (attachment) {
-            return attachment.digest
-          })
-          .sort()
-        log.info('publication', publication)
-        validate(publication)
-        var validationErrors = validate.errors
-        if (validationErrors) {
-          log.info('validationErrors', validationErrors)
-          var validationError = new Error('Invalid input')
-          validationError.validationErrors = validationErrors
-          callback(validationError)
-        } else {
-          var record = Buffer.from(stringify(publication), 'utf8')
-          var digest = encoding.encode(
-            sodium.crypto_hash_sha256(record)
-          )
-          var uri = (
-            'https://' + configuration.hostname +
-            '/publications/' + digest
-          )
-          var timestamp = {
-            digest: digest,
-            uri: uri,
-            timestamp: time
-          }
-          var signature = encoding.encode(
-            sodium.crypto_sign_detached(
-              Buffer.from(stringify(timestamp)),
-              secretKey
-            )
-          )
-          var pathPrefix = path.join(
-            directory, 'publications', digest
-          )
-          runSeries([
-            function writeJSONFile (done) {
-              fs.writeFile(pathPrefix + '.json', record, done)
-            },
-            function createDirectory (done) {
-              mkdirp(pathPrefix, done)
-            },
-            function writeTimestampFile (done) {
-              fs.writeFile(
-                path.join(
-                  pathPrefix,
-                  encoding.encode(publicKey) + '.json'
-                ),
-                stringify({
-                  timestamp: timestamp,
-                  signature: signature
-                }),
-                done
-              )
-            },
-            function writeAttachments (done) {
-              if (attachments.length > 0) {
-                runParallel(
-                  attachments.reduce(
-                    function (tasks, attachment) {
-                      var file = path.join(
-                        directory, 'publications', digest,
-                        attachment.digest
-                      )
-                      return tasks.concat([
-                        function writeTypeFile (done) {
-                          fs.writeFile(
-                            file + '.type',
-                            attachment.type,
-                            'utf8',
-                            done
-                          )
-                        },
-                        function moveFile (done) {
-                          fs.rename(
-                            attachment.temporaryFile, file,
-                            done
-                          )
-                        }
-                      ])
-                    },
-                    []
-                  ),
-                  done
-                )
-              } else {
-                done()
-              }
-            },
-            function appendToAccessions (done) {
-              fs.appendFile(
-                path.join(directory, 'accessions'),
-                time + ',' + digest + '\n',
-                done
-              )
-            }
-          ], function (error) {
-            /* istanbul ignore if */
-            if (error) {
-              error.statusCode = 500
-              callback(error)
-            } else {
-              callback(null, digest)
-            }
-          })
-        }
+    var secretKey = configuration.keypair.secret
+    var publicKey = configuration.keypair.public
+    var time = new Date().toISOString()
+    publication.attachments = attachments
+      .map(function (attachment) {
+        return attachment.digest
+      })
+      .sort()
+    log.info('publication', publication)
+    validate(publication)
+    var validationErrors = validate.errors
+    if (validationErrors) {
+      log.info('validationErrors', validationErrors)
+      var validationError = new Error('Invalid input')
+      validationError.validationErrors = validationErrors
+      callback(validationError)
+    } else {
+      var record = Buffer.from(stringify(publication), 'utf8')
+      var digest = encoding.encode(
+        sodium.crypto_hash_sha256(record)
+      )
+      var uri = (
+        'https://' + configuration.hostname +
+        '/publications/' + digest
+      )
+      var timestamp = {
+        digest: digest,
+        uri: uri,
+        timestamp: time
       }
-    })
+      var signature = encoding.encode(
+        sodium.crypto_sign_detached(
+          Buffer.from(stringify(timestamp)),
+          secretKey
+        )
+      )
+      var pathPrefix = path.join(
+        directory, 'publications', digest
+      )
+      runSeries([
+        function writeJSONFile (done) {
+          fs.writeFile(pathPrefix + '.json', record, done)
+        },
+        function createDirectory (done) {
+          mkdirp(pathPrefix, done)
+        },
+        function writeTimestampFile (done) {
+          fs.writeFile(
+            path.join(
+              pathPrefix,
+              encoding.encode(publicKey) + '.json'
+            ),
+            stringify({
+              timestamp: timestamp,
+              signature: signature
+            }),
+            done
+          )
+        },
+        function writeAttachments (done) {
+          if (attachments.length > 0) {
+            runParallel(
+              attachments.reduce(
+                function (tasks, attachment) {
+                  var file = path.join(
+                    directory, 'publications', digest,
+                    attachment.digest
+                  )
+                  return tasks.concat([
+                    function writeTypeFile (done) {
+                      fs.writeFile(
+                        file + '.type',
+                        attachment.type,
+                        'utf8',
+                        done
+                      )
+                    },
+                    function moveFile (done) {
+                      fs.rename(
+                        attachment.temporaryFile, file,
+                        done
+                      )
+                    }
+                  ])
+                },
+                []
+              ),
+              done
+            )
+          } else {
+            done()
+          }
+        },
+        function appendToAccessions (done) {
+          fs.appendFile(
+            path.join(directory, 'accessions'),
+            time + ',' + digest + '\n',
+            done
+          )
+        }
+      ], function (error) {
+        /* istanbul ignore if */
+        if (error) {
+          error.statusCode = 500
+          callback(error)
+        } else {
+          callback(null, digest)
+        }
+      })
+    }
   }
 }

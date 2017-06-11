@@ -10,13 +10,14 @@ var VERSION = require('../package.json').version
 var RANDOM_HIGH_PORT = 0
 
 module.exports = function (callback) {
-  fs.mkdtemp('/tmp/', function (_, directory) {
-    initialize(directory, function (_) {
+  fs.mkdtemp('/tmp/', function (ignore, directory) {
+    initialize(directory, function (ignore, keypair) {
       var configuration = {
         version: VERSION,
         hostname: 'testserver',
         timeout: 5000,
         directory: directory,
+        keypair: keypair,
         recaptcha: {
           // Use the test keys from reCAPTCHA FAQ.
           public: '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',

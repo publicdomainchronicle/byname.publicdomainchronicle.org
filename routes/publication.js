@@ -8,7 +8,6 @@ var mustache = require('mustache')
 var notFound = require('./not-found')
 var parse = require('json-parse-errback')
 var path = require('path')
-var readKeypair = require('../keypair/read')
 var runParallel = require('run-parallel')
 var send = require('send')
 var url = require('url')
@@ -64,22 +63,22 @@ module.exports = function (request, response, configuration) {
               }))
             },
             function readTimestamps (done) {
-              readKeypair(directory, ecb(done, function (keypair) {
-                var publicKey = encoding.encode(keypair.public)
-                var sig = path.join(
-                  pathPrefix, publicKey + '.json'
-                )
-                fs.readFile(sig, 'utf8', ecb(done, function (json) {
-                  parse(json, ecb(done, function (data) {
-                    var timestamp = data.timestamp
-                    timestamp.timestamp = new Date(timestamp.timestamp)
-                      .toLocaleString()
-                    timestamp.hostname = url.parse(timestamp.uri)
-                      .hostname
-                    timestamp.signature = encoding.format(data.signature)
-                    timestamps.push(timestamp)
-                    done()
-                  }))
+              var publicKey = encoding.encode(
+                configuration.keypair.public
+              )
+              var sig = path.join(
+                pathPrefix, publicKey + '.json'
+              )
+              fs.readFile(sig, 'utf8', ecb(done, function (json) {
+                parse(json, ecb(done, function (data) {
+                  var timestamp = data.timestamp
+                  timestamp.timestamp = new Date(timestamp.timestamp)
+                    .toLocaleString()
+                  timestamp.hostname = url.parse(timestamp.uri)
+                    .hostname
+                  timestamp.signature = encoding.format(data.signature)
+                  timestamps.push(timestamp)
+                  done()
                 }))
               }))
             }

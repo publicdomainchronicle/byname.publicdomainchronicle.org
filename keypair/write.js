@@ -10,5 +10,14 @@ module.exports = function (directory, callback) {
     public: encoding.encode(keypair.publicKey),
     secret: encoding.encode(keypair.secretKey)
   })
-  fs.writeFile(file, json, callback)
+  fs.writeFile(file, json, function (error) {
+    if (error) {
+      callback(error)
+    } else {
+      callback(null, {
+        public: keypair.publicKey,
+        secret: keypair.secretKey
+      })
+    }
+  })
 }

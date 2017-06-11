@@ -2,7 +2,6 @@ var encoding = require('../encoding')
 var methodNotAllowed = require('./method-not-allowed')
 var notFound = require('./not-found')
 var path = require('path')
-var readKeypair = require('../keypair/read')
 var send = require('send')
 
 module.exports = function (request, response, configuration) {
@@ -12,25 +11,17 @@ module.exports = function (request, response, configuration) {
       notFound(request, response)
     } else {
       var directory = configuration.directory
-      readKeypair(directory, function (error, keypair) {
-        /* istanbul ignore if */
-        if (error) {
-          response.statusCode = 500
+      var file = path.join(
+        directory, 'publications', digest,
+        configuration.keypair.public.toString('hex') + '.json'
+      )
+      send(request, file)
+        .on('error', /* istanbul ignore next */ function (error) {
+          request.log.error(error)
+          response.statusCode = error.status || 500
           response.end()
-        } else {
-          var file = path.join(
-            directory, 'publications', digest,
-            keypair.public.toString('hex') + '.json'
-          )
-          send(request, file)
-            .on('error', /* istanbul ignore next */ function (error) {
-              request.log.error(error)
-              response.statusCode = error.status || 500
-              response.end()
-            })
-            .pipe(response)
-        }
-      })
+        })
+        .pipe(response)
     }
   } else {
     methodNotAllowed(response)
