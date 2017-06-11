@@ -224,7 +224,8 @@ function readPeers (directory, callback) {
         var split = line.split(',')
         return {
           url: url.parse(split[0]),
-          last: parseInt(split[1])
+          publicKey: encoding.decode(split[1]),
+          last: parseInt(split[2])
         }
       })
     callback(null, peers)
