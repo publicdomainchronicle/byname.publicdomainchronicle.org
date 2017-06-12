@@ -35,10 +35,10 @@ module.exports = function (configuration, log) {
       }),
       ecb(logError, function () {
         if (peers.length === 0) {
-          log.info('done')
+          log.info({event: 'done'})
         } else {
           writePeers(directory, peers, ecb(logError, function () {
-            log.info('done')
+            log.info({event: 'done'})
           }))
         }
       })
@@ -170,7 +170,7 @@ function republish (configuration, peer, publication, log, done) {
     validate(record)
     var errors = validate.errors
     if (errors) {
-      log.info('validationErrors', errors)
+      log.info({'validationErrors': errors})
       var error = new Error('invalid record')
       error.validationErrors = errors
       return done(error)
