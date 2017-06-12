@@ -34,17 +34,15 @@ var validateTimestamp = new AJV({allErrors: true})
 module.exports = function (configuration, log) {
   var directory = configuration.directory
   readPeers(directory, ecb(logError, function (peers) {
-    log.info('peers', {
+    log.info({
       peers: peers.map(function (peer) {
         return url.format(peer.url)
       })
-    })
+    }, 'read peers')
     runParallel(
       peers.map(function (peer) {
         return function (done) {
-          var peerLog = log.child({
-            peer: peer.url.hostname
-          })
+          var peerLog = log.child({peer: peer.url.hostname})
           peerLog.info('replicating')
           replicatePeer(configuration, peerLog, peer, done)
         }
@@ -88,9 +86,7 @@ function replicatePeer (configuration, log, peer, done) {
           })
         }),
         flushWriteStream.obj(function (publication, _, done) {
-          var recordLog = log.child({
-            digest: publication.digest
-          })
+          var recordLog = log.child({digest: publication.digest})
           republish(configuration, recordLog, peer, publication, done)
         }),
         function (error) {
@@ -228,9 +224,8 @@ function republish (configuration, log, peer, publication, done) {
           var error = new Error('Could not get timestamp')
           error.statusCode = response.statusCode
           log.error({
-            get: 'timestamp',
             statusCode: response.statusCode
-          })
+          }, 'failed to get timestamp')
           done(error)
         } else {
           pump(
@@ -257,7 +252,7 @@ function republish (configuration, log, peer, publication, done) {
     validatePublication(record)
     var errors = validatePublication.errors
     if (errors) {
-      log.info('invalid publication', {errors: errors})
+      log.info({errors: errors}, 'invalid publication')
       var error = new Error('invalid record')
       error.validationErrors = errors
       return done(error)
@@ -280,14 +275,14 @@ function republish (configuration, log, peer, publication, done) {
     validateTimestamp(peerTimestamp.timestamp)
     var errors = validateTimestamp.errors
     if (errors) {
-      log.info('invalid timestamp', {errors: errors})
+      log.info({errors: errors}, 'invalid timestamp')
       var error = new Error('invalid timestamp')
       error.validationErrors = errors
       return done(error)
     }
     var keys = Object.keys(peerTimestamp)
     if (keys.length !== 2 || !keys.includes('signature')) {
-      log.info('invalid timestamp record', {keys: keys})
+      log.info({keys: keys}, 'invalid timestamp record')
       var error = new Error('invalid timestamp record')
       return done(error)
     }
