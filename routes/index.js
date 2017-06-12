@@ -19,7 +19,7 @@ routes.set('/accessions', require('./accessions'))
 routes.set('/accessions/:number', require('./accession'))
 
 routes.set('/publications/:digest', require('./publication'))
-routes.set('/publications/:digest/timestamp', require('./timestamp'))
+routes.set('/publications/:digest/timestamps/:key', require('./timestamp'))
 routes.set(
   '/publications/:digest/attachments/:attachment',
   require('./attachment')
