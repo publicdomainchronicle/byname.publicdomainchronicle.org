@@ -1,3 +1,4 @@
+var AJV = require('ajv')
 var concat = require('concat-stream')
 var ecb = require('ecb')
 var encoding = require('./encoding')
@@ -8,7 +9,6 @@ var parse = require('json-parse-errback')
 var path = require('path')
 var pump = require('pump')
 var pumpify = require('pumpify')
-var readKeypair = require('../keypair/read')
 var runParallel = require('run-parallel')
 var runSeries = require('run-series')
 var sodium = require('sodium-prebuilt').api
@@ -18,161 +18,259 @@ var through2 = require('through2')
 var url = require('url')
 var xtend = require('xtend')
 
+var validate = new AJV({allErrors: true})
+  .compile(require('./schemas/publication'))
+
 module.exports = function (configuration, log) {
   var directory = configuration.directory
-  readKeypair(directory, ecb(logError, function (keypair) {
-    readPeers(directory, ecb(logError, function (peers) {
-      runParallel(
-        peers.map(function (peer) {
-          return function (done) {
-            getPublicKey(peer, keypair, ecb(logError, function (key) {
-              peer.key = key
-              pump(
-                createNewPublicationsStream(peer),
-                flushWriteStream.obj(function (publication, _, done) {
-                  getJSON(peer, publication, function (error, record) {
-                    if (error) {
-                      logError(error)
-                      done()
-                    } else {
-                      var time = new Date().toISOString()
-                      // TODO: Validate publications from peers
-                      var digest = publication.digest
-                      runSeries([
-                        function copyFiles (done) {
-                          var tasks = record
-                            .attachments
-                            .map(function (attachment) {
-                              return function (done) {
-                                var file = path.join(
-                                  directory, 'publications',
-                                  digest, attachment
-                                )
-                                // Download the attachment file.
-                                download(
-                                  xtend(peer.url, {
-                                    path: (
-                                      peer.url.path +
-                                      '/publications/' + digest +
-                                      '/attachments/' + attachment
-                                    )
-                                  }),
-                                  file,
-                                  // Write Content-Type to .type file.
-                                  ecb(done, function (contentType) {
-                                    writeIfMissing(
-                                      file + '.type',
-                                      contentType,
-                                      done
-                                    )
-                                  })
-                                )
-                              }
-                            })
-                            .concat(function writeRecordJSON (done) {
-                              writeIfMissing(
-                                path.join(
-                                  directory, 'publications',
-                                  digest + '.json'
-                                ),
-                                stringify(record),
-                                done
-                              )
-                            })
-                            .concat(function writeTimestamp (done) {
-                              // TODO: Share logic with route.
-                              var timestamp = {
-                                digest: digest,
-                                uri: (
-                                  'https://' + configuration.hostname +
-                                  '/publications/' + digest
-                                ),
-                                timestamp: time
-                              }
-                              var signature = encoding.encode(
-                                sodium.crypto_sign_detached(
-                                  Buffer.from(stringify(timestamp)),
-                                  keypair.secret
-                                )
-                              )
-                              writeIfMissing(
-                                path.join(
-                                  directory, 'publications',
-                                  encoding.encode(keypair.public) +
-                                  '.json'
-                                ),
-                                stringify({
-                                  timestamp: timestamp,
-                                  signature: signature
-                                }),
-                                done
-                              )
-                            })
-                            .concat(function downloadTimestamp (done) {
-                              download(
-                                xtend(peer.url, {
-                                  path: (
-                                    peer.url.path +
-                                    '/publications/' + digest +
-                                    '/timestamps/' + peer.key
-                                  )
-                                }),
-                                path.join(
-                                  directory,
-                                  'publications', digest,
-                                  peer.key + '.json'
-                                ),
-                                done
-                              )
-                            })
-                          runParallel(tasks, done)
-                        },
-                        function appendToAccessionsLog (done) {
-                          fs.appendFile(
-                            path.join(directory, 'accessions'),
-                            time + ',' + publication.digest + '\n',
-                            function (error) {
-                              if (error) {
-                                logError(error)
-                                done()
-                              } else {
-                                peer.lastAccessionNumber = publication.accessionNumber
-                                done()
-                              }
-                            }
-                          )
-                        }
-                      ])
-                      lastAccessionNumber = publication.accessionNumber
-                    }
-                  })
-                })
-              )
-            }))
-          }
-        }),
-        function () {
-          writePeers(directory, peers, ecb(logError, function () {
-            log.info('done')
-          }))
-        }
-      )
-    }))
+  readPeers(directory, ecb(logError, function (peers) {
+    runParallel(
+      peers.map(function (peer) {
+        return replicatePeer.bind(null, configuration, peer, log)
+      }),
+      ecb(logError, function () {
+        writePeers(directory, peers, ecb(logError, function () {
+          log.info('done')
+        }))
+      })
+    )
   }))
 
   function logError (error) {
-    if (error) {
-      log.error(error)
+    log.error(error)
+  }
+}
+
+function replicatePeer (configuration, log, peer) {
+  pump(
+    createNewPublicationsStream(peer),
+    flushWriteStream.obj(function (publication, _, done) {
+      replicatePublication(configuration, log, peer, publication, done)
+    })
+  )
+}
+
+/*
+getRecord(peer, publication, function (error, record) {
+  if (error) {
+    log.error(error)
+    done()
+  } else {
+    var time = new Date().toISOString()
+    // TODO: Validate publications from peers
+    var digest = publication.digest
+    runSeries([
+      function copyFiles (done) {
+        var tasks = record
+          .attachments
+          .map(function (attachment) {
+            return function (done) {
+              var file = path.join(
+                directory, 'publications',
+                digest, attachment
+              )
+              // Download the attachment file.
+              download(
+                xtend(peer.url, {
+                  path: (
+                    peer.url.path +
+                    '/publications/' + digest +
+                    '/attachments/' + attachment
+                  )
+                }),
+                file,
+                // Write Content-Type to .type file.
+                ecb(done, function (contentType) {
+                  writeIfMissing(
+                    file + '.type',
+                    contentType,
+                    done
+                  )
+                })
+              )
+            }
+          })
+          .concat(function writeRecordJSON (done) {
+            writeIfMissing(
+              path.join(
+                directory, 'publications',
+                digest + '.json'
+              ),
+              stringify(record),
+              done
+            )
+          })
+          .concat(function writeTimestamp (done) {
+            // TODO: Share logic with route.
+            var timestamp = {
+              digest: digest,
+              uri: (
+                'https://' + hostname + '/publications/' + digest
+              ),
+              timestamp: time
+            }
+            var signature = encoding.encode(
+              sodium.crypto_sign_detached(
+                Buffer.from(stringify(timestamp)),
+                keypair.secret
+              )
+            )
+            writeIfMissing(
+              path.join(
+                directory, 'publications',
+                encoding.encode(keypair.public) +
+                '.json'
+              ),
+              stringify({
+                timestamp: timestamp,
+                signature: signature
+              }),
+              done
+            )
+          })
+          .concat(function downloadTimestamp (done) {
+            download(
+              xtend(peer.url, {
+                path: (
+                  peer.url.path +
+                  '/publications/' + digest +
+                  '/timestamps/' + peer.key
+                )
+              }),
+              path.join(
+                directory,
+                'publications', digest,
+                peer.key + '.json'
+              ),
+              done
+            )
+          })
+        runParallel(tasks, done)
+      },
+      function appendToAccessionsLog (done) {
+        fs.appendFile(
+          path.join(directory, 'accessions'),
+          time + ',' + publication.digest + '\n',
+          function (error) {
+            if (error) {
+              log.error(error)
+              done()
+            } else {
+              peer.lastAccessionNumber = publication.accessionNumber
+              done()
+            }
+          }
+        )
+      }
+    ])
+    lastAccessionNumber = publication.accessionNumber
+  }
+})
+*/
+
+function replicatePublication (configuration, peer, publication, log, done) {
+  var directory = configuration.directory
+  var keypair = configuration.keypair
+  var hostname = configuration.hostname
+
+  var record
+  var peerTimestamp
+  runSeries([
+    checkConflict,
+    runParallel.bind(null, [
+      getRecord,
+      getTimestamp
+    ]),
+    validateRecord,
+    validateTimestamp,
+    runParallel.bind(null, [
+      saveOwnTimestamp,
+      savePeerTimestamp,
+      savePublication,
+      getAndSaveAttachments
+    ])
+  ])
+
+  function checkConflict (done) {
+    
+  }
+
+  function getRecord (done) {
+    pump(
+      http.get(xtend(peer.url, {
+        path: peer.url.path + '/accessions/' + publication.digest,
+        headers: {accept: 'application/json'}
+      })),
+      concat(function (buffer) {
+        parse(buffer, ecb(done, function (parsed) {
+          record = parsed
+          done()
+        }))
+      }),
+      function (error) {
+        if (error) {
+          done(error)
+        }
+      }
+    )
+  }
+
+  function getTimestamp (done) {
+    pump(
+      http.get(xtend(peer.url, {
+        path: (
+          peer.url.path +
+          '/accessions/' + publication.digest +
+          '/timestamp/' + peer.publicKey
+        ),
+        headers: {accept: 'application/json'}
+      })),
+      concat(function (buffer) {
+        parse(buffer, ecb(done, function (parsed) {
+          peerTimestamp = parsed
+          done()
+        }))
+      }),
+      function (error) {
+        if (error) {
+          done(error)
+        }
+      }
+    )
+  }
+
+  function validateRecord (done) {
+    validate(record)
+    var errors = validate.errors
+    if (errors) {
+      log.info('validationErrors', errors)
+      var error = new Error('invalid record')
+      error.validationErrors = errors
+      done(error)
+    } else {
+      done()
     }
+  }
+
+  function validateTimestamp (done) {
+    done(
+      sodium.crypto_sign_verify_detached(
+        encoding.decode(peerTimestamp.signature),
+        Buffer.from(stringify(peerTimestamp.timestamp)),
+        peer.publicKey
+      )
+        ? new Error('Invalid peer timestamp')
+        : null
+    )
   }
 }
 
 function writeIfMissing (path, data, done) {
-  fs.access(to, fs.constants.F_OK, function (error) {
-    if (!error) {
-      done()
+  fs.writeFile(path, data, {flag: 'wx'}, function (error) {
+    if (error && error.code !== 'EEXIST') {
+      done(error)
     } else {
-      fs.writeFile(path, data, done)
+      done()
     }
   })
 }
@@ -198,21 +296,10 @@ function download (from, to, done) {
   })
 }
 
-function getJSON (peer, publication, done) {
-  pump(
-    http.get(xtend(peer.url, {
-      path: peer.url.path + '/accessions/' + publication.digest,
-      headers: {accept: 'application/json'}
-    })),
-    concat(function (buffer) {
-      parse(buffer, done)
-    }),
-    function (error) {
-      if (error) {
-        done(error)
-      }
-    }
-  )
+function getRecord (peer, publication, done) {
+}
+
+function getTimestamp (peer, publication, done) {
 }
 
 function readPeers (directory, callback) {
@@ -242,28 +329,6 @@ function writePeers (directory, peers, callback) {
       )
     })
   fs.writeFile(file, data, callback)
-}
-
-function getPublicKey (peer, ourKeyPair, callback) {
-  pump(
-    http.get(xtend(peer.url, {
-      path: peer.url.path + '/key'
-    })),
-    concat(function (buffer) {
-      // TODO: Validate peer public key.
-      var string = buffer.toString()
-      if (string === encoding.encode(ourKeyPair.public)) {
-        callback(new Error('Peer served our own public key'))
-      } else {
-        callback(null, buffer.toString())
-      }
-    }),
-    function (error) {
-      if (error) {
-        callback(error)
-      }
-    }
-  )
 }
 
 function createNewPublicationsStream (peer) {
