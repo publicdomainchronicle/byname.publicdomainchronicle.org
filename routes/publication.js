@@ -8,15 +8,17 @@ var mustache = require('mustache')
 var notFound = require('./not-found')
 var parse = require('json-parse-errback')
 var path = require('path')
+var readTimestamps = require('../util/read-timestamps')
 var runParallel = require('run-parallel')
 var send = require('send')
 var url = require('url')
+var xtend = require('xtend')
 
 var TEMPLATE = path.join(
   __dirname, '..', 'templates', 'publication.html'
 )
 
-module.exports = function (request, response, configuration) {
+module.exports = function (request, response, configuration, log) {
   if (request.method === 'GET') {
     var digest = request.params.digest
     if (!encoding.isDigest(digest)) {
@@ -46,7 +48,7 @@ module.exports = function (request, response, configuration) {
         } else if (type === 'text/html') {
           var template
           var data
-          var timestamps = []
+          var timestamps
           runParallel([
             function readTemplate (done) {
               fs.readFile(TEMPLATE, 'utf8', ecb(done, function (read) {
@@ -62,25 +64,30 @@ module.exports = function (request, response, configuration) {
                 }))
               }))
             },
-            function readTimestamps (done) {
-              var publicKey = encoding.encode(
-                configuration.keypair.public
-              )
-              var sig = path.join(
-                pathPrefix, publicKey + '.json'
-              )
-              fs.readFile(sig, 'utf8', ecb(done, function (json) {
-                parse(json, ecb(done, function (data) {
-                  var timestamp = data.timestamp
-                  timestamp.timestamp = new Date(timestamp.timestamp)
-                    .toLocaleString()
-                  timestamp.hostname = url.parse(timestamp.uri)
-                    .hostname
-                  timestamp.signature = encoding.format(data.signature)
-                  timestamps.push(timestamp)
+            function readAllTimestamps (done) {
+              readTimestamps(
+                directory, digest,
+                ecb(done, function (read) {
+                  timestamps = read
+                    .map(function (record) {
+                      var stamp = record.timestamp
+                      return {
+                        time: new Date(stamp.time),
+                        hostname: url.parse(stamp.uri).hostname,
+                        signature: encoding.format(record.signature)
+                      }
+                    })
+                    .sort(function (a, b) {
+                      return a.time - b.time
+                    })
+                    .map(function (record) {
+                      return xtend(record, {
+                        time: record.time.toLocaleString()
+                      })
+                    })
                   done()
-                }))
-              }))
+                })
+              )
             }
           ], function (error) {
             if (error) {
