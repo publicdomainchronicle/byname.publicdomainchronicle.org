@@ -148,7 +148,7 @@ module.exports = function (configuration, log, callback) {
       var timestamp = {
         digest: digest,
         uri: uri,
-        timestamp: time
+        time: time
       }
       var signature = encoding.encode(
         sodium.crypto_sign_detached(

@@ -46,7 +46,7 @@ tape('schema', function (suite) {
         'ebc72160fa6fcdce751e5d7298c8df58' +
         '3e6131eec161faf52094159e05c6d350'
       ),
-      timestamp: new Date().toISOString()
+      time: new Date().toISOString()
     })
     test.equal(validate.errors, null)
     test.end()

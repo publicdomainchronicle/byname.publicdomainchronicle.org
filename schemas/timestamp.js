@@ -9,13 +9,13 @@ module.exports = {
       type: 'string',
       format: 'uri'
     },
-    timestamp: {
+    time: {
       type: 'string',
       format: 'date-time'
     }
   },
   required: [
-    'timestamp',
+    'time',
     'digest',
     'uri'
   ],
