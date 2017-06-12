@@ -1,4 +1,5 @@
 var AJV = require('ajv')
+var attachmentPath = require('./util/attachment-path')
 var crypto = require('crypto')
 var ecb = require('ecb')
 var encoding = require('./encoding')
@@ -7,12 +8,15 @@ var fs = require('fs')
 var mkdirp = require('mkdirp')
 var path = require('path')
 var pump = require('pump')
+var recordDirectoryPath = require('./util/record-directory-path')
+var recordPath = require('./util/record-path')
 var runParallel = require('run-parallel')
 var runSeries = require('run-series')
 var schema = require('./schemas/publication')
 var sodium = require('sodium-prebuilt').api
 var stringify = require('json-stable-stringify')
 var through2 = require('through2')
+var timestampPath = require('./util/timestamp-path')
 var uuid = require('uuid/v4')
 
 var validate = new AJV({allErrors: true}).compile(schema)
@@ -152,22 +156,16 @@ module.exports = function (configuration, log, callback) {
           secretKey
         )
       )
-      var pathPrefix = path.join(
-        directory, 'publications', digest
-      )
       runSeries([
         function writeJSONFile (done) {
-          fs.writeFile(pathPrefix + '.json', record, done)
+          fs.writeFile(recordPath(directory, digest), record, done)
         },
         function createDirectory (done) {
-          mkdirp(pathPrefix, done)
+          mkdirp(recordDirectoryPath(directory, digest), done)
         },
         function writeTimestampFile (done) {
           fs.writeFile(
-            path.join(
-              pathPrefix,
-              encoding.encode(publicKey) + '.json'
-            ),
+            timestampPath(directory, digest, publicKey),
             stringify({
               timestamp: timestamp,
               signature: signature
@@ -180,9 +178,8 @@ module.exports = function (configuration, log, callback) {
             runParallel(
               attachments.reduce(
                 function (tasks, attachment) {
-                  var file = path.join(
-                    directory, 'publications', digest,
-                    attachment.digest
+                  var file = attachmentPath(
+                    directory, digest, attachment.digest
                   )
                   return tasks.concat([
                     function writeTypeFile (done) {
