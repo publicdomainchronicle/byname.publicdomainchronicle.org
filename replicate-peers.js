@@ -25,8 +25,11 @@ var timestampPath = require('./util/timestamp-path')
 var url = require('url')
 var xtend = require('xtend')
 
-var validate = new AJV({allErrors: true})
+var validatePublication = new AJV({allErrors: true})
   .compile(require('./schemas/publication'))
+
+var validateTimestamp = new AJV({allErrors: true})
+  .compile(require('./schemas/timestamp'))
 
 module.exports = function (configuration, log) {
   var directory = configuration.directory
@@ -251,10 +254,10 @@ function republish (configuration, log, peer, publication, done) {
   }
 
   function validateRecord (done) {
-    validate(record)
-    var errors = validate.errors
+    validatePublication(record)
+    var errors = validatePublication.errors
     if (errors) {
-      log.info({'validationErrors': errors})
+      log.info('invalid publication', {errors: errors})
       var error = new Error('invalid record')
       error.validationErrors = errors
       return done(error)
@@ -274,6 +277,20 @@ function republish (configuration, log, peer, publication, done) {
   }
 
   function validatePeerTimestamp (done) {
+    validateTimestamp(peerTimestamp.timestamp)
+    var errors = validateTimestamp.errors
+    if (errors) {
+      log.info('invalid timestamp', {errors: errors})
+      var error = new Error('invalid timestamp')
+      error.validationErrors = errors
+      return done(error)
+    }
+    var keys = Object.keys(peerTimestamp)
+    if (keys.length !== 2 || !keys.includes('signature')) {
+      log.info('invalid timestamp record', {keys: keys})
+      var error = new Error('invalid timestamp record')
+      return done(error)
+    }
     var digestsMatch = (
       peerTimestamp.timestamp.digest ===
       encoding.encode(
@@ -316,7 +333,7 @@ function republish (configuration, log, peer, publication, done) {
         'https://' + configuration.hostname +
         '/publications/' + publication.digest
       ),
-      timestamp: time
+      time: time
     }
     var signature = encoding.encode(
       sodium.crypto_sign_detached(
