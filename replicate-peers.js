@@ -34,9 +34,13 @@ module.exports = function (configuration, log) {
         return replicatePeer.bind(null, configuration, peer, log)
       }),
       ecb(logError, function () {
-        writePeers(directory, peers, ecb(logError, function () {
+        if (peers.length === 0) {
           log.info('done')
-        }))
+        } else {
+          writePeers(directory, peers, ecb(logError, function () {
+            log.info('done')
+          }))
+        }
       })
     )
   }))
@@ -318,19 +322,27 @@ function download (from, to, done) {
 
 function readPeers (directory, callback) {
   var file = path.join(directory, 'peers')
-  fs.readFile(file, 'utf8', ecb(callback, function (string) {
-    var peers = string
-      .split('\n')
-      .map(function (line) {
-        var split = line.split(',')
-        return {
-          url: url.parse(split[0]),
-          publicKey: encoding.decode(split[1]),
-          last: parseInt(split[2])
-        }
-      })
-    callback(null, peers)
-  }))
+  fs.readFile(file, 'utf8', function (error, string) {
+    if (error) {
+      if (error.code === 'ENOENT') {
+        callback(null, [])
+      } else {
+        callback(error)
+      }
+    } else {
+      var peers = string
+        .split('\n')
+        .map(function (line) {
+          var split = line.split(',')
+          return {
+            url: url.parse(split[0]),
+            publicKey: encoding.decode(split[1]),
+            last: parseInt(split[2])
+          }
+        })
+      callback(null, peers)
+    }
+  })
 }
 
 function writePeers (directory, peers, callback) {
