@@ -6,11 +6,12 @@ var encoding = require('./encoding')
 var flushWriteStream = require('flush-write-stream')
 var fs = require('fs')
 var http = require('http-https')
+var latest = semver.maxSatisfying(Object.keys(versions), '*')
 var mkdirp = require('mkdirp')
 var parse = require('json-parse-errback')
 var path = require('path')
-var pumpify = require('pumpify')
 var pump = require('pump')
+var pumpify = require('pumpify')
 var readRecord = require('./util/read-record')
 var recordDirectoryPath = require('./util/record-directory-path')
 var recordPath = require('./util/record-path')
@@ -26,10 +27,10 @@ var url = require('url')
 var xtend = require('xtend')
 
 var validatePublication = new AJV({allErrors: true})
-  .compile(require('./schemas/publication'))
+  .compile(latest(require('./schemas/publication')))
 
 var validateTimestamp = new AJV({allErrors: true})
-  .compile(require('./schemas/timestamp'))
+  .compile(latest(require('./schemas/timestamp')))
 
 module.exports = function (configuration, log) {
   var directory = configuration.directory
@@ -344,7 +345,8 @@ function republish (configuration, log, peer, publication, done) {
     files.push(file)
     var data = stringify({
       timestamp: timestamp,
-      signature: signature
+      signature: signature,
+      version: timestampSchema.properties.version.constant
     })
     fs.writeFile(file, data, 'utf8', ecb(done, function () {
       log.info('saved own timestamp')

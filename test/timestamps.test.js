@@ -69,6 +69,10 @@ tape('GET /publication/{created}/timestamps/{key}', function (test) {
     ], function () {
       var signature = Buffer.from(timestamp.signature, 'hex')
       test.assert(
+        timestamp.hasOwnProperty('version'),
+        'has version'
+      )
+      test.assert(
         location.endsWith(timestamp.timestamp.digest),
         'digests match'
       )

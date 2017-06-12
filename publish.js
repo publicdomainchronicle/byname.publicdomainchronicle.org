@@ -5,6 +5,7 @@ var ecb = require('ecb')
 var encoding = require('./encoding')
 var flushWriteStream = require('flush-write-stream')
 var fs = require('fs')
+var latest = require('./latest')
 var mkdirp = require('mkdirp')
 var path = require('path')
 var pump = require('pump')
@@ -12,14 +13,17 @@ var recordDirectoryPath = require('./util/record-directory-path')
 var recordPath = require('./util/record-path')
 var runParallel = require('run-parallel')
 var runSeries = require('run-series')
-var schema = require('./schemas/publication')
 var sodium = require('sodium-prebuilt').api
 var stringify = require('json-stable-stringify')
 var through2 = require('through2')
 var timestampPath = require('./util/timestamp-path')
 var uuid = require('uuid/v4')
 
-var validate = new AJV({allErrors: true}).compile(schema)
+var publicationSchema = latest(require('./schemas/publication'))
+var timestampSchema = latest(require('./schemas/timestamp'))
+
+var validatePublication = new AJV({allErrors: true})
+  .compile(publicationSchema)
 
 // TODO: Delete attachment files in /tmp for invalid publications.
 
@@ -129,8 +133,9 @@ module.exports = function (configuration, log, callback) {
       })
       .sort()
     log.info('publication', publication)
-    validate(publication)
-    var validationErrors = validate.errors
+    publication.version = '1.0.0'
+    validatePublication(publication)
+    var validationErrors = validatePublication.errors
     if (validationErrors) {
       log.info('validationErrors', validationErrors)
       var validationError = new Error('Invalid input')
@@ -168,7 +173,8 @@ module.exports = function (configuration, log, callback) {
             timestampPath(directory, digest, publicKey),
             stringify({
               timestamp: timestamp,
-              signature: signature
+              signature: signature,
+              version: timestampSchema.properties.version.constant
             }),
             done
           )
