@@ -8,6 +8,8 @@ The server reads and stores all information to disk, within the directory specif
 
 - `${DIRECTORY}/accessions` is an append-only, line-delimited, plain-text file.  Each line contains an ISO8601 timestamp, followed by a comma, and then a hex-encoded SHA256 publication digest.  The line number is the accession number of the publication.  Each line is less than Linux' `PIPE_BUF`, affording atomicity.
 
+- `${DIRECTORY}/peers` is an optional, line-delimited, comma-separate-values file.  Each line contains the URI and hex-encoded public key of another DBOS server, followed by the accession number of the latest publication republished by this DBOS server.  The server will periodically check these peer servers for new publications, validate them, and if it finds them valid, republish them, with both the peer's timestamp and a new timestamp.
+
 - `${DIRECTORY}/publications/` contains:
 
   - `{digest}.json` files, deterministically-serialized JSON objects representing publications, with the addition of date stamps.
