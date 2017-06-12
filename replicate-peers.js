@@ -68,7 +68,7 @@ module.exports = function (configuration, log) {
 
 function replicatePeer (configuration, log, peer, done) {
   var request = xtend(peer.url, {
-    path: peer.url.path + '/accessions?from=' + peer.last,
+    path: peer.url.path + '/accessions?from=' + (peer.last + 1),
     headers: {accept: 'text/csv'}
   })
   http.request(request)
