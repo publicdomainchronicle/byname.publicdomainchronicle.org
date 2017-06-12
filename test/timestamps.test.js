@@ -128,7 +128,7 @@ tape('GET /publication/{created}/timestamp/{key}', function (test) {
       },
       function (done) {
         http.get({
-          path: location + '/timestamp/' + publicKey,
+          path: location + '/timestamp',
           port: port
         }, function (response) {
           test.equal(
