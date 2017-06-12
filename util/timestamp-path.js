@@ -1,7 +1,7 @@
 var path = require('path')
 var encoding = require('../encoding')
 
-module.exports = function (directory, digest, publicKey, done) {
+module.exports = function (directory, digest, publicKey) {
   return path.join(
     directory, 'publications', digest,
     (

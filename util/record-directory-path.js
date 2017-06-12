@@ -1,5 +1,5 @@
 var path = require('path')
 
-module.exports = function (directory, digest, done) {
+module.exports = function (directory, digest) {
   return path.join(directory, 'publications', digest)
 }
