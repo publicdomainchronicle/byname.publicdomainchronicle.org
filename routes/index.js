@@ -12,14 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+var glob = require('glob')
+var path = require('path')
 var serveDocument = require('./serve-document')
 var serveFile = require('./serve-file')
+var serveAllFiles = require('./serve-all-files')
 
 var routes = module.exports = require('http-hash')()
 
 routes.set('/', serveFile('homepage.html'))
-routes.set('/styles.css', serveFile('styles.css'))
+
+serveAllFiles(routes, 'png')
+serveAllFiles(routes, 'css')
 
 routes.set('/about', serveFile('about.html'))
 
