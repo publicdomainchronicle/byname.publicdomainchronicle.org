@@ -106,7 +106,8 @@ module.exports = function (request, response, configuration) {
             var date = rfc822(new Date(split[0]))
             var digest = split[1]
             var link = (
-              configuration.hostname + '/publications/' + digest
+              'https://' + configuration.hostname +
+              '/publications/' + digest
             )
             var file = path.join(
               configuration.directory, 'publications', digest + '.json'
