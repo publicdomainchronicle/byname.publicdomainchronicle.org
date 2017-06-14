@@ -5,9 +5,7 @@
     <link href=styles.css rel=stylesheet>
   </head>
   <body>
-    <header>
-      <h1>Publish in the Distributed Bulletin of Open Science</h1>
-    </header>
+    {{> header}}
 
     <main>
       <p>Use this form to contribute scientific work to the public domain by publishing it to the Distributed Bullet of Open Science.  For more about DBOS, see the <a href=/about>about page</a>.</p>
@@ -202,6 +200,10 @@
         </section>
       </form>
     </main>
+
+    {{> nav}}
+
+    {{> footer}}
 
     <script src=publish.js></script>
     <script src=https://www.google.com/recaptcha/api.js></script>

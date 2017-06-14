@@ -23,6 +23,7 @@ var latest = require('../latest')
 var methodNotAllowed = require('./method-not-allowed')
 var mustache = require('mustache')
 var parse = require('json-parse-errback')
+var partials = require('../partials')
 var path = require('path')
 var publish = require('../publish')
 var pump = require('pump')
@@ -50,13 +51,17 @@ function get (request, response, configuration, errors) {
       response.end()
     } else {
       response.end(
-        mustache.render(template, {
-          journals: JOURNALS,
-          RECAPTCHA_PUBLIC: configuration.recaptcha.public,
-          errors: errors,
-          license: license,
-          declaration: declaration
-        })
+        mustache.render(
+          template,
+          {
+            journals: JOURNALS,
+            RECAPTCHA_PUBLIC: configuration.recaptcha.public,
+            errors: errors,
+            license: license,
+            declaration: declaration
+          },
+          partials
+        )
       )
     }
   })
