@@ -7,14 +7,15 @@ body {
 }
 
 main {
-  text-align: left;
-  display: inline-block;
+  border-right: 1px solid #eee;
   color: rgb(102, 102, 102);
+  display: inline-block;
   margin: 0 auto;
-  vertical-align: top;
   max-width: 40rem;
   padding-bottom: 5rem;
   padding-top: 2rem;
+  text-align: left;
+  vertical-align: top;
 }
 
 main p {
@@ -23,7 +24,6 @@ main p {
 }
 
 nav {
-  border-left: 1px solid #eee;
   display: inline-block;
   height: 100%;
   max-width: 10rem;
