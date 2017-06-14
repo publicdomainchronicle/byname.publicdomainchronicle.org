@@ -5,20 +5,17 @@
     <link href=styles.css rel=stylesheet>
   </head>
   <body>
-    <header>
-      <h1>Distributed Bulletin of Open Science</h1>
-    </header>
+    {{> header}}
+
     <main>
       <h1>Users Guide</h1>
 
-      <p>This is a guide to DBOS, the Distributed Bulletin of Open Science.  Read this guide before <a href=/publish>publishing</a> with DBOS, whenever your affiliation changes, and whenever you would like a refresher.</p>
+      <ul>
+        <li><a href=#fit>Is DBOS a good fit for my finding?</a></li>
+        <li><a href=#use>Can I use DBOS?</a></li>
+      </ul>
 
-      <nav>
-        <ul>
-          <li><a href=#fit>Is DBOS a good fit for my finding?</a></li>
-          <li><a href=#use>Can I use DBOS?</a></li>
-        </ul>
-      </nav>
+      <p>This is a guide to DBOS, the Distributed Bulletin of Open Science.  Read this guide before <a href=/publish>publishing</a> with DBOS, whenever your affiliation changes, and whenever you would like a refresher.</p>
 
       <h2 id=fit>Is DBOS a good fit for my finding?</h2>
 
@@ -101,5 +98,9 @@
 
       <p>It is very difficult to generalize the legal environment of nonprofit organizations, because they vary so widely.  Scientists at nonprofit community labs or research centers may be subject to few if any relevant rules, like <a href=#independent>independent scientists</a>.  Nonprofits may also have policies and legal requirements like those of <a href=#academic>academic</a> institutions, and many academic universities are indeed nonprofit.  However, even tax-exempt nonprofits may engage in contract or other relationships that utilize <a href=#commercial>commercial</a> terms and approaches, related or unrelated to the purpose of the nonprofit.</p>
     </main>
+
+    {{> nav}}
+
+    {{> footer}}
   </body>
 </html>

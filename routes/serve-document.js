@@ -15,6 +15,7 @@
 
 var Negotiator = require('negotiator')
 var fs = require('fs')
+var glob = require('glob')
 var latest = require('../latest')
 var methodNotAllowed = require('./method-not-allowed')
 var mustache = require('mustache')
@@ -28,6 +29,16 @@ var documents = path.join(__dirname, '..', 'documents')
 var TEMPLATE = path.join(
   __dirname, '..', 'templates', 'document.html'
 )
+
+// FIXME
+var partials = glob.sync(
+  path.join(__dirname, '..', 'static', 'partials', '*')
+)
+  .reduce(function (partials, file) {
+    var name = path.basename(file, '.mustache')
+    partials[name] = fs.readFileSync(file, 'utf8')
+    return partials
+  }, {})
 
 module.exports = function (name) {
   return function (request, response) {
@@ -82,7 +93,7 @@ module.exports = function (name) {
                         'text/html; charset=UTF-8'
                       )
                       response.end(
-                        mustache.render(t, latest(data))
+                        mustache.render(t, latest(data), partials)
                       )
                     }
                   })

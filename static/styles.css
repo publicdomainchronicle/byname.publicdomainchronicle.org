@@ -3,53 +3,70 @@ body {
   font-family: sans-serif;
   font-weight: 500;
   line-height: 1.7em;
+  text-align: center;
 }
 
 main {
+  text-align: left;
+  display: inline-block;
+  color: rgb(102, 102, 102);
   margin: 0 auto;
-  max-width: 50rem;
+  vertical-align: top;
+  max-width: 40rem;
   padding-bottom: 5rem;
   padding-top: 2rem;
 }
 
+main p {
+  color: rgb(102, 102, 102);
+  font-family: "PT Sans", Helvetica, Arial, Lucida, sans-serif;
+}
+
+nav {
+  border-left: 1px solid #eee;
+  display: inline-block;
+  height: 100%;
+  max-width: 10rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 1rem 0 1rem 2rem;
+}
+
+nav a {
+  color: #777;
+  text-transform: uppercase;
+}
+
+nav a:hover {
+  color: rgb(88, 175, 54);
+}
+
 header {
+  border-bottom: 1px solid #eee;
+  padding: 0.5rem 0;
   text-align: center;
   width: 100%;
-}
-
-.foundation {
-  padding: 0.5rem 0;
-}
-
-.project {
-  background-image: url(/polygon-background.png);
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  color: white;
-  font-size: 0.8rem;
-  text-align: left;
-  text-transform: lowercase;
-}
-
-.projectTitle {
-  color: white;
-  margin: 0 auto;
-  max-width: 50rem;
-  padding: 3rem 0;
 }
 
 .bottomLinks {
   background-color: rgb(68, 68, 68);
-  border-top: 1px solid #777;
+  color: white;
   font-size: 80%;
   margin: 1rem auto 0 auto;
-  width: 100%;
   padding: 3rem 0;
-  text-align: center;
   position: relative;
+  text-align: center;
   vertical-align: top;
-  color: white;
+  width: 100%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #515151;
+  font-family: 'Roboto', Helvetica, Arial, Lucida, sans-serif;
 }
 
 .bottomLinks h1 {
@@ -234,4 +251,8 @@ li {
 a {
   color: #2ea3f2;
   text-decoration: none;
+}
+
+.lead{
+  font-weight: bold;
 }

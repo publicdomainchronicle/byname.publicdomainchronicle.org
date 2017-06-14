@@ -2,25 +2,24 @@
 <html lang=en>
   <head>
     <title>Distributed Bulletin of Open Science / About</title>
+    <link href=/normalize.css rel=stylesheet>
     <link href=styles.css rel=stylesheet>
   </head>
+
   <body>
-    <header>
-      <h1>Distributed Bulletin of Open Science</h1>
-    </header>
+    {{> header}}
+
     <main>
       <h1>About</h1>
 
-      <nav>
-        <ul>
-          <li><a href=#for>What is DBOS?</a></li>
-          <li><a href=#work>How does DBOS work?</a></li>
-          <li><a href=#copyright>How does DBOS address copyright?</a></li>
-          <li><a href=#patent>How does DBOS address patent?</a></li>
-          <li><a href=#race>What&rsquo;s the &ldquo;race to the publisher&rdquo;?</a></li>
-          <li><a href=#compare>How does DBOS compare?</a></li>
-        </ul>
-      </nav>
+      <ul>
+        <li><a href=#for>What is DBOS?</a></li>
+        <li><a href=#work>How does DBOS work?</a></li>
+        <li><a href=#copyright>How does DBOS address copyright?</a></li>
+        <li><a href=#patent>How does DBOS address patent?</a></li>
+        <li><a href=#race>What&rsquo;s the &ldquo;race to the publisher&rdquo;?</a></li>
+        <li><a href=#compare>How does DBOS compare?</a></li>
+      </ul>
 
       <h2 id=for>What is DBOS?</h2>
 
@@ -191,5 +190,9 @@
 
       <p>Like a weblog, DBOS allows scientists to publish to the Internet instantaneously, in a format with few inconvenient constraints, and opportunity to categorize and link their disclosures for context.  Bloggers may also choose to apply open licenses to their posts.  DBOS publications offer the advantages of good, structured, machine-readable data on top of the searchability that general Internet search engines provide.  The standard format of DBOS publications, as well as their public licenses and cryptographic features, allow others to syndicate, index, aggregate, and archive them, efficiently and reliably.</p>
     </main>
+
+    {{> nav}}
+
+    {{> footer}}
   </body>
 </html>

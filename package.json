@@ -53,6 +53,7 @@
   },
   "private": true,
   "scripts": {
+    "build": "make",
     "coverage": "istanbul check-coverage coverage/coverage.json",
     "depcheck": "depcheck --ignores chromedriver",
     "lint": "standard",
