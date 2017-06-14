@@ -29,6 +29,8 @@ routes.set('/about', serveFile('about.html'))
 
 routes.set('/guide', serveFile('guide.html'))
 
+routes.set('/host', serveFile('host.html'))
+
 routes.set('/publish', require('./publish'))
 routes.set('/publish.js', serveFile('publish.js'))
 
