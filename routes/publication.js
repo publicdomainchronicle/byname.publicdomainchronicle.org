@@ -122,6 +122,9 @@ module.exports = function (request, response, configuration, log) {
               if (data.safety) {
                 data.safety = splitIntoParagraphs(data.safety)
               }
+              response.setHeader(
+                'Content-Type', 'text/html; charset=UTF-8'
+              )
               response.end(
                 mustache.render(template, data, partials)
               )
