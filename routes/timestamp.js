@@ -16,7 +16,6 @@
 var encoding = require('../encoding')
 var methodNotAllowed = require('./method-not-allowed')
 var notFound = require('./not-found')
-var path = require('path')
 var send = require('send')
 var timestampPath = require('../util/timestamp-path')
 

@@ -12,8 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var glob = require('glob')
-var path = require('path')
 var serveDocument = require('./serve-document')
 var serveFile = require('./serve-file')
 var serveAllFiles = require('./serve-all-files')
@@ -41,7 +39,9 @@ routes.set('/rss.xml', require('./accessions'))
 routes.set('/accessions/:number', require('./accession'))
 
 routes.set('/publications/:digest', require('./publication'))
-routes.set('/publications/:digest/timestamps/:key', require('./timestamp'))
+routes.set(
+  '/publications/:digest/timestamps/:key', require('./timestamp')
+)
 routes.set(
   '/publications/:digest/attachments/:attachment',
   require('./attachment')

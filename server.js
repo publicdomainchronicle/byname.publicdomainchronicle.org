@@ -18,10 +18,6 @@ var initialize = require('./initialize-directory')
 var makeHandler = require('./')
 var pino = require('pino')
 var replicatePeers = require('./replicate-peers')
-var runParallel = require('run-parallel')
-var runSeries = require('run-series')
-var touch = require('touch')
-var writeKeypair = require('./keypair/write')
 
 var NAME = require('./package.json').name
 var VERSION = require('./package.json').version

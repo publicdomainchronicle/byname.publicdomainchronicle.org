@@ -23,7 +23,7 @@ module.exports = function (directory, digest, publicKey) {
       typeof publicKey === 'string'
         ? publicKey
         : encoding.encode(publicKey)
-    )
-    + '.json'
+    ) +
+    '.json'
   )
 }

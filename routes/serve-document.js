@@ -15,7 +15,6 @@
 
 var Negotiator = require('negotiator')
 var fs = require('fs')
-var glob = require('glob')
 var latest = require('../latest')
 var methodNotAllowed = require('./method-not-allowed')
 var mustache = require('mustache')
