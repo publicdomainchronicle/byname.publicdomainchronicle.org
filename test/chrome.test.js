@@ -29,7 +29,7 @@ tape('chrome', function (suite) {
         .click('input[name=license]')
         .click('button.safety')
         .click('input[type=submit]')
-        .waitForExist('.title')
+        .waitForExist('h1')
         .isExisting('//*[contains(text(), "Test Invention")]')
         .then(function (existing) {
           test.assert(existing)
