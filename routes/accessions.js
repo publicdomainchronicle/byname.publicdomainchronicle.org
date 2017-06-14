@@ -45,57 +45,7 @@ module.exports = function (request, response, configuration) {
     } else {
       var accessions = path.join(configuration.directory, 'accessions')
       /* istanbul ignore else */
-      if (type === 'text/csv') {
-        response.setHeader('Content-Type', 'text/csv; charset=ASCII')
-        var options = request.query.from
-          ? {start: BYTES_PER_LINE * (parseInt(request.query.from) - 1)}
-          : {}
-        fs.createReadStream(accessions, options)
-          .once('error', /* istanbul ignore next */ function (error) {
-            request.log.error(error)
-            response.statusCode = 500
-            response.end()
-          })
-          .pipe(response)
-      } else if (type === 'text/html') {
-        var data = {accessions: []}
-        var counter = 0
-        pump(
-          fs.createReadStream(accessions),
-          split2(),
-          flushWriteStream.obj(function (line, _, done) {
-            var split = line.split(',')
-            var timestamp = formatDate(new Date(split[0]))
-            data.accessions.push({
-              number: ++counter,
-              timestamp: timestamp,
-              digest: encoding.encode(split[1]),
-              formattedDigest: encoding.format(split[1])
-            })
-            done()
-          }),
-          function (error) {
-            if (error) {
-              response.statusCode = 500
-              response.end()
-            } else {
-              fs.readFile(TEMPLATE, 'utf8', function (error, template) {
-                if (error) {
-                  response.statusCode = 500
-                  response.end()
-                } else {
-                  response.setHeader(
-                    'Content-Type', 'text/html; charset=UTF-8'
-                  )
-                  response.end(
-                    mustache.render(template, data, partials)
-                  )
-                }
-              })
-            }
-          }
-        )
-      } else if (type === 'application/rss+xml') {
+      if (request.pathname === '/rss.xml' || type === 'application/rss+xml') {
         response.setHeader(
           'Content-Type', 'application/rss+xml; charset=UTF-8'
         )
@@ -157,6 +107,56 @@ module.exports = function (request, response, configuration) {
           split2(),
           through,
           response
+        )
+      } else if (type === 'text/csv') {
+        response.setHeader('Content-Type', 'text/csv; charset=ASCII')
+        var options = request.query.from
+          ? {start: BYTES_PER_LINE * (parseInt(request.query.from) - 1)}
+          : {}
+        fs.createReadStream(accessions, options)
+          .once('error', /* istanbul ignore next */ function (error) {
+            request.log.error(error)
+            response.statusCode = 500
+            response.end()
+          })
+          .pipe(response)
+      } else if (type === 'text/html') {
+        var data = {accessions: []}
+        var counter = 0
+        pump(
+          fs.createReadStream(accessions),
+          split2(),
+          flushWriteStream.obj(function (line, _, done) {
+            var split = line.split(',')
+            var timestamp = formatDate(new Date(split[0]))
+            data.accessions.push({
+              number: ++counter,
+              timestamp: timestamp,
+              digest: encoding.encode(split[1]),
+              formattedDigest: encoding.format(split[1])
+            })
+            done()
+          }),
+          function (error) {
+            if (error) {
+              response.statusCode = 500
+              response.end()
+            } else {
+              fs.readFile(TEMPLATE, 'utf8', function (error, template) {
+                if (error) {
+                  response.statusCode = 500
+                  response.end()
+                } else {
+                  response.setHeader(
+                    'Content-Type', 'text/html; charset=UTF-8'
+                  )
+                  response.end(
+                    mustache.render(template, data, partials)
+                  )
+                }
+              })
+            }
+          }
         )
       }
     }

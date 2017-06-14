@@ -33,6 +33,7 @@ module.exports = function (configuration, log) {
     )
     var parsed = url.parse(request.url, true)
     request.query = parsed.query
+    request.pathname = parsed.pathname
     var route = routes.get(parsed.pathname)
     if (route.handler) {
       request.params = route.params

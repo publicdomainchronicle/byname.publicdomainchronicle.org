@@ -37,6 +37,7 @@ routes.set('/publish.js', serveFile('publish.js'))
 routes.set('/key', require('./key'))
 
 routes.set('/accessions', require('./accessions'))
+routes.set('/rss.xml', require('./accessions'))
 routes.set('/accessions/:number', require('./accession'))
 
 routes.set('/publications/:digest', require('./publication'))
