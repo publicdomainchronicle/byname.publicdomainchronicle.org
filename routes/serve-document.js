@@ -23,22 +23,13 @@ var parse = require('json-parse-errback')
 var path = require('path')
 var straightenQuotes = require('straighten-quotes')
 var wordwrap = require('wordwrap')
+var partials = require('../partials')
 
 var documents = path.join(__dirname, '..', 'documents')
 
 var TEMPLATE = path.join(
   __dirname, '..', 'templates', 'document.html'
 )
-
-// FIXME
-var partials = glob.sync(
-  path.join(__dirname, '..', 'static', 'partials', '*')
-)
-  .reduce(function (partials, file) {
-    var name = path.basename(file, '.mustache')
-    partials[name] = fs.readFileSync(file, 'utf8')
-    return partials
-  }, {})
 
 module.exports = function (name) {
   return function (request, response) {

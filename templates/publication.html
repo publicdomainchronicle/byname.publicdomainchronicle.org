@@ -5,10 +5,7 @@
     <link href=/styles.css rel=stylesheet>
   </head>
   <body>
-    <header>
-      <h1 class=title>{{title}}</h1>
-      <p class=digest><code>{{{formattedDigest}}}</code></p>
-    </header>
+    {{> header}}
 
     <main>
       {{#name}}
@@ -91,5 +88,9 @@
       {{/timestamps}}
       </ul>
     </main>
+
+    {{> nav}}
+
+    {{> footer}}
   </body>
 </html>

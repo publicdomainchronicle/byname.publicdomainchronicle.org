@@ -22,6 +22,7 @@ var methodNotAllowed = require('./method-not-allowed')
 var mustache = require('mustache')
 var notFound = require('./not-found')
 var parse = require('json-parse-errback')
+var partials = require('../partials')
 var path = require('path')
 var readTimestamps = require('../util/read-timestamps')
 var runParallel = require('run-parallel')
@@ -122,7 +123,7 @@ module.exports = function (request, response, configuration, log) {
                 data.safety = splitIntoParagraphs(data.safety)
               }
               response.end(
-                mustache.render(template, data)
+                mustache.render(template, data, partials)
               )
             }
           })
