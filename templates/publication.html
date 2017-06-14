@@ -10,6 +10,8 @@
     <main>
       <h1>{{title}}</h1>
 
+      <p><code>dbos:{{{formattedDigest}}}</code></p>
+
       {{#name}}
       <h2>Name</h2>
       <p class=name>{{.}}</p>
@@ -67,11 +69,19 @@
       {{/publications}}
       </ul>
 
-      <h2>Declaration</h2>
-      <p>Version {{declaration}}</p>
+      <h2>Versions</h2>
 
-      <h2>License</h2>
-      <p>Version {{license}}</p>
+      <table>
+        <tr>
+          <th>Schema</th><td>{{version}}</td>
+        </tr>
+        <tr>
+          <th>Declaration</th><td>{{declaration}}</td>
+        </tr>
+        <tr>
+          <th>License</th><td>{{license}}</td>
+        </tr>
+      </table>
 
       <h2>Timestamps</h2>
 
