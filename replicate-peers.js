@@ -26,7 +26,6 @@ var mkdirp = require('mkdirp')
 var parse = require('json-parse-errback')
 var path = require('path')
 var pump = require('pump')
-var pumpify = require('pumpify')
 var readRecord = require('./util/read-record')
 var recordDirectoryPath = require('./util/record-directory-path')
 var recordPath = require('./util/record-path')
@@ -41,15 +40,17 @@ var timestampPath = require('./util/timestamp-path')
 var url = require('url')
 var xtend = require('xtend')
 
+var timestampSchema = latest(require('./schemas/timestamp'))
+
 var validatePublication = new AJV({allErrors: true})
   .compile(latest(require('./schemas/publication')))
 
 var validateTimestamp = new AJV({allErrors: true})
-  .compile(latest(require('./schemas/timestamp')))
+  .compile(timestampSchema)
 
 module.exports = function (configuration, log) {
   var directory = configuration.directory
-  readPeers(directory, ecb(logError, function (peers) {
+  readPeers(directory, log, ecb(logError, function (peers) {
     log.info({
       peers: peers.map(function (peer) {
         return url.format(peer.url)
@@ -118,6 +119,7 @@ function replicatePeer (configuration, log, peer, done) {
 }
 
 function republish (configuration, log, peer, publication, done) {
+  var time = new Date().toISOString()
   var files = []
   var haveRecord
   var havePeerTimestamp
@@ -288,18 +290,12 @@ function republish (configuration, log, peer, publication, done) {
   }
 
   function validatePeerTimestamp (done) {
-    validateTimestamp(peerTimestamp.timestamp)
+    validateTimestamp(peerTimestamp)
     var errors = validateTimestamp.errors
     if (errors) {
       log.info({errors: errors}, 'invalid timestamp')
       var error = new Error('invalid timestamp')
       error.validationErrors = errors
-      return done(error)
-    }
-    var keys = Object.keys(peerTimestamp)
-    if (keys.length !== 2 || !keys.includes('signature')) {
-      log.info({keys: keys}, 'invalid timestamp record')
-      var error = new Error('invalid timestamp record')
       return done(error)
     }
     var digestsMatch = (
@@ -337,7 +333,6 @@ function republish (configuration, log, peer, publication, done) {
   }
 
   function saveOwnTimestamp (done) {
-    time = new Date().toISOString()
     var timestamp = {
       digest: publication,
       uri: (
@@ -431,8 +426,8 @@ function republish (configuration, log, peer, publication, done) {
   function appendToAccessions (done) {
     fs.appendFile(
       path.join(configuration.directory, 'accessions'),
-      (time ? time : new Date().toISOString()) + ','
-      + publication.digest + '\n',
+      (time || new Date().toISOString()) + ',' +
+      publication.digest + '\n',
       done
     )
   }
@@ -498,7 +493,7 @@ function download (from, to, done) {
     .end()
 }
 
-function readPeers (directory, callback) {
+function readPeers (directory, log, callback) {
   var file = path.join(directory, 'peers')
   fs.readFile(file, 'utf8', function (error, string) {
     if (error) {
