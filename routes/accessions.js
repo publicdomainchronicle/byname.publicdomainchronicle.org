@@ -15,16 +15,18 @@
 
 var Negotiator = require('negotiator')
 var encoding = require('../encoding')
+var flushWriteStream = require('flush-write-stream')
 var formatDate = require('../format-date')
 var fs = require('fs')
 var methodNotAllowed = require('./method-not-allowed')
+var mustache = require('mustache')
 var parse = require('json-parse-errback')
+var partials = require('../partials')
 var path = require('path')
 var pump = require('pump')
 var rfc822 = require('rfc822-date')
 var split2 = require('split2')
 var through2 = require('through2')
-var trumpet = require('trumpet')
 
 var TEMPLATE = path.join(
   __dirname, '..', 'templates', 'accessions.html'
@@ -56,31 +58,42 @@ module.exports = function (request, response, configuration) {
           })
           .pipe(response)
       } else if (type === 'text/html') {
-        response.setHeader('Content-Type', 'text/html; charset=UTF-8')
-        var html = trumpet()
-        pump(html, response)
-        pump(fs.createReadStream(TEMPLATE), html)
+        var data = {accessions: []}
         var counter = 0
         pump(
           fs.createReadStream(accessions),
           split2(),
-          through2.obj(function (line, _, done) {
+          flushWriteStream.obj(function (line, _, done) {
             var split = line.split(',')
             var timestamp = formatDate(new Date(split[0]))
-            this.push(`
-              <tr>
-                <td>${++counter}</td>
-                <td>${timestamp}</td>
-                <td>
-                  <a href=/publications/${split[1]}>
-                    <code>${encoding.format(split[1])}</code>
-                  </a>
-                </td>
-              </tr>
-            `)
+            data.accessions.push({
+              number: ++counter,
+              timestamp: timestamp,
+              digest: encoding.encode(split[1]),
+              formattedDigest: encoding.format(split[1])
+            })
             done()
           }),
-          html.select('tbody').createWriteStream()
+          function (error) {
+            if (error) {
+              response.statusCode = 500
+              response.end()
+            } else {
+              fs.readFile(TEMPLATE, 'utf8', function (error, template) {
+                if (error) {
+                  response.statusCode = 500
+                  response.end()
+                } else {
+                  response.setHeader(
+                    'Content-Type', 'text/html; charset=UTF-8'
+                  )
+                  response.end(
+                    mustache.render(template, data, partials)
+                  )
+                }
+              })
+            }
+          }
         )
       } else if (type === 'application/rss+xml') {
         response.setHeader(

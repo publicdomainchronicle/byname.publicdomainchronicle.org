@@ -4,10 +4,10 @@
     <title>DBOS Publications Index</title>
     <link href=/styles.css rel=stylesheet>
   </head>
+
   <body>
-    <header>
-      <h1>DBOS Publications Index</h1>
-    </header>
+    {{> header}}
+
     <main>
       <table>
         <thead>
@@ -17,8 +17,24 @@
             <th>Cryptographic Digest</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody>
+          {{#accessions}}
+          <tr>
+            <td>{{number}}</td>
+            <td>{{timestamp}}</td>
+            <td>
+              <a href=/publications/{{digest}}>
+                <code>{{{formattedDigest}}}</code>
+              </a>
+            </td>
+          </tr>
+          {{/accessions}}
+        </tbody>
       </table>
     </main>
+
+    {{> nav}}
+
+    {{> footer}}
   </body>
 </html>
