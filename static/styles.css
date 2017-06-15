@@ -172,16 +172,10 @@ td {
 }
 
 form section {
-  border: 1px solid #777;
-  margin-bottom: 1rem;
-  margin-top: 0;
+  border: 1px solid #eee;
+  margin: 1rem 1rem 1rem 0;
   padding: 0 1rem 1rem 1rem;
   position: relative;
-}
-
-form section section {
-  margin-left: 1rem;
-  margin-right: 1rem;
 }
 
 .fullWidth {
@@ -210,7 +204,7 @@ ul.inputs li {
 .legal {
   background: lightyellow;
   font-size: 80%;
-  margin: 1rem 0;
+  margin: 1rem 1rem 1rem 0;
   padding: 1rem;
 }
 
