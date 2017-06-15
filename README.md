@@ -23,3 +23,17 @@ The server reads and stores all information to disk, within the directory specif
     - `{digest}` files, containing attachment data
 
     - `{digest}.type` files, containing MIME types for attachment data
+
+## HTTP Data API
+
+The server responds to requests to several endpoints.  The most important, for programs looking to access and consume data, are:
+
+- `GET /accessions, Accept: text/csv` serves comma-separated tuples of ISO 8601 publication date-time and SHA-256 submission digest, in accession order, earliest first.  Clients can add a `?from=number` query parameter to limit to more recent accessions.
+
+- `GET /publications/{digest}, Accept: application/json` serves JSON submission records.
+
+- `GET /publications/{digest}/attachments/{digest}` serves submission attachments.
+
+- `GET /publications/{digest}/timestamps/{public key}` serves JSON signed-timestamp records.
+
+- `GET /key` serves the server's hex-encoded, Ed25519 public signing key.
