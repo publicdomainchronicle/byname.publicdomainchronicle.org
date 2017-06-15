@@ -24,6 +24,7 @@ module.exports = function (directory, publication, done) {
   var dir = recordDirectoryPath(directory, publication)
   fs.readdir(dir, ecb(done, function (files) {
     var timestamps = []
+    var publicKeys = []
     runParallel(
       files
         .filter(function (file) {
@@ -38,6 +39,7 @@ module.exports = function (directory, publication, done) {
               directory, publication, basename,
               ecb(done, function (timestamp) {
                 timestamps.push(timestamp)
+                publicKeys.push(basename)
                 done()
               })
             )
@@ -45,7 +47,7 @@ module.exports = function (directory, publication, done) {
         }
       ),
       ecb(done, function () {
-        done(null, timestamps)
+        done(null, timestamps, publicKeys)
       })
     )
   }))

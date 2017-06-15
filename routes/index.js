@@ -40,6 +40,7 @@ routes.set('/rss.xml', require('./accessions'))
 routes.set('/accessions/:number', require('./accession'))
 
 routes.set('/publications/:digest', require('./publication'))
+routes.set('/publications/:digest/timestamps', require('./timestamps'))
 routes.set(
   '/publications/:digest/timestamps/:key', require('./timestamp')
 )

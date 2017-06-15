@@ -34,6 +34,8 @@ The server responds to requests to several endpoints.  The most important, for p
 
 - `GET /publications/{digest}/attachments/{digest}` serves submission attachments.
 
+- `GET /publications/{digest}/timestamps` serves newline-delimited list of public keys for which the server has signed timestamps for the publication.
+
 - `GET /publications/{digest}/timestamps/{public key}` serves JSON signed-timestamp records.
 
 - `GET /key` serves the server's hex-encoded, Ed25519 public signing key.
