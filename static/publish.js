@@ -96,13 +96,16 @@ function countWords (textarea) {
 }
 
 function configurePatentSearch () {
-  var results = document.getElementById('ipcSearchResults')
-  var added = document.getElementById('ipcs')
+  var list = document.getElementById('ipcs')
   var input = document.getElementById('ipcSearchBox')
+  var request
   input.addEventListener('input', function () {
     var search = input.value
     if (search) {
-      var request = new window.XMLHttpRequest()
+      if (request) {
+        request.abort()
+      }
+      request = new window.XMLHttpRequest()
       request.overrideMimeType('application/json')
       request.addEventListener('load', function () {
         var body = this.responseText
@@ -113,24 +116,31 @@ function configurePatentSearch () {
           return
         }
         window.requestAnimationFrame(function () {
-          results.innerHTML = ''
+          removeUncheckedIPCs()
+          var checked = checkedIPCs()
           response
             .slice(0, 10)
             .forEach(function (result) {
               result.ipcs.forEach(function (ipc) {
+                if (checked.indexOf(ipc) !== -1) return
                 var li = document.createElement('li')
-                li.addEventListener('change', addIPC)
                 var label = document.createElement('label')
                 var input = document.createElement('input')
                 input.setAttribute('type', 'checkbox')
                 input.setAttribute('value', ipc)
+                input.setAttribute('name', 'classifications[]')
+                input.addEventListener('change', function () {
+                  if (this.checked) {
+                    removeUncheckedIPCs(this.value)
+                  }
+                })
                 label.appendChild(input)
                 label.appendChild(
                   document.createTextNode(
                     ' ' + ipc + ': ' + result.catchword
                   )
                 )
-                results.appendChild(li)
+                list.appendChild(li)
                 li.appendChild(label)
               })
             })
@@ -141,23 +151,47 @@ function configurePatentSearch () {
       )
       request.send()
     } else {
-      results.innerHTML = ''
+      window.requestAnimationFrame(function () {
+        removeUncheckedIPCs()
+      })
     }
   })
+}
 
-  function addIPC (event) {
-    var li = this
-    window.requestAnimationFrame(function () {
-      li.removeEventListener('change', addIPC)
-      li.addEventListener('change', removeIPC)
-      li.parentNode.removeChild(li)
-      added.appendChild(li)
-      li.getElementsByTagName('input')[0]
-        .setAttribute('name', 'classifications[]')
-    })
-  }
+function checkedIPCs () {
+  var returned = []
+  eachIPCItem(function (li, input) {
+    if (input.checked) {
+      returned.push(input.value)
+    }
+  })
+  return returned
+}
 
-  function removeIPC (event) {
-    this.parentNode.removeChild(this)
+function removeUncheckedIPCs (ipc) {
+  var toRemove = []
+  eachIPCItem(function (li, input) {
+    if (
+      !input.checked &&
+      (
+        ipc === undefined ||
+        input.value === ipc
+      )
+    ) {
+      toRemove.push(li)
+    }
+  })
+  toRemove.forEach(function (element) {
+    element.parentNode.removeChild(element)
+  })
+}
+
+function eachIPCItem (iterator) {
+  var list = document.getElementById('ipcs')
+  var children = list.children
+  for (var index = 0; index < children.length; index++) {
+    var li = children[index]
+    var input = li.getElementsByTagName('input')[0]
+    iterator(li, input)
   }
 }
