@@ -1,4 +1,3 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*
 Copyright 2017 The BioBricks Foundation
 
@@ -16,12 +15,12 @@ limitations under the License.
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-  addAnotherInputButton('classifications', 'Classification', 10)
   addAnotherInputButton('publications', 'Publication', 25)
   addAnotherInputButton('attachments', 'Attachment', 5)
   addSubmitSafety()
   addWordCount('finding')
   addWordCount('safety')
+  configurePatentSearch()
 })
 
 // Add a button at the end of a <section> to add another
@@ -96,4 +95,69 @@ function countWords (textarea) {
   return textarea.value.split(/\w+\s*/g).length - 1
 }
 
-},{}]},{},[1]);
+function configurePatentSearch () {
+  var results = document.getElementById('ipcSearchResults')
+  var added = document.getElementById('ipcs')
+  var input = document.getElementById('ipcSearchBox')
+  input.addEventListener('input', function () {
+    var search = input.value
+    if (search) {
+      var request = new window.XMLHttpRequest()
+      request.overrideMimeType('application/json')
+      request.addEventListener('load', function () {
+        var body = this.responseText
+        var response
+        try {
+          response = JSON.parse(body)
+        } catch (error) {
+          return
+        }
+        window.requestAnimationFrame(function () {
+          results.innerHTML = ''
+          response
+            .slice(0, 10)
+            .forEach(function (result) {
+              result.ipcs.forEach(function (ipc) {
+                var li = document.createElement('li')
+                li.addEventListener('change', addIPC)
+                var label = document.createElement('label')
+                var input = document.createElement('input')
+                input.setAttribute('type', 'checkbox')
+                input.setAttribute('value', ipc)
+                label.appendChild(input)
+                label.appendChild(
+                  document.createTextNode(
+                    ' ' + ipc + ': ' + result.catchword
+                  )
+                )
+                results.appendChild(li)
+                li.appendChild(label)
+              })
+            })
+        })
+      })
+      request.open(
+        'GET', '/ipc?search=' + encodeURIComponent(input.value)
+      )
+      request.send()
+    } else {
+      results.innerHTML = ''
+    }
+  })
+
+  function addIPC (event) {
+    var li = this
+    window.requestAnimationFrame(function () {
+      li.removeEventListener('change', addIPC)
+      li.addEventListener('change', removeIPC)
+      li.parentNode.removeChild(li)
+      added.appendChild(li)
+      li.getElementsByTagName('input')[0]
+        .setAttribute('name', 'classifications[]')
+    })
+  }
+
+  function removeIPC (event) {
+    this.parentNode.removeChild(this)
+  }
+}
