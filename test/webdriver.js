@@ -28,7 +28,10 @@ var webdriver = module.exports = require('webdriverio')
     host: 'localhost',
     port: 9515,
     desiredCapabilities: {
-      browserName: 'chrome'
+      browserName: 'chrome',
+      chromeOptions: process.env.DISABLE_HEADLESS
+        ? undefined
+        : {args: ['headless', '--disable-gpu']}
     }
   })
   .init()
