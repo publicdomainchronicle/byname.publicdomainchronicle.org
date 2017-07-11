@@ -10,6 +10,7 @@
     "ecb": "^1.0.0",
     "english-months": "^1.0.3",
     "flush-write-stream": "^1.0.2",
+    "fuzzysearch": "^1.0.3",
     "glob": "^7.1.2",
     "http-hash": "^2.0.0",
     "http-https": "^1.0.0",
@@ -43,6 +44,7 @@
     "form-data": "^2.1.4",
     "istanbul": "^0.4.5",
     "nsp": "^2.6.3",
+    "parse-ipc-catchwords": "github:kemitchell/parse-ipc-catchwords.js",
     "rimraf": "^2.6.1",
     "standard": "^10.0.2",
     "string-to-stream": "^1.1.0",
@@ -58,6 +60,7 @@
     "nsp": "nsp check",
     "precoverage": "NODE_ENV=test istanbul cover -- tape test/*.test.js",
     "test": "NODE_ENV=test tape test/*.test.js",
-    "testserver": "NODE_ENV=test RECAPTCHA_PUBLIC=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI RECAPTCHA_SECRET=6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe node server.js"
+    "testserver": "NODE_ENV=test RECAPTCHA_PUBLIC=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI RECAPTCHA_SECRET=6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe node server.js",
+    "prestart": "make catchwords.json"
   }
 }

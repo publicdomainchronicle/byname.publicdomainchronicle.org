@@ -49,6 +49,8 @@ routes.set(
   require('./attachment')
 )
 
+routes.set('/ipc', require('./ipc'))
+
 routes.set('/robots.txt', serveFile('robots.txt'))
 
 routes.set('/declaration', serveDocument('declaration'))
