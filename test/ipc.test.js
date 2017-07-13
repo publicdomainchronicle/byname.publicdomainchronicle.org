@@ -25,7 +25,7 @@ tape('GET /ipc?search={query}', function (test) {
       port: port,
       path: '/ipc?search=' + encodeURIComponent('ball-point pens'),
       headers: {
-        accept: 'application/json'
+        accept: 'text/plain'
       }
     }, function (response) {
       test.equal(
@@ -33,47 +33,17 @@ tape('GET /ipc?search={query}', function (test) {
         'responds 200'
       )
       test.equal(
-        response.headers['content-type'], 'application/json',
-        'Content-Type', 'application/json'
+        response.headers['content-type'], 'text/plain',
+        'Content-Type', 'text/plain'
       )
       response.pipe(concat(function (body) {
-        var parsed = JSON.parse(body)
         test.assert(
-          Array.isArray(parsed),
-          'serves JSON array'
-        )
-        test.assert(
-          parsed.every(function (element) {
-            return typeof element === 'object'
-          }),
-          'array of objects'
-        )
-        test.assert(
-          parsed.every(function (element) {
-            return typeof element.catchword === 'string'
-          }),
-          'objects with catchword properties'
-        )
-        test.assert(
-          parsed.every(function (element) {
-            return Array.isArray(element.ipcs)
-          }),
-          'objects with ipcs arrays'
-        )
-        test.assert(
-          parsed.every(function (element) {
-            return element.ipcs.every(function (element) {
-              return typeof element === 'string'
-            })
-          }),
-          'ipcs arrays of strings'
-        )
-        test.assert(
-          parsed.some(function (element) {
-            return element.ipcs.some(function (ipc) {
-              return ipc === 'B43K 7/00'
-            })
-          }),
+          body
+            .toString()
+            .split('\n')
+            .some(function (line) {
+              return line.split('\t')[0] === 'B43K 7/00'
+            }),
           'serves B43K 7/00'
         )
         test.end()

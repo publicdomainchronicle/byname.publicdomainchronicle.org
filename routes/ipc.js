@@ -13,49 +13,27 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-var fuzzysearch = require('fuzzysearch')
+var http = require('http')
+var pump = require('pump')
+var through2 = require('through2')
 var methodNotAllowed = require('./method-not-allowed')
-
-// Lots of RAM...
-var rawCatchwords = require('../catchwords')
-var catchwords = Object.keys(rawCatchwords)
-  .reduce(function (catchwords, key) {
-    var ipcs = rawCatchwords[key]
-      .filter(function (element) {
-        return element.length === 14
-      })
-    if (ipcs.length !== 0) {
-      catchwords.push([
-        key.toLowerCase(),
-        ipcs.map(function (symbol) {
-          return unparse(parseSymbol(symbol))
-        })
-      ])
-    }
-    return catchwords
-  }, [])
-rawCatchwords = null
+var split2 = require('split2')
 
 module.exports = function (request, response, configuration) {
   if (request.method === 'GET') {
     var search = request.query.search
     if (search) {
-      response.setHeader(
-        'Content-Type', 'application/json'
-      )
-      response.end(JSON.stringify(
-        catchwords.reduce(function (matches, element) {
-          var catchword = element[0]
-          return fuzzysearch(search, catchword)
-            ? matches.concat(
-              {
-                catchword: catchword,
-                ipcs: element[1]
-              }
-            )
-            : matches
-        }, [])
-      ))
+      http.get({
+        host: 'ipc.kemitchell.com',
+        path: (
+          '/classifications' +
+          '?search=' + encodeURIComponent(search) +
+          '&limit=10'
+        )
+      }, function (apiResponse) {
+        response.setHeader('Content-Type', 'text/plain')
+        pump(apiResponse, response)
+      })
     } else {
       response.statusCode = 400
       response.end()
@@ -63,37 +41,4 @@ module.exports = function (request, response, configuration) {
   } else {
     methodNotAllowed(response)
   }
-}
-
-function parseSymbol (symbol) {
-  return {
-    section: symbol[0],
-    class: parseInt(symbol.substr(1, 2)),
-    subclass: symbol[3],
-    group: parseInt(symbol.substr(4, 4)),
-    // The string encoding for subgroups is bizarre.
-    // For example:
-    // ...421000 -> 421
-    // ...100000 -> 10
-    // ...010000 -> 1
-    subgroup: symbol.endsWith('0'.repeat(4))
-      ? parseInt(symbol.substr(8, 2))
-      : parseInt(symbol.substr(8, 3))
-  }
-}
-
-function unparse (parsed) {
-  return (
-    parsed.section +
-    parsed.class +
-    parsed.subclass +
-    ' ' +
-    parsed.group +
-    '/' +
-    (
-      parsed.subgroup.length === 2
-        ? parsed.subgroup
-        : ('0' + parsed.subgroup)
-    )
-  )
 }
