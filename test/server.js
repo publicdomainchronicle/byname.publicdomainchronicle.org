@@ -38,7 +38,8 @@ module.exports = function (callback) {
           // Use the test keys from reCAPTCHA FAQ.
           public: '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
           secret: '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'
-        }
+        },
+        stampery: false
       }
       var log = pino({}, devNull())
       var server = http.createServer(makeHandler(configuration, log))

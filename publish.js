@@ -16,13 +16,17 @@ limitations under the License.
 
 var AJV = require('ajv')
 var attachmentPath = require('./util/attachment-path')
+var concat = require('simple-concat')
 var crypto = require('crypto')
 var ecb = require('ecb')
 var encoding = require('./encoding')
 var flushWriteStream = require('flush-write-stream')
 var fs = require('fs')
+var https = require('https')
 var latest = require('./latest')
 var mkdirp = require('mkdirp')
+var once = require('once')
+var parse = require('json-parse-errback')
 var path = require('path')
 var pump = require('pump')
 var recordDirectoryPath = require('./util/record-directory-path')
@@ -234,6 +238,13 @@ module.exports = function (configuration, log, callback) {
             time + ',' + digest + '\n',
             done
           )
+        },
+        function stampWithStampery (done) {
+          if (configuration.stampery) {
+            stamp(configuration, log, digest, done)
+          } else {
+            done()
+          }
         }
       ], function (error) {
         /* istanbul ignore if */
@@ -246,4 +257,84 @@ module.exports = function (configuration, log, callback) {
       })
     }
   }
+}
+
+function stamp (configuration, log, digest, callback) {
+  callback = once(callback)
+  var auth = (
+    configuration.stampery.user + ':' +
+    configuration.stampery.password
+  )
+  https.request({
+    host: 'api-prod.stampery.com',
+    path: '/stamps/' + digest,
+    auth: auth
+  })
+    .once('error', function (error) {
+      log.error(error)
+      callback()
+    })
+    .once('response', function (response) {
+      concat(response, function (error, buffer) {
+        if (error) {
+          log.error(error)
+          callback()
+        } else {
+          parse(buffer, function (error, data) {
+            if (error) {
+              log.error(error)
+              callback()
+            } else if (data.error) {
+              log.error(data)
+              callback()
+            } else if (!Array.isArray(data.results)) {
+              log.error('no stampery results')
+              callback()
+            } else {
+              if (data.results.length !== 0) {
+                log.info('already stamped')
+                callback()
+              } else {
+                https.request({
+                  method: 'POST',
+                  host: 'api-prod.stampery.com',
+                  path: '/stamps',
+                  auth: auth,
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                })
+                  .once('error', function (error) {
+                    log.error(error)
+                    callback()
+                  })
+                  .once('response', function (response) {
+                    concat(response, function (error, buffer) {
+                      if (error) {
+                        log.error(error)
+                        callback()
+                      } else {
+                        parse(buffer, function (error, data) {
+                          if (error) {
+                            log.error(error)
+                          } else if (data.error) {
+                            log.error(data.error)
+                          } else if (!data.result) {
+                            log.error('no stampery result')
+                          } else {
+                            log.info(data.result, 'stamp')
+                          }
+                          callback()
+                        })
+                      }
+                    })
+                  })
+                  .end(JSON.stringify({hash: digest}))
+              }
+            }
+          })
+        }
+      })
+    })
+    .end()
 }

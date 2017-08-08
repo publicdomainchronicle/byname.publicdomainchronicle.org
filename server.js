@@ -37,6 +37,9 @@ if (!RECAPTCHA_PUBLIC) {
   throw new Error('Missing RECAPTCHA_PUBLIC env var.')
 }
 
+var STAMPERY_USER = ENV.STAMPERY_USER
+var STAMPERY_PASSWORD = ENV.STAMPERY_PASSWORD
+
 var HOSTNAME = ENV.HOSTNAME || require('os').hostname()
 var DIRECTORY = ENV.DATA || NAME
 
@@ -59,7 +62,13 @@ initialize(DIRECTORY, function (error, keypair) {
       recaptcha: {
         public: RECAPTCHA_PUBLIC,
         secret: RECAPTCHA_SECRET
-      }
+      },
+      stampery: (STAMPERY_USER && STAMPERY_PASSWORD)
+        ? {
+          user: STAMPERY_USER,
+          password: STAMPERY_PASSWORD
+        }
+        : false
     }
     var requestHandler = makeHandler(configuration, log)
     var server = http.createServer(requestHandler)
