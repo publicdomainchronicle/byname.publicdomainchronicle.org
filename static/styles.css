@@ -201,15 +201,27 @@ ul.inputs li {
   text-align: right;
 }
 
-.legal {
-  background: lightyellow;
+.legal, .problem {
   font-size: 80%;
   margin: 1rem 1rem 1rem 0;
   padding: 1rem;
 }
 
+.legal {
+  background: lightyellow;
+}
+
+.problem {
+  background-color: rgb(255, 200, 200);
+}
+
 .legal:before {
   content: 'Legal Note: ';
+  font-style: italic;
+}
+
+.problem:before {
+  content: 'Problem: ';
   font-style: italic;
 }
 

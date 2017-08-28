@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
   addSubmitSafety()
   addWordCount('finding')
   addWordCount('safety')
+  warnAboutFileTypes()
   configurePatentSearch()
 })
 
@@ -201,5 +202,124 @@ function eachIPCItem (iterator) {
     var li = children[index]
     var input = li.getElementsByTagName('input')[0]
     iterator(li, input)
+  }
+}
+
+var DOCUMENT_TYPES = [
+  'application/excel',
+  'application/msword',
+  'application/pdf',
+  'application/rtf',
+  'application/vnd.openxmlformats-officedocument.' +
+  'spreadsheetml.sheet',
+  'application/vnd.openxmlformats-officedocument.' +
+  'wordprocessingml.document',
+  'application/x-excel',
+  'text/richtext'
+]
+
+var DOCUMENT_EXTENSIONS = [
+  'pdf', 'doc', 'rtf', 'docx', 'xls', 'xlsx', 'ps', 'latex', 'tex'
+]
+
+var SOFTWARE_TYPES = [
+  'application/java',
+  'application/java-byte-code',
+  'application/javascript',
+  'application/x-bytecode.python',
+  'application/x-java-class',
+  'application/x-javascript',
+  'text/javascript',
+  'text/x-javascript',
+  'text/x-script.phyton'
+]
+
+var SOFTWARE_EXTENSIONS = [
+  'c', 'cpp', 'cc', 'js', 'java', 'rb', 'py'
+]
+
+var SOFTWARE_WARNING = [
+  'The attachment above looks like computer software.',
+  'Please consider releasing under an',
+  '<a href=https://opensource.org/licenses>',
+  'open source software license',
+  '</a>.'
+].join(' ')
+
+var DOCUMENT_WARNING = [
+  'This attachment looks like a word-processing document',
+  'rather than a data file.',
+  'You should publish documents through a preprint server instead,',
+  'and describey what you’ve found succinctly above.'
+].join(' ')
+
+// Add a listener to <input type=file> that displays warnings and errors
+// about attachments that are likely documents or source code.
+function warnAboutFileTypes () {
+  document.getElementById('attachments')
+    .addEventListener('change', onChange)
+
+  function onChange (event) {
+    event.preventDefault()
+    event.stopPropagation()
+    var looksLikeSoftware = false
+    var looksLikeDocument = false
+    var input = event.target
+    var files = input.files
+    for (var index = 0; index < files.length; index++) {
+      var file = files[index]
+      SOFTWARE_EXTENSIONS.forEach(function (extension) {
+        if (file.name.endsWith(extension)) looksLikeSoftware = true
+      })
+      if (!looksLikeSoftware) {
+        looksLikeSoftware = SOFTWARE_TYPES.some(function (type) {
+          return file.type === type
+        })
+      }
+      DOCUMENT_EXTENSIONS.forEach(function (extension) {
+        if (file.name.endsWith(extension)) looksLikeDocument = true
+      })
+      if (!looksLikeDocument) {
+        looksLikeDocument = DOCUMENT_TYPES.some(function (type) {
+          return file.type === type
+        })
+      }
+    }
+    var warning
+    if (looksLikeSoftware || looksLikeDocument) {
+      warning = input.nextSibling
+      if (!warning) {
+        warning = document.createElement('p')
+        setClassName(warning)
+        warning.innerHTML = looksLikeDocument
+          ? DOCUMENT_WARNING
+          : SOFTWARE_WARNING
+        input.parentNode.appendChild(warning)
+      } else {
+        setClassName(warning)
+        warning.innerHTML = looksLikeDocument
+          ? DOCUMENT_WARNING
+          : SOFTWARE_WARNING
+      }
+    } else {
+      warning = input.nextSibling
+      if (warning) {
+        warning.parentNode.removeChild(warning)
+      }
+    }
+    function setClassName (warning) {
+      warning.className = looksLikeDocument ? 'problem' : 'legal'
+    }
+  }
+}
+
+if (!String.prototype.endsWith) {
+  // eslint-disable-next-line no-extend-native
+  String.prototype.endsWith = function (search, position) {
+    if (!(position < this.length)) {
+      position = this.length
+    }
+    var length = search.length
+    return this.substr(position - length, length) === search
   }
 }
