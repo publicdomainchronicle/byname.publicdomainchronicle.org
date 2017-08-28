@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
   addSubmitSafety()
   addWordCount('finding')
   addWordCount('safety')
-  warnAboutFileTypes()
+  showFileWarniings()
   configurePatentSearch()
 })
 
@@ -253,53 +253,78 @@ var DOCUMENT_WARNING = [
   'and describey what you’ve found succinctly above.'
 ].join(' ')
 
+var ATTACHMENT_SIZE = 1000000
+
+var OVERSIZE_WARNING = [
+  'This file is over 1MB in size.',
+  'Please attach smaller files whenever possible.'
+].join(' ')
+
 // Add a listener to <input type=file> that displays warnings and errors
 // about attachments that are likely documents or source code.
-function warnAboutFileTypes () {
+function showFileWarniings () {
   document.getElementById('attachments')
     .addEventListener('change', onChange)
 
   function onChange (event) {
     event.preventDefault()
     event.stopPropagation()
+    var oversize = false
     var looksLikeSoftware = false
     var looksLikeDocument = false
     var input = event.target
     var files = input.files
-    for (var index = 0; index < files.length; index++) {
-      var file = files[index]
-      SOFTWARE_EXTENSIONS.forEach(function (extension) {
-        if (file.name.endsWith(extension)) looksLikeSoftware = true
-      })
-      if (!looksLikeSoftware) {
-        looksLikeSoftware = SOFTWARE_TYPES.some(function (type) {
-          return file.type === type
-        })
+    for (var fileIndex = 0; fileIndex < files.length; fileIndex++) {
+      var file = files[fileIndex]
+      if (file.size > ATTACHMENT_SIZE) {
+        oversize = true
+        break
       }
-      DOCUMENT_EXTENSIONS.forEach(function (extension) {
-        if (file.name.endsWith(extension)) looksLikeDocument = true
-      })
-      if (!looksLikeDocument) {
-        looksLikeDocument = DOCUMENT_TYPES.some(function (type) {
-          return file.type === type
-        })
+      var index, extension, type
+      for (index = 0; index < DOCUMENT_EXTENSIONS.length; index++) {
+        extension = DOCUMENT_EXTENSIONS[index]
+        if (file.name.endsWith(extension)) {
+          looksLikeDocument = true
+          break
+        }
+      }
+      for (index = 0; index < DOCUMENT_TYPES.length; index++) {
+        type = DOCUMENT_TYPES[index]
+        if (file.type === type) {
+          looksLikeDocument = true
+          break
+        }
+      }
+      for (index = 0; index < SOFTWARE_EXTENSIONS.length; index++) {
+        extension = SOFTWARE_EXTENSIONS[index]
+        if (file.name.endsWith(extension)) {
+          looksLikeSoftware = true
+          break
+        }
+      }
+      for (index = 0; index < SOFTWARE_TYPES.length; index++) {
+        type = SOFTWARE_TYPES[index]
+        if (file.type === type) {
+          looksLikeSoftware = true
+          break
+        }
       }
     }
     var warning
-    if (looksLikeSoftware || looksLikeDocument) {
+    if (oversize || looksLikeSoftware || looksLikeDocument) {
       warning = input.nextSibling
+      var html = oversize
+        ? OVERSIZE_WARNING
+        : (looksLikeSoftware ? SOFTWARE_WARNING : DOCUMENT_WARNING)
+      console.log(html)
       if (!warning) {
         warning = document.createElement('p')
         setClassName(warning)
-        warning.innerHTML = looksLikeDocument
-          ? DOCUMENT_WARNING
-          : SOFTWARE_WARNING
+        warning.innerHTML = html
         input.parentNode.appendChild(warning)
       } else {
         setClassName(warning)
-        warning.innerHTML = looksLikeDocument
-          ? DOCUMENT_WARNING
-          : SOFTWARE_WARNING
+        warning.innerHTML = html
       }
     } else {
       warning = input.nextSibling
@@ -308,7 +333,13 @@ function warnAboutFileTypes () {
       }
     }
     function setClassName (warning) {
-      warning.className = looksLikeDocument ? 'problem' : 'legal'
+      if (oversize) {
+        warning.className = 'problem'
+      } else if (looksLikeDocument) {
+        warning.className = 'problem'
+      } else if (looksLikeSoftware) {
+        warning.className = 'legal'
+      }
     }
   }
 }
