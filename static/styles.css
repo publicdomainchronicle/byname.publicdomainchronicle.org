@@ -267,3 +267,35 @@ a {
 .lead{
   font-weight: bold;
 }
+
+.collapsed section {
+  display: none;
+}
+
+.collapsed .toggle:before {
+  content: '+';
+}
+
+.toggle:before {
+  content: '-';
+}
+
+.toggle {
+  float: left;
+  font-family: monospace;
+}
+
+#ipcSearch section {
+  padding-bottom: 0;
+  margin-right: 0rem;
+  border: none;
+}
+
+#ipcSearch section > p {
+  margin-left: 3rem;
+  padding: 0;
+}
+
+input[type=checkbox] {
+  margin-right: 0.5rem;
+}

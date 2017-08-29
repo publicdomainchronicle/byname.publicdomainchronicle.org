@@ -96,12 +96,14 @@ function countWords (textarea) {
   return textarea.value.split(/\w+\s*/g).length - 1
 }
 
+var checkedIPCs = []
+
 function configurePatentSearch () {
   var list = document.getElementById('ipcs')
-  var input = document.getElementById('ipcSearchBox')
+  var searchBox = document.getElementById('ipcSearchBox')
   var button = document.getElementById('ipcSearchButton')
   var request
-  input.addEventListener('keypress', function (event) {
+  searchBox.addEventListener('keypress', function (event) {
     if (event.keyCode === 13) {
       event.preventDefault()
       event.stopPropagation()
@@ -114,7 +116,10 @@ function configurePatentSearch () {
     searchIPCSs()
   })
   function searchIPCSs () {
-    var search = input.value
+    var search = searchBox.value
+    button.disabled = true
+    var buttonText = button.innerHTML
+    button.innerHTML = 'Loading...'
     if (search) {
       if (request) {
         request.abort()
@@ -122,86 +127,132 @@ function configurePatentSearch () {
       request = new window.XMLHttpRequest()
       request.overrideMimeType('text/plain')
       request.addEventListener('load', function () {
+        button.disabled = false
+        button.innerHTML = buttonText
         var body = this.responseText
         window.requestAnimationFrame(function () {
-          removeUncheckedIPCs()
-          var checked = checkedIPCs()
-          body
-            .split('\n')
-            .forEach(function (line) {
-              var split = line.split('\t')
-              var ipc = split[0]
-              var description = split[1]
-              if (checked.indexOf(ipc) !== -1) return
-              var li = document.createElement('li')
-              var label = document.createElement('label')
-              var input = document.createElement('input')
-              input.setAttribute('type', 'checkbox')
-              input.setAttribute('value', ipc)
-              input.setAttribute('name', 'classifications[]')
-              input.addEventListener('change', function () {
-                if (this.checked) {
-                  removeUncheckedIPCs(this.value)
-                }
+          var tree = JSON.parse(body)
+          sortedKeys(tree, function (sectionCode) {
+            var section = tree[sectionCode]
+            var sectionElement = document.createElement('section')
+            sectionElement.appendChild(
+              descriptionElement(section.description, 'h3')
+            )
+            list.appendChild(sectionElement)
+
+            sortedKeys(section.children, function (classCode) {
+              var _class = section.children[classCode]
+              var classElement = collapsable(_class.description)
+              sectionElement.appendChild(classElement)
+
+              sortedKeys(_class.children, function (subclassCode) {
+                var subclass = _class.children[subclassCode]
+                var subclassElement = collapsable(subclass.description)
+                classElement.appendChild(subclassElement)
+
+                sortedKeys(subclass.children, function (groupCode) {
+                  var group = subclass.children[groupCode]
+                  var groupElement = document.createElement('section')
+                  var p = document.createElement('p')
+                  groupElement.appendChild(p)
+                  subclassElement.appendChild(groupElement)
+
+                  sortedKeys(group.children, function (subgroupCode) {
+                    var subgroup = group.children[subgroupCode]
+                    var ipc = (
+                      sectionCode + classCode + subclassCode +
+                      ' ' +
+                      groupCode + '/' + subgroupCode
+                    )
+                    var description = subgroup.length === 0
+                      ? '(same as above)'
+                      : subgroup.join(', ')
+                    var li = document.createElement('li')
+                    var label = document.createElement('label')
+                    var input = document.createElement('input')
+                    input.setAttribute('type', 'checkbox')
+                    input.setAttribute('value', ipc)
+                    input.setAttribute('name', 'classifications[]')
+                    input.addEventListener('change', function () {
+                      var thisIPC = this.value
+                      if (this.checked) {
+                        checkedIPCs.push(thisIPC)
+                        button.disabled = true
+                        searchBox.disabled = true
+                      } else {
+                        var index = checkedIPCs.indexOf(thisIPC)
+                        checkedIPCs.splice(index, 1)
+                        if (checkedIPCs.length === 0) {
+                          button.disabled = false
+                          searchBox.disabled = false
+                        }
+                      }
+                    })
+                    label.appendChild(input)
+                    label.appendChild(
+                      document.createTextNode(ipc + '—' + description)
+                    )
+                    groupElement.appendChild(li)
+                    li.appendChild(label)
+                  })
+                })
               })
-              label.appendChild(input)
-              label.appendChild(
-                document.createTextNode(
-                  ' ' + ipc + ': ' + description
-                )
-              )
-              list.appendChild(li)
-              li.appendChild(label)
             })
+          })
         })
       })
       request.open(
-        'GET', '/ipc?search=' + encodeURIComponent(input.value)
+        'GET', '/ipc?search=' + encodeURIComponent(searchBox.value)
       )
       request.send()
-    } else {
-      window.requestAnimationFrame(function () {
-        removeUncheckedIPCs()
+    }
+
+    function sortedKeys (object, each) {
+      return Object.keys(object)
+        .sort()
+        .forEach(each)
+    }
+
+    function descriptionElement (description, type) {
+      var p = document.createElement(type || 'p')
+      description.forEach(function (component, index) {
+        if (index !== 0) {
+          p.appendChild(document.createElement('br'))
+        }
+        p.appendChild(
+          document.createTextNode(
+            Array.isArray(component)
+              ? component
+                .map(function (element) {
+                  return element.toLowerCase()
+                })
+                .join(', ')
+              : component.toLowerCase()
+          )
+        )
       })
+      return p
     }
-  }
-}
 
-function checkedIPCs () {
-  var returned = []
-  eachIPCItem(function (li, input) {
-    if (input.checked) {
-      returned.push(input.value)
+    function collapsable (description, startsOpen) {
+      var returned = document.createElement('section')
+      returned.className = startsOpen ? '' : 'collapsed'
+      var toggle = document.createElement('button')
+      toggle.className = 'toggle'
+      toggle.addEventListener('click', function (event) {
+        event.stopPropagation()
+        event.preventDefault()
+        if (returned.className === 'collapsed') {
+          returned.className = ''
+        } else {
+          returned.className = 'collapsed'
+        }
+      })
+      returned.appendChild(toggle)
+      var p = descriptionElement(description)
+      returned.appendChild(p)
+      return returned
     }
-  })
-  return returned
-}
-
-function removeUncheckedIPCs (ipc) {
-  var toRemove = []
-  eachIPCItem(function (li, input) {
-    if (
-      !input.checked &&
-      (
-        ipc === undefined ||
-        input.value === ipc
-      )
-    ) {
-      toRemove.push(li)
-    }
-  })
-  toRemove.forEach(function (element) {
-    element.parentNode.removeChild(element)
-  })
-}
-
-function eachIPCItem (iterator) {
-  var list = document.getElementById('ipcs')
-  var children = list.children
-  for (var index = 0; index < children.length; index++) {
-    var li = children[index]
-    var input = li.getElementsByTagName('input')[0]
-    iterator(li, input)
   }
 }
 
@@ -316,7 +367,6 @@ function showFileWarniings () {
       var html = oversize
         ? OVERSIZE_WARNING
         : (looksLikeSoftware ? SOFTWARE_WARNING : DOCUMENT_WARNING)
-      console.log(html)
       if (!warning) {
         warning = document.createElement('p')
         setClassName(warning)
