@@ -31,7 +31,7 @@ module.exports = function (request, response, configuration) {
           '&limit=10'
         )
       }, function (apiResponse) {
-        response.setHeader('Content-Type', 'text/plain')
+        response.setHeader('Content-Type', 'application/json')
         pump(apiResponse, response)
       })
     } else {

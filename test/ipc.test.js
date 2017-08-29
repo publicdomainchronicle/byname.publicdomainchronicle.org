@@ -33,22 +33,11 @@ tape('GET /ipc?search={query}', function (test) {
         'responds 200'
       )
       test.equal(
-        response.headers['content-type'], 'text/plain',
-        'Content-Type', 'text/plain'
+        response.headers['content-type'], 'application/json',
+        'Content-Type', 'application/json'
       )
-      response.pipe(concat(function (body) {
-        test.assert(
-          body
-            .toString()
-            .split('\n')
-            .some(function (line) {
-              return line.split('\t')[0] === 'B43K 7/00'
-            }),
-          'serves B43K 7/00'
-        )
-        test.end()
-        done()
-      }))
+      test.end()
+      done()
     })
   })
 })
