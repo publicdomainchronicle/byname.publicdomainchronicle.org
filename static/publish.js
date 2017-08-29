@@ -166,7 +166,11 @@ function configurePatentSearch () {
                     )
                     var description = subgroup.length === 0
                       ? '(same as above)'
-                      : subgroup.join(', ')
+                      : subgroup
+                          .map(function (element) {
+                            return element.join(', ')
+                          })
+                          .join(' … ')
                     var li = document.createElement('li')
                     var label = document.createElement('label')
                     var input = document.createElement('input')
@@ -190,7 +194,7 @@ function configurePatentSearch () {
                     })
                     label.appendChild(input)
                     label.appendChild(
-                      document.createTextNode(ipc + '—' + description)
+                      document.createTextNode(ipc + ': ' + description)
                     )
                     groupElement.appendChild(li)
                     li.appendChild(label)
