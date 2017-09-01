@@ -17,7 +17,6 @@ limitations under the License.
 var Busboy = require('busboy')
 var FormData = require('form-data')
 var concat = require('concat-stream')
-var ecb = require('ecb')
 var fs = require('fs')
 var https = require('https')
 var latest = require('../latest')
@@ -167,9 +166,10 @@ function verifyCatpcha (response, secret, callback) {
         headers: form.getHeaders()
       }, function (response) {
         response.pipe(concat(function (body) {
-          parse(body, ecb(callback, function (data) {
+          parse(body, function (error, data) {
+            if (error) return callback(error)
             callback(null, data.success)
-          }))
+          })
         }))
       })
     )

@@ -17,7 +17,6 @@ limitations under the License.
 var AJV = require('ajv')
 var attachmentPath = require('./util/attachment-path')
 var concat = require('concat-stream')
-var ecb = require('ecb')
 var encoding = require('./encoding')
 var flushWriteStream = require('flush-write-stream')
 var fs = require('fs')
@@ -51,7 +50,8 @@ var validateTimestamp = new AJV({allErrors: true})
 
 module.exports = function (configuration, log) {
   var directory = configuration.directory
-  readPeers(directory, log, ecb(logError, function (peers) {
+  readPeers(directory, log, function (error, peers) {
+    if (error) return logError(error)
     log.info({
       peers: peers.map(function (peer) {
         return url.format(peer.url)
@@ -65,17 +65,19 @@ module.exports = function (configuration, log) {
           replicatePeer(configuration, peerLog, peer, done)
         }
       }),
-      ecb(logError, function () {
+      function (error) {
+        if (error) return logError(error)
         if (peers.length === 0) {
           log.info('done')
         } else {
-          writePeers(directory, peers, ecb(logError, function () {
+          writePeers(directory, peers, function (error) {
+            if (error) return logError(error)
             log.info('done')
-          }))
+          })
         }
-      })
+      }
     )
-  }))
+  })
 
   function logError (error) {
     log.error(error)
@@ -168,11 +170,12 @@ function republish (configuration, log, peer, publication, done) {
 
   function checkHaveRecord (done) {
     var file = recordPath(configuration.directory, publication.digest)
-    fileExists(file, ecb(done, function (exists) {
+    fileExists(file, function (error, exists) {
+      if (error) return done(error)
       haveRecord = exists
       log.info({haveRecord: exists})
       done()
-    }))
+    })
   }
 
   function checkHavePeerTimestamp (done) {
@@ -181,21 +184,23 @@ function republish (configuration, log, peer, publication, done) {
       publication.digest,
       peer.publicKey
     )
-    fileExists(file, ecb(done, function (exists) {
+    fileExists(file, function (error, exists) {
+      if (error) return done(error)
       havePeerTimestamp = exists
       log.info({havePeerTimestamp: exists})
       done()
-    }))
+    })
   }
 
   function getRecord (done) {
     if (haveRecord) {
       readRecord(
         configuration.directory, publication.digest,
-        ecb(done, function (parsed) {
+        function (error, parsed) {
+          if (error) return done(error)
           record = parsed
           done()
-        })
+        }
       )
     } else {
       http.request(xtend(peer.url, {
@@ -209,11 +214,12 @@ function republish (configuration, log, peer, publication, done) {
           pump(
             response,
             concat(function (buffer) {
-              parse(buffer, ecb(done, function (parsed) {
+              parse(buffer, function (error, parsed) {
+                if (error) return done(error)
                 record = parsed
                 log.info('got record')
                 done()
-              }))
+              })
             }),
             function (error) {
               if (error) {
@@ -250,11 +256,12 @@ function republish (configuration, log, peer, publication, done) {
           pump(
             response,
             concat(function (buffer) {
-              parse(buffer, ecb(done, function (parsed) {
+              parse(buffer, function (error, parsed) {
+                if (error) return done(error)
                 peerTimestamp = parsed
                 log.info('got timestamp')
                 done()
-              }))
+              })
             }),
             function (error) {
               if (error) {
@@ -359,10 +366,11 @@ function republish (configuration, log, peer, publication, done) {
       signature: signature,
       version: timestampSchema.properties.version.constant
     })
-    fs.writeFile(file, data, 'utf8', ecb(done, function () {
+    fs.writeFile(file, data, 'utf8', function (error) {
+      if (error) return done(error)
       log.info('saved own timestamp')
       done()
-    }))
+    })
   }
 
   function savePeerTimestamp (done) {
@@ -373,20 +381,22 @@ function republish (configuration, log, peer, publication, done) {
     )
     files.push(file)
     var data = stringify(peerTimestamp)
-    fs.writeFile(file, data, 'utf8', ecb(done, function () {
+    fs.writeFile(file, data, 'utf8', function (error) {
+      if (error) return done(error)
       log.info('saved peer timestamp')
       done()
-    }))
+    })
   }
 
   function saveRecord (done) {
     var file = recordPath(configuration.directory, publication.digest)
     files.push(file)
     var data = stringify(record)
-    writeIfMissing(file, data, ecb(done, function () {
+    writeIfMissing(file, data, function (error) {
+      if (error) return done(error)
       log.info('saved record')
       done()
-    }))
+    })
   }
 
   function getAndSaveAttachments (done) {
@@ -408,16 +418,18 @@ function republish (configuration, log, peer, publication, done) {
             publication.digest,
             attachmentDigest
           )
-          download(request, file, ecb(done, function (contentType) {
+          download(request, file, function (error, contentType) {
+            if (error) return done(error)
             attachmentLog.info('downloaded')
             writeIfMissing(
               file + '.type', contentType,
-              ecb(done, function () {
+              function (error) {
+                if (error) return done(error)
                 attachmentLog.info('wrote type file')
                 done()
-              })
+              }
             )
-          }))
+          })
         }
       }),
       done

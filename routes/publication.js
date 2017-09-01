@@ -15,7 +15,6 @@ limitations under the License.
  */
 
 var Negotiator = require('negotiator')
-var ecb = require('ecb')
 var encoding = require('../encoding')
 var formatDate = require('../format-date')
 var fs = require('fs')
@@ -68,23 +67,27 @@ module.exports = function (request, response, configuration, log) {
           var timestamps
           runParallel([
             function readTemplate (done) {
-              fs.readFile(TEMPLATE, 'utf8', ecb(done, function (read) {
+              fs.readFile(TEMPLATE, 'utf8', function (error, read) {
+                if (error) return done(error)
                 template = read
                 done()
-              }))
+              })
             },
             function readPublication (done) {
-              fs.readFile(json, 'utf8', ecb(done, function (read) {
-                parse(read, ecb(done, function (parsed) {
+              fs.readFile(json, 'utf8', function (error, read) {
+                if (error) return done(error)
+                parse(read, function (error, parsed) {
+                  if (error) return done(error)
                   data = parsed
                   done()
-                }))
-              }))
+                })
+              })
             },
             function readAllTimestamps (done) {
               readTimestamps(
                 directory, digest,
-                ecb(done, function (read) {
+                function (error, read) {
+                  if (error) return done(error)
                   timestamps = read
                     .map(function (record) {
                       var stamp = record.timestamp
@@ -103,7 +106,7 @@ module.exports = function (request, response, configuration, log) {
                       })
                     })
                   done()
-                })
+                }
               )
             }
           ], function (error) {

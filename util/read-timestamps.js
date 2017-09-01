@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-var ecb = require('ecb')
 var fs = require('fs')
 var readTimestamp = require('./read-timestamp')
 var recordDirectoryPath = require('./record-directory-path')
@@ -22,7 +21,8 @@ var runParallel = require('run-parallel')
 
 module.exports = function (directory, publication, done) {
   var dir = recordDirectoryPath(directory, publication)
-  fs.readdir(dir, ecb(done, function (files) {
+  fs.readdir(dir, function (error, files) {
+    if (error) return done(error)
     var timestamps = []
     var publicKeys = []
     runParallel(
@@ -37,18 +37,20 @@ module.exports = function (directory, publication, done) {
           return function (done) {
             readTimestamp(
               directory, publication, basename,
-              ecb(done, function (timestamp) {
+              function (error, timestamp) {
+                if (error) return done(error)
                 timestamps.push(timestamp)
                 publicKeys.push(basename)
                 done()
-              })
+              }
             )
           }
         }
       ),
-      ecb(done, function () {
+      function (error) {
+        if (error) return done(error)
         done(null, timestamps, publicKeys)
-      })
+      }
     )
-  }))
+  })
 }

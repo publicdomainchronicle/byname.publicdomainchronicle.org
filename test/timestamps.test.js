@@ -15,7 +15,6 @@ limitations under the License.
  */
 
 var concat = require('concat-stream')
-var ecb = require('ecb')
 var http = require('http')
 var makeValidPublication = require('./make-valid-publication')
 var parse = require('json-parse-errback')
@@ -141,10 +140,11 @@ tape('GET /publication/{created}/timestamps/{key}', function (test) {
             'responds 200'
           )
           response.pipe(concat(function (body) {
-            parse(body, ecb(done, function (data) {
+            parse(body, function (error, data) {
+              if (error) return done(error)
               timestamp = data
               done()
-            }))
+            })
           }))
         })
       }

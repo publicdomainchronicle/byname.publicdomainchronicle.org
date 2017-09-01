@@ -18,7 +18,6 @@ var AJV = require('ajv')
 var attachmentPath = require('./util/attachment-path')
 var concat = require('simple-concat')
 var crypto = require('crypto')
-var ecb = require('ecb')
 var encoding = require('./encoding')
 var flushWriteStream = require('flush-write-stream')
 var fs = require('fs')
@@ -71,10 +70,11 @@ module.exports = function (configuration, log, callback) {
       if (object.type === 'attachment') {
         writeAttachment(object, done)
       } else {
-        writePublication(object, ecb(done, function (digest) {
+        writePublication(object, function (error, digest) {
+          if (error) return done(error)
           validPublication = digest
           done()
-        }))
+        })
       }
     },
     function (done) {

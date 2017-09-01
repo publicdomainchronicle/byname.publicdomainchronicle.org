@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-var ecb = require('ecb')
 var encoding = require('../encoding')
 var fs = require('fs')
 var parse = require('json-parse-errback')
@@ -22,12 +21,14 @@ var path = require('path')
 
 module.exports = function (directory, callback) {
   var file = path.join(directory, 'keys')
-  fs.readFile(file, ecb(callback, function (data) {
-    parse(data, ecb(callback, function (data) {
+  fs.readFile(file, function (error, data) {
+    if (error) return callback(error)
+    parse(data, function (error, data) {
+      if (error) return callback(error)
       callback(null, {
         public: encoding.decode(data.public),
         secret: encoding.decode(data.secret)
       })
-    }))
-  }))
+    })
+  })
 }
