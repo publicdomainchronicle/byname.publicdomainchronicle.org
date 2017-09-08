@@ -43,6 +43,7 @@
     "dev-null": "^0.1.1",
     "form-data": "^2.1.4",
     "istanbul": "^0.4.5",
+    "licensee": "^4.5.0",
     "nsp": "^2.6.3",
     "rimraf": "^2.6.1",
     "standard": "^10.0.2",
@@ -59,6 +60,7 @@
     "nsp": "nsp check",
     "precoverage": "NODE_ENV=test istanbul cover -- tape test/*.test.js",
     "test": "NODE_ENV=test tape test/*.test.js",
-    "testserver": "NODE_ENV=test RECAPTCHA_PUBLIC=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI RECAPTCHA_SECRET=6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe node server.js"
+    "testserver": "NODE_ENV=test RECAPTCHA_PUBLIC=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI RECAPTCHA_SECRET=6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe node server.js",
+    "licenses": "licensee --errors-only"
   }
 }
