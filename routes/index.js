@@ -24,12 +24,6 @@ routes.set('/', serveFile('homepage.html'))
 serveAllFiles(routes, 'png')
 serveAllFiles(routes, 'css')
 
-routes.set('/about', serveFile('about.html'))
-
-routes.set('/guide', serveFile('guide.html'))
-
-routes.set('/host', serveFile('host.html'))
-
 routes.set('/publish', require('./publish'))
 routes.set('/publish.js', serveFile('publish.js'))
 
@@ -50,8 +44,6 @@ routes.set(
 )
 
 routes.set('/ipc', require('./ipc'))
-
-routes.set('/robots.txt', serveFile('robots.txt'))
 
 routes.set('/declaration', serveDocument('declaration'))
 routes.set('/license', serveDocument('license'))
