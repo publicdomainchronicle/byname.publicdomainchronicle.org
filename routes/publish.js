@@ -101,6 +101,7 @@ function post (request, response, configuration) {
   request.pipe(
     parser
       .on('field', function (field, value) {
+        if (value.length === 0) return
         if (field.endsWith('[]')) {
           field = field.substring(0, field.length - 2)
           if (fields[field] && Array.isArray(fields[field])) {
@@ -208,20 +209,19 @@ function redirectTo (location) {
   `
 }
 
-var DELETE_IF_EMPTY = [
-  'name', 'affiliation',
-  'journals', 'classifications', 'publications',
-  'safety'
-]
+var DELETE_IF_EMPTY = ['name', 'affiliation', 'safety']
 
-var ARRAYS = ['journals', 'classifications', 'publications']
+var ARRAYS = ['journals', 'classifications']
 
 var NORMALIZE_LINES = ['finding', 'safety']
 
 function normalize (record) {
+  record.metadata = {}
   ARRAYS.forEach(function (key) {
-    if (!record.hasOwnProperty(key)) {
-      record[key] = []
+    if (record.hasOwnProperty(key) && record[key].length !== 0) {
+      var list = record[key]
+      delete record[key]
+      record.metadata[key] = list
     }
   })
   DELETE_IF_EMPTY.forEach(function (key) {

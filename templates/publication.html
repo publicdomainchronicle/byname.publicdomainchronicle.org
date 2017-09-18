@@ -50,24 +50,27 @@
       <p>No attachments</p>
       {{/attachments}}
 
+      {{#metadata}}
       <h2>Metadata</h2>
 
-      <ul id=journals>
-      {{#journals}}
-        <li>Related Journal: {{.}}</li>
-      {{/journals}}
-      </ul>
+        <ul id=journals>
+        {{#journals}}
+          <li>Related Journal: {{.}}</li>
+        {{/journals}}
+        </ul>
 
-      <ul id=classifications>
-      {{#classifications}}
-        <li>International Patent Classification: {{.}}</li>
-      {{/classifications}}
-      </ul>
+        <ul id=classifications>
+        {{#classifications}}
+          <li>International Patent Classification: {{.}}</li>
+        {{/classifications}}
+        </ul>
 
-      <ul id=publications>
-      {{#publications}}
+      {{/metadata}}
+
+      <ul id=links>
+      {{#links}}
         <li>Related PDC Publication: <a href=/publications/{{{.}}}>{{.}}</a></li>
-      {{/publications}}
+      {{/links}}
       </ul>
 
       <h2>Versions</h2>

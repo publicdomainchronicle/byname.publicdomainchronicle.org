@@ -47,25 +47,22 @@ module.exports = {
       },
       uniqueItems: true
     },
-    journals: {
-      type: 'array',
-      items: {
-        type: 'string',
-        minLength: 1,
-        maxLength: 256
+    metadata: {
+      type: 'object',
+      patternProperties: {
+        '^[a-z]+$': {
+          type: 'array',
+          items: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 256
+          },
+          uniqueItems: true
+        }
       },
-      uniqueItems: true
+      additionalProperties: false
     },
-    classifications: {
-      type: 'array',
-      items: {
-        description: 'International Patent Classification',
-        type: 'string',
-        pattern: '[ABCDEFGH][0-9][0-9][A-Z] [0-9]{1,3}/[0-9]{2,}'
-      },
-      uniqueItems: true
-    },
-    publications: {
+    links: {
       type: 'array',
       items: {
         $ref: '#/definitions/digest'

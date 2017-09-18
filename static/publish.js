@@ -15,7 +15,7 @@ limitations under the License.
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-  addAnotherInputButton('publications', 'Publication', 25)
+  addAnotherInputButton('links', 'Publication', 25)
   addAnotherInputButton('attachments', 'Attachment', 5)
   addSubmitSafety()
   addWordCount('finding')

@@ -26,9 +26,11 @@ tape('schema', function (suite) {
         version: '1.0.0',
         name: 'Kyle Evan Mitchell',
         affiliation: 'BioBricks Foundation',
-        journals: ['Nature'],
-        classifications: ['G06F 3/00'],
-        publications: [
+        metadata: {
+          journals: ['Nature'],
+          classifications: ['G06F 3/00']
+        },
+        links: [
           'ebc72160fa6fcdce751e5d7298c8df58' +
           '3e6131eec161faf52094159e05c6d350'
         ],
