@@ -28,7 +28,7 @@
     "semver": "^5.3.0",
     "send": "^0.15.3",
     "simple-concat": "^1.0.0",
-    "sodium-prebuilt": "^1.0.22",
+    "sodium-native": "^1.10.3",
     "split2": "^2.1.1",
     "straighten-quotes": "^0.1.0",
     "through2": "^2.0.3",

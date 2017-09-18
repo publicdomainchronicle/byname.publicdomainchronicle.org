@@ -32,7 +32,7 @@ var recordPath = require('./util/record-path')
 var runParallel = require('run-parallel')
 var runSeries = require('run-series')
 var signaturePath = require('./util/timestamp-path')
-var sodium = require('sodium-prebuilt').api
+var sodium = require('sodium-native')
 var split2 = require('split2')
 var stringify = require('json-stable-stringify')
 var through2 = require('through2')
@@ -283,11 +283,12 @@ function republish (configuration, log, peer, publication, done) {
       error.validationErrors = errors
       return done(error)
     }
-    var computedDigest = encoding.encode(
-      sodium.crypto_hash_sha256(
-        Buffer.from(stringify(record), 'utf8')
-      )
+    var computedDigest = Buffer.alloc(sodium.crypto_hash_sha256_BYTES)
+    sodium.crypto_hash_sha256(
+      computedDigest,
+      Buffer.from(stringify(record), 'utf8')
     )
+    computedDigest = encoding.encode(computedDigest)
     if (computedDigest !== publication.digest) {
       done(new Error(
         'reported and computed digests do not match'
@@ -306,14 +307,9 @@ function republish (configuration, log, peer, publication, done) {
       error.validationErrors = errors
       return done(error)
     }
-    var digestsMatch = (
-      peerTimestamp.timestamp.digest ===
-      encoding.encode(
-        sodium.crypto_hash_sha256(
-          Buffer.from(stringify(record), 'utf8')
-        )
-      )
-    )
+    var otherDigest = Buffer.alloc(sodium.crypto_hash_sha256_BYTES)
+    sodium.crypto_hash_sha256(otherDigest, Buffer.from(stringify(record), 'utf8'))
+    var digestsMatch = peerTimestamp.timestamp.digest === encoding.encode(otherDigest)
     if (!digestsMatch) {
       log.error('timestamp digest mismatch')
       return done(new Error(
@@ -349,12 +345,13 @@ function republish (configuration, log, peer, publication, done) {
       ),
       time: time
     }
-    var signature = encoding.encode(
-      sodium.crypto_sign_detached(
-        Buffer.from(stringify(timestamp)),
-        configuration.keypair.secret
-      )
+    var signature = Buffer.alloc(sodium.crypto_sign_BYTES)
+    sodium.crypto_sign_detached(
+      signature,
+      Buffer.from(stringify(timestamp)),
+      configuration.keypair.secret
     )
+    signature = encoding.encode(signature)
     var file = signaturePath(
       configuration.directory,
       publication.digest,

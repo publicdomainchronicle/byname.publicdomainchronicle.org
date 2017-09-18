@@ -20,7 +20,7 @@ var makeValidPublication = require('./make-valid-publication')
 var parse = require('json-parse-errback')
 var runSeries = require('run-series')
 var server = require('./server')
-var sodium = require('sodium-prebuilt').api
+var sodium = require('sodium-native')
 var stringify = require('json-stable-stringify')
 var tape = require('tape')
 

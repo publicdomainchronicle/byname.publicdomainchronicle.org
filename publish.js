@@ -32,7 +32,7 @@ var recordDirectoryPath = require('./util/record-directory-path')
 var recordPath = require('./util/record-path')
 var runParallel = require('run-parallel')
 var runSeries = require('run-series')
-var sodium = require('sodium-prebuilt').api
+var sodium = require('sodium-native')
 var stringify = require('json-stable-stringify')
 var through2 = require('through2')
 var timestampPath = require('./util/timestamp-path')
@@ -163,9 +163,9 @@ module.exports = function (configuration, log, callback) {
       callback(validationError)
     } else {
       var record = Buffer.from(stringify(publication), 'utf8')
-      var digest = encoding.encode(
-        sodium.crypto_hash_sha256(record)
-      )
+      var digest = Buffer.alloc(sodium.crypto_hash_sha256_BYTES)
+      sodium.crypto_hash_sha256(digest, record)
+      digest = encoding.encode(digest)
       var uri = (
         'https://' + configuration.hostname +
         '/publications/' + digest
@@ -175,11 +175,11 @@ module.exports = function (configuration, log, callback) {
         uri: uri,
         time: time
       }
-      var signature = encoding.encode(
-        sodium.crypto_sign_detached(
-          Buffer.from(stringify(timestamp)),
-          secretKey
-        )
+      var signature = Buffer.alloc(sodium.crypto_sign_BYTES)
+      sodium.crypto_sign_detached(
+        signature,
+        Buffer.from(stringify(timestamp)),
+        secretKey
       )
       runSeries([
         function writeJSONFile (done) {
@@ -193,7 +193,7 @@ module.exports = function (configuration, log, callback) {
             timestampPath(directory, digest, publicKey),
             stringify({
               timestamp: timestamp,
-              signature: signature,
+              signature: encoding.encode(signature),
               version: timestampSchema.properties.version.constant
             }),
             done

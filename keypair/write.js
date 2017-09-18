@@ -17,10 +17,14 @@ limitations under the License.
 var encoding = require('../encoding')
 var fs = require('fs')
 var path = require('path')
-var sodium = require('sodium-prebuilt').api
+var sodium = require('sodium-native')
 
 module.exports = function (directory, callback) {
-  var keypair = sodium.crypto_sign_keypair()
+  var keypair = {
+    publicKey: Buffer.alloc(sodium.crypto_sign_PUBLICKEYBYTES),
+    secretKey: Buffer.alloc(sodium.crypto_sign_SECRETKEYBYTES)
+  }
+  sodium.crypto_sign_keypair(keypair.publicKey, keypair.secretKey)
   var file = path.join(directory, 'keys')
   var json = JSON.stringify({
     public: encoding.encode(keypair.publicKey),
