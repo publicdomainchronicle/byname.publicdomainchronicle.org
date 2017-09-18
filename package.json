@@ -62,7 +62,7 @@
     "coverage": "NODE_ENV=test istanbul cover -- tape test/*.test.js",
     "pretest": "npm run build",
     "test": "NODE_ENV=test tape test/*.test.js",
-    "testserver": "NODE_ENV=test RECAPTCHA_PUBLIC=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI RECAPTCHA_SECRET=6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe node server.js",
+    "testserver": "NODE_ENV=test RECAPTCHA_PUBLIC=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI RECAPTCHA_SECRET=6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe node server.js | tee server.log",
     "licenses": "licensee --errors-only"
   }
 }
