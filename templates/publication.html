@@ -1,7 +1,7 @@
 <Submitter!doctype html>
 <html lang=en>
   <head>
-    <title>DBOS Publication</title>
+    <title>Public Domain Chronicle Publication</title>
     <link href=/normalize.css rel=stylesheet>
     <link href=/styles.css rel=stylesheet>
   </head>
@@ -11,7 +11,7 @@
     <main>
       <h1>{{title}}</h1>
 
-      <p><code>dbos:{{{formattedDigest}}}</code></p>
+      <p><code>pdc:{{{formattedDigest}}}</code></p>
 
       {{#name}}
       <h2>Contributor</h2>
@@ -66,7 +66,7 @@
 
       <ul id=publications>
       {{#publications}}
-        <li>Related DBOS Publication: <a href=/publications/{{{.}}}>{{.}}</a></li>
+        <li>Related PDC Publication: <a href=/publications/{{{.}}}>{{.}}</a></li>
       {{/publications}}
       </ul>
 

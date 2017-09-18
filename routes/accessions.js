@@ -96,10 +96,10 @@ module.exports = function (request, response, configuration) {
           <?xml version="1.0"?>
           <rss version="2.0">
             <channel>
-              <title>Distributed Bulletin of Open Science</title>
+              <title>Public Domain Chronicle</title>
               <link>${configuration.hostname}</link>
               <description>
-                Distributed Bulletin of Open Science publications
+                Public Domain Chronicle publications
                 from ${configuration.hostname}
               </description>
         `)
