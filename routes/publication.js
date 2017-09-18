@@ -16,13 +16,13 @@ limitations under the License.
 
 var Negotiator = require('negotiator')
 var encoding = require('../encoding')
+var escape = require('./escape')
 var formatDate = require('../format-date')
 var fs = require('fs')
+var html = require('./html')
 var methodNotAllowed = require('./method-not-allowed')
-var mustache = require('mustache')
 var notFound = require('./not-found')
 var parse = require('json-parse-errback')
-var partials = require('../partials')
 var path = require('path')
 var readTimestamps = require('../util/read-timestamps')
 var runParallel = require('run-parallel')
@@ -30,9 +30,10 @@ var send = require('send')
 var url = require('url')
 var xtend = require('xtend')
 
-var TEMPLATE = path.join(
-  __dirname, '..', 'templates', 'publication.html'
-)
+var footer = require('./partials/footer')
+var head = require('./partials/head')
+var header = require('./partials/header')
+var nav = require('./partials/nav')
 
 module.exports = function (request, response, configuration, log) {
   if (request.method === 'GET') {
@@ -62,17 +63,9 @@ module.exports = function (request, response, configuration, log) {
             })
             .pipe(response)
         } else if (type === 'text/html') {
-          var template
           var data
           var timestamps
           runParallel([
-            function readTemplate (done) {
-              fs.readFile(TEMPLATE, 'utf8', function (error, read) {
-                if (error) return done(error)
-                template = read
-                done()
-              })
-            },
             function readPublication (done) {
               fs.readFile(json, 'utf8', function (error, read) {
                 if (error) return done(error)
@@ -129,9 +122,117 @@ module.exports = function (request, response, configuration, log) {
               response.setHeader(
                 'Content-Type', 'text/html; charset=UTF-8'
               )
-              response.end(
-                mustache.render(template, data, partials)
-              )
+              response.end(html`
+<!doctype html>
+<html lang=en>
+  ${head(data.title)}
+  <body>
+    ${header('Publication')}
+    <main>
+      <h1>${escape(data.title)}</h1>
+
+      <p><code>${data.formattedDigest}</code></p>
+
+      ${
+        data.name
+          ? html`
+            <h2>Contributor</h2>
+            <p class=name>${escape(data.name)}</p>
+          `
+          : html`<p>Published anonymously.</p>`
+      }
+
+      ${data.affiliation && html`
+        <h2>Affiliation</h2>
+        <p class=affiliation>${escape(data.affiliation)}</p>
+      `}
+
+      <h2>Finding</h2>
+      <p>${escape(data.finding)}</p>
+
+      <h2>Safety Notes</h2>
+      ${
+        data.safety
+          ? data.safety.map(function (paragraph) {
+            return html`<p>${escape(paragraph)}</p>`
+          })
+          : html`<p>No safety notes.</p>`
+      }
+
+      <h2>Attachments</h2>
+
+      <ul>
+      ${data.attachments.map(function (attachment) {
+        return html`
+        <li>
+          <a href="publications/${data.digest}/attachments/${attachment}">
+            ${escape(attachment)}
+          </a>
+        </li>
+        `
+      })}
+      </ul>
+
+      ${data.attachments.length === 0 && html`<p>No attachments.</p>`}
+
+      <h2>Metadata</h2>
+
+      <ul id=journals>
+      ${data.metadata.journals && data.metadata.journals.map(function (journal) {
+        return html`<li>Related Journal: ${escape(journal)}</li>`
+      })}
+      </ul>
+
+      <ul id=classifications>
+      ${data.metadata.classifications && data.metadata.classifications.map(function (ipc) {
+        return html`<li>International Patent Classification: ${escape(ipc)}</li>`
+      })}
+      </ul>
+
+      <ul id=links>
+      ${data.links && data.links.map(function (link) {
+        return html`<li>Related PDC Publication: ${escape(link)}</li>`
+      })}
+      </ul>
+
+      <h2>Versions</h2>
+
+      <table>
+        <tr>
+          <th>Schema</th><td>${escape(data.version)}</td>
+        </tr>
+        <tr>
+          <th>Declaration</th><td>${escape(data.declaration)}</td>
+        </tr>
+        <tr>
+          <th>License</th><td>${escape(data.license)}</td>
+        </tr>
+      </table>
+
+      <h2>Timestamps</h2>
+
+      <ul>
+      ${timestamps.map(function (timestamp) {
+        return html`
+        <li>
+          <dl>
+            <dt>Published</dt>
+            <dd>${escape(timestamp.time)}</dd>
+            <dt>Host</dt>
+            <dd><a href="${escape(timestamp.uri)}">${escape(timestamp.hostname)}</a></dd>
+            <dt>Signature</dt>
+            <dd><code>${timestamp.signature}</code></dd>
+          </dl>
+        </li>
+        `
+      })}
+      </ul>
+    </main>
+    ${nav()}
+    ${footer()}
+  </body>
+</html>
+              `)
             }
           })
         }

@@ -2,108 +2,14 @@
 <html lang=en>
   <head>
     <title>Public Domain Chronicle Publication</title>
-    <link href=/normalize.css rel=stylesheet>
-    <link href=/styles.css rel=stylesheet>
+    <link href=normalize.css rel=stylesheet>
+    <link href=styles.css rel=stylesheet>
   </head>
   <body>
     {{> header}}
 
-    <main>
-      <h1>{{title}}</h1>
-
-      <p><code>pdc:{{{formattedDigest}}}</code></p>
-
-      {{#name}}
-      <h2>Contributor</h2>
-      <p class=name>{{.}}</p>
-      {{/name}}
-
-      {{^name}}
-      <p>Published anonymously.</p>
-      {{/name}}
-
-      {{#affiliation}}
-      <h2>Affiliation</h2>
-      <p class=affiliation>{{.}}</p>
-      {{/affiliation}}
-
-      <h2>Finding</h2>
-      {{#finding}}<p>{{.}}</p>{{/finding}}
-
-      <h2>Safety Notes</h2>
-      {{^safety}}<p>No safety notes.</p>{{/safety}}
-      {{#safety}}<p>{{.}}</p>{{/safety}}
-
-      <h2>Attachments</h2>
-
-      <ul>
-      {{#attachments}}
-        <li>
-          <a href="/publications/{{{digest}}}/attachments/{{{.}}}">
-            {{.}}
-          </a>
-        </li>
-      {{/attachments}}
-      </ul>
-
-      {{^attachments}}
-      <p>No attachments</p>
-      {{/attachments}}
-
-      {{#metadata}}
-      <h2>Metadata</h2>
-
-        <ul id=journals>
-        {{#journals}}
-          <li>Related Journal: {{.}}</li>
-        {{/journals}}
-        </ul>
-
-        <ul id=classifications>
-        {{#classifications}}
-          <li>International Patent Classification: {{.}}</li>
-        {{/classifications}}
-        </ul>
-
-      {{/metadata}}
-
-      <ul id=links>
-      {{#links}}
-        <li>Related PDC Publication: <a href=/publications/{{{.}}}>{{.}}</a></li>
-      {{/links}}
-      </ul>
-
-      <h2>Versions</h2>
-
-      <table>
-        <tr>
-          <th>Schema</th><td>{{version}}</td>
-        </tr>
-        <tr>
-          <th>Declaration</th><td>{{declaration}}</td>
-        </tr>
-        <tr>
-          <th>License</th><td>{{license}}</td>
-        </tr>
-      </table>
-
-      <h2>Timestamps</h2>
-
-      <ul>
-      {{#timestamps}}
-        <li>
-          <dl>
-            <dt>Published</dt>
-            <dd>{{time}}</dd>
-            <dt>Host</dt>
-            <dd><a href="{{{uri}}}">{{hostname}}</a></dd>
-            <dt>Signature</dt>
-            <dd><code>{{{signature}}}</code></dd>
-          </dl>
-        </li>
-      {{/timestamps}}
-      </ul>
-    </main>
+     <main>
+     </main>
 
     {{> nav}}
 

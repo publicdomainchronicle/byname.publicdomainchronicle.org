@@ -19,7 +19,7 @@ var serveAllFiles = require('./serve-all-files')
 
 var routes = module.exports = require('http-hash')()
 
-routes.set('/', serveFile('homepage.html'))
+routes.set('/', require('./homepage'))
 
 serveAllFiles(routes, 'png')
 serveAllFiles(routes, 'css')

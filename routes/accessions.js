@@ -16,22 +16,23 @@ limitations under the License.
 
 var Negotiator = require('negotiator')
 var encoding = require('../encoding')
+var escape = require('./escape')
 var flushWriteStream = require('flush-write-stream')
 var formatDate = require('../format-date')
 var fs = require('fs')
+var html = require('./html')
 var methodNotAllowed = require('./method-not-allowed')
-var mustache = require('mustache')
 var parse = require('json-parse-errback')
-var partials = require('../partials')
 var path = require('path')
 var pump = require('pump')
 var rfc822 = require('rfc822-date')
 var split2 = require('split2')
 var through2 = require('through2')
 
-var TEMPLATE = path.join(
-  __dirname, '..', 'templates', 'accessions.html'
-)
+var footer = require('./partials/footer')
+var head = require('./partials/head')
+var header = require('./partials/header')
+var nav = require('./partials/nav')
 
 var BYTES_PER_LINE = require('../bytes-per-accession')
 
@@ -143,19 +144,47 @@ module.exports = function (request, response, configuration) {
               response.statusCode = 500
               response.end()
             } else {
-              fs.readFile(TEMPLATE, 'utf8', function (error, template) {
-                if (error) {
-                  response.statusCode = 500
-                  response.end()
-                } else {
-                  response.setHeader(
-                    'Content-Type', 'text/html; charset=UTF-8'
-                  )
-                  response.end(
-                    mustache.render(template, data, partials)
-                  )
-                }
-              })
+              response.setHeader(
+                'Content-Type', 'text/html; charset=UTF-8'
+              )
+              response.end(html`
+<!doctype html>
+<html lang=en>
+  ${head(data.title)}
+  <body>
+    ${header()}
+    <main>
+      <table>
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Published</th>
+            <th>Cryptographic Digest</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.accessions.map(function (accession) {
+            return html`
+            <tr>
+              <td>${escape(accession.number)}</td>
+              <td>${escape(accession.timestamp)}</td>
+              <td>
+                <a href=/publications/${escape(accession.digest)}>
+                  <code>${accession.formattedDigest}</code>
+                </a>
+              </td>
+            </tr>
+            `
+          })}
+        </tbody>
+      </table>
+    </main>
+    ${nav()}
+    ${footer()}
+  </body>
+</html>
+
+              `)
             }
           }
         )

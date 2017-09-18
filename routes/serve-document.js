@@ -15,21 +15,22 @@ limitations under the License.
  */
 
 var Negotiator = require('negotiator')
+var escape = require('./escape')
 var fs = require('fs')
+var html = require('./html')
 var latest = require('../latest')
 var methodNotAllowed = require('./method-not-allowed')
-var mustache = require('mustache')
 var parse = require('json-parse-errback')
 var path = require('path')
 var straightenQuotes = require('straighten-quotes')
 var wordwrap = require('wordwrap')
-var partials = require('../partials')
+
+var footer = require('./partials/footer')
+var head = require('./partials/head')
+var header = require('./partials/header')
+var nav = require('./partials/nav')
 
 var documents = path.join(__dirname, '..', 'documents')
-
-var TEMPLATE = path.join(
-  __dirname, '..', 'templates', 'document.html'
-)
 
 module.exports = function (name) {
   return function (request, response) {
@@ -74,20 +75,34 @@ module.exports = function (name) {
                   )
                   response.end(jsonToTXT(latest(data)))
                 } else if (type === 'text/html') {
-                  fs.readFile(TEMPLATE, 'utf8', function (error, t) {
-                    if (error) {
-                      response.statusCode = 500
-                      response.end()
-                    } else {
-                      response.setHeader(
-                        'Content-Type',
-                        'text/html; charset=UTF-8'
-                      )
-                      response.end(
-                        mustache.render(t, latest(data), partials)
-                      )
-                    }
-                  })
+                  var vars = latest(data)
+                  response.setHeader(
+                    'Content-Type',
+                    'text/html; charset=UTF-8'
+                  )
+                  response.end(html`
+<!doctype html>
+<html>
+  ${head(vars.title)}
+  <body>
+    ${header()}
+    <main>
+      <h1>${escape(vars.title)}</h1>
+      <p>Version ${escape(vars.version)}</p>
+      <p class=premable>${escape(vars.preamble)}</p>
+      <ol>
+      ${vars.items.map(function (element) {
+        return html`<li>${escape(element)}</li>`
+      })}
+      </ol>
+      <p>${escape(vars.copyright)}</p>
+      <p>${escape(vars.license)}</p>
+    </main>
+    ${nav()}
+    ${footer()}
+  </body>
+</html>
+                  `)
                 }
               }
             })

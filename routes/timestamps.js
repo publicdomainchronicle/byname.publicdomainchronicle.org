@@ -15,11 +15,8 @@ limitations under the License.
  */
 
 var encoding = require('../encoding')
-var glob = require('glob')
 var methodNotAllowed = require('./method-not-allowed')
 var notFound = require('./not-found')
-var send = require('send')
-var timestampPath = require('../util/timestamp-path')
 var readTimestamps = require('../util/read-timestamps')
 
 module.exports = function (request, response, configuration) {

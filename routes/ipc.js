@@ -15,9 +15,7 @@ limitations under the License.
  */
 var http = require('http')
 var pump = require('pump')
-var through2 = require('through2')
 var methodNotAllowed = require('./method-not-allowed')
-var split2 = require('split2')
 
 module.exports = function (request, response, configuration) {
   if (request.method === 'GET') {

@@ -14,11 +14,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-var sendFile = require('./serve-file')
+var html = require('./html')
 
-var handler = sendFile('not-found.html')
+var footer = require('./partials/footer')
+var head = require('./partials/head')
+var header = require('./partials/header')
+var nav = require('./partials/nav')
 
 module.exports = function (request, response) {
   response.statusCode = 404
-  handler(request, response)
+  response.setHeader('Content-Type', 'text/html; charset=UTF-8')
+  response.end(html`
+<!doctype html>
+<html lang=en>
+  ${head('Not Found')}
+  <body>
+    ${header()}
+    <main>
+      <p>Not Found</p>
+    </main>
+    ${nav()}
+    ${footer()}
+  </body>
+</html>
+  `)
 }

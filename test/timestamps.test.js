@@ -28,7 +28,6 @@ tape('GET /publication/{created}/timestamps', function (test) {
   server(function (port, done) {
     var location
     var publicKey
-    var timestamp
     runSeries([
       function (done) {
         var form = makeValidPublication()

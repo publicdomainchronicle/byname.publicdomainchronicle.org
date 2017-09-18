@@ -52,91 +52,9 @@ header {
   width: 100%;
 }
 
-.bottomLinks {
-  background-color: rgb(68, 68, 68);
-  color: white;
-  font-size: 80%;
-  margin: 1rem auto 0 auto;
-  padding: 3rem 0;
-  position: relative;
-  text-align: center;
-  vertical-align: top;
-  width: 100%;
-}
-
 h1, h2, h3, h4, h5, h6 {
   color: #515151;
   font-family: 'Roboto', Helvetica, Arial, Lucida, sans-serif;
-}
-
-.bottomLinks h1 {
-  color: #dd9933;
-  font-size: 140%;
-  font-weight: normal;
-}
-
-.bottomLinks section {
-  display: inline-block;
-  margin: 0 auto;
-  padding: 0.375rem;
-  text-align: left;
-  vertical-align: top;
-  width: 12rem;
-}
-
-.bottomLinks section:first-child {
-  padding-left: 0;
-}
-
-.bottomLinks section:last-child {
-  padding-right: 0;
-}
-
-.bottomLinks ul {
-  list-style-position: outside;
-  list-style-type: none;
-  padding: 0;
-}
-
-.bottomLinks > ul {
-  font-size: 90%;
-}
-
-.bottomLinks ul ul {
-  padding-left: 1rem;
-}
-
-.bottomLinks li:before {
-  color: #81d742;
-  content: '• ';
-  font-weight: bold;
-}
-
-.bottomLinks ul li a {
-  color: white;
-  text-transform: uppercase;
-}
-
-.bottomLinks ul li ul li a {
-  font-style: oblique;
-  text-transform: none;
-}
-
-.copyright {
-  background-color: #2e2e2e;
-  display: block;
-  color: rgb(102, 102, 102);
-  margin: 0;
-  width: 100%;
-  text-align: center;
-  padding: 1rem 0;
-}
-
-.copyright p {
-  text-align: left;
-  width: 50rem;
-  margin: 0 auto;
-  font-size: 85%;
 }
 
 table {
