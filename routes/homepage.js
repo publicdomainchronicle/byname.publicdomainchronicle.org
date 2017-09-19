@@ -5,12 +5,12 @@ var head = require('./partials/head')
 var header = require('./partials/header')
 var nav = require('./partials/nav')
 
-module.exports = function (request, response) {
+module.exports = function (request, response, configuration) {
   response.setHeader('Content-Type', 'text/html; charset=UTF-8')
   response.end(html`
 <!doctype html>
 <html>
-  ${head()}
+  ${head(configuration)}
   <body>
     ${header()}
     ${nav()}

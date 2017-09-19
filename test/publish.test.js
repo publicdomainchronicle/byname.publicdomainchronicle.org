@@ -54,7 +54,7 @@ tape('POST /publish with valid', function (test) {
             'responds 201'
           )
           test.assert(
-            response.headers.location.startsWith('/publications/'),
+            response.headers.location.includes('/publications/'),
             'sets Location'
           )
           done()
@@ -89,7 +89,7 @@ tape('POST /publish with attachment', function (test) {
             'responds 201'
           )
           test.assert(
-            response.headers.location.startsWith('/publications/'),
+            response.headers.location.includes('/publications/'),
             'sets Location'
           )
           done()

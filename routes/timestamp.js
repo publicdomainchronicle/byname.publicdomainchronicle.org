@@ -25,7 +25,7 @@ module.exports = function (request, response, configuration) {
     var digest = request.params.digest
     var key = request.params.key
     if (!encoding.isDigest(digest)) {
-      notFound(request, response)
+      notFound(request, response, configuration)
     } else {
       var directory = configuration.directory
       var file = timestampPath(directory, digest, key)

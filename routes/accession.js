@@ -50,7 +50,7 @@ module.exports = function (request, response, configuration) {
             // If the accessions file is too small to have the requested
             // accession number, respond 404.
             if (stats.size < (offset + BYTES_PER_LINE)) {
-              notFound(request, response)
+              notFound(request, response, configuration)
             // Otherwise, read the line for the accession from the file,
             // starting at the calculated offset.
             } else {
@@ -70,7 +70,7 @@ module.exports = function (request, response, configuration) {
                       .split(',')
                     response.statusCode = 303
                     response.setHeader(
-                      'Location', '/publications/' + split[1]
+                      'Location', configuration.base + 'publications/' + split[1]
                     )
                     response.end()
                   }

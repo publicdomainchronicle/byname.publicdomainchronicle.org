@@ -147,7 +147,7 @@ module.exports = function (request, response, configuration) {
               response.end(html`
 <!doctype html>
 <html lang=en>
-  ${head(data.title)}
+  ${head(configuration, data.title)}
   <body>
     ${header()}
     ${nav()}
@@ -167,7 +167,7 @@ module.exports = function (request, response, configuration) {
               <td>${escape(accession.number)}</td>
               <td>${escape(accession.timestamp)}</td>
               <td>
-                <a href=publications/${escape(accession.digest)}>
+                <a href=${configuration.base}publications/${escape(accession.digest)}>
                   <code>${accession.formattedDigest}</code>
                 </a>
               </td>

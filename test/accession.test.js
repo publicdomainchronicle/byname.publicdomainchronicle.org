@@ -40,7 +40,7 @@ tape('GET /accessions CSV', function (test) {
                 'responds 201'
               )
               test.assert(
-                response.headers.location.startsWith('/publications/'),
+                response.headers.location.includes('/publications/'),
                 'sets Location'
               )
               location = response.headers.location
@@ -59,9 +59,9 @@ tape('GET /accessions CSV', function (test) {
             'responds 200'
           )
           response.pipe(concat(function (body) {
-            var digest = location.replace('/publications/', '')
+            var digest = /\/publications\/([a-f0-9]{64})/.exec(location)[1]
             test.assert(
-              body.toString().indexOf(digest) !== -1,
+              body.toString().includes(digest),
               'body contains digest'
             )
             done()
@@ -97,14 +97,12 @@ tape('GET /accessions?from CSV', function (test) {
                 test.assert(
                   response.headers
                     .location
-                    .startsWith('/publications/'),
+                    .includes('/publications/'),
                   'sets Location'
                 )
-                digests.push(
-                  response.headers
-                    .location
-                    .replace('/publications/', '')
-                )
+                var digest = /\/publications\/([a-f0-9]{64})/
+                  .exec(response.headers.location)[1]
+                digests.push(digest)
                 done()
               })
           )
@@ -161,7 +159,7 @@ tape('GET /accessions HTML', function (test) {
                 'responds 201'
               )
               test.assert(
-                response.headers.location.startsWith('/publications/'),
+                response.headers.location.includes('/publications/'),
                 'sets Location'
               )
               location = response.headers.location
@@ -214,7 +212,7 @@ tape('GET /accessions RSS', function (test) {
                 'responds 201'
               )
               test.assert(
-                response.headers.location.startsWith('/publications/'),
+                response.headers.location.includes('/publications/'),
                 'sets Location'
               )
               location = response.headers.location
@@ -323,7 +321,7 @@ tape('GET /accessions/{created}', function (test) {
                 'responds 201'
               )
               test.assert(
-                response.headers.location.startsWith('/publications/'),
+                response.headers.location.includes('/publications/'),
                 'sets Location'
               )
               location = response.headers.location
@@ -392,7 +390,7 @@ tape('GET /accessions/{number}', function (test) {
               'responds 201'
             )
             test.assert(
-              response.headers.location.startsWith('/publications/'),
+              response.headers.location.includes('/publications/'),
               'sets Location'
             )
             locations.push(response.headers.location)

@@ -44,7 +44,7 @@ var JOURNALS = require('pct-minimum-documentation')
 function get (request, response, configuration, errors) {
   response.setHeader('Content-Type', 'text/html; charset=UTF-8')
   response.end(
-    template({
+    template(configuration, {
       journals: JOURNALS,
       RECAPTCHA_PUBLIC: configuration.recaptcha.public,
       errors: errors,
@@ -71,7 +71,7 @@ function post (request, response, configuration) {
   pump(
     through,
     publish(configuration, request.log, function (digest) {
-      var location = '/publications/' + digest
+      var location = configuration.base + 'publications/' + digest
       response.statusCode = 201
       response.setHeader('Content-Type', 'text/html; charset=UTF-8')
       response.setHeader('Location', location)
@@ -227,13 +227,13 @@ function normalize (record) {
   })
 }
 
-function template (data) {
+function template (configuration, data) {
   var license = data.license
   var declaration = data.declaration
   return html`
 <!doctype html>
 <html lang=en>
-  ${head('Publish')}
+  ${head(configuration, 'Publish')}
   <body>
     ${header()}
     ${nav()}
@@ -471,7 +471,6 @@ function template (data) {
           </section>
         </section>
 
-        ${declaration && html`
         <section id=declaration class=required>
           <h2>${escape(declaration.title)}</h2>
           <p class=version>Version ${escape(declaration.version)}</p>
@@ -485,6 +484,7 @@ function template (data) {
 
           <label>
             <input
+                id=declarationButton
                 name=declaration
                 type=checkbox
                 value="${escape(declaration.version)}"
@@ -492,7 +492,6 @@ function template (data) {
             Check this box to make the declaration above.
           </label>
         </section>
-        `}
 
         ${license && html`
         <section id=license class=required>

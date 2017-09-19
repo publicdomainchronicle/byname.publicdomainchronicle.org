@@ -33,7 +33,7 @@ var nav = require('./partials/nav')
 var documents = path.join(__dirname, '..', 'documents')
 
 module.exports = function (name) {
-  return function (request, response) {
+  return function (request, response, configuration) {
     if (request.method === 'GET') {
       var type = new Negotiator(request).mediaType([
         'application/json', 'text/plain', 'text/html'
@@ -83,7 +83,7 @@ module.exports = function (name) {
                   response.end(html`
 <!doctype html>
 <html>
-  ${head(vars.title)}
+  ${head(configuration, vars.title)}
   <body>
     ${header()}
     ${nav()}

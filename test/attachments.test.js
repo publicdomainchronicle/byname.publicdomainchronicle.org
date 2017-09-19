@@ -56,7 +56,7 @@ tape('GET /publications/{}/attachments/{}', function (test) {
                 'responds 201'
               )
               test.assert(
-                response.headers.location.startsWith('/publications/'),
+                response.headers.location.includes('/publications/'),
                 'sets Location'
               )
               location = response.headers.location

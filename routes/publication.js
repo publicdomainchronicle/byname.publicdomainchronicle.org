@@ -35,11 +35,11 @@ var head = require('./partials/head')
 var header = require('./partials/header')
 var nav = require('./partials/nav')
 
-module.exports = function (request, response, configuration, log) {
+module.exports = function (request, response, configuration) {
   if (request.method === 'GET') {
     var digest = request.params.digest
     if (!encoding.isDigest(digest)) {
-      notFound(request, response)
+      notFound(request, response, configuration)
     } else {
       var type = new Negotiator(request).mediaType([
         'application/json', 'text/html'
@@ -125,7 +125,7 @@ module.exports = function (request, response, configuration, log) {
               response.end(html`
 <!doctype html>
 <html lang=en>
-  ${head(data.title)}
+  ${head(configuration, data.title)}
   <body>
     ${header()}
     ${nav()}

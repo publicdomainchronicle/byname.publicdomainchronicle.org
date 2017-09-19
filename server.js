@@ -57,7 +57,7 @@ initialize(DIRECTORY, function (error, keypair) {
     var configuration = {
       version: VERSION,
       hostname: HOSTNAME,
-      base: BASE_HREF,
+      base: BASE_HREF.endsWith('/') ? BASE_HREF : (BASE_HREF + '/'),
       timeout: TIMEOUT,
       directory: DIRECTORY,
       keypair: keypair,

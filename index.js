@@ -40,7 +40,7 @@ module.exports = function (configuration, log) {
       request.params = route.params
       route.handler(request, response, configuration)
     } else {
-      notFound(request, response)
+      notFound(request, response, configuration)
     }
   }
 }

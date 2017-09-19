@@ -31,7 +31,6 @@ module.exports = function (callback) {
       var configuration = {
         version: VERSION,
         hostname: 'testserver',
-        base: 'http://testserver/',
         timeout: 5000,
         directory: directory,
         keypair: keypair,
@@ -45,7 +44,9 @@ module.exports = function (callback) {
       var log = pino({}, devNull())
       var server = http.createServer(makeHandler(configuration, log))
       server.listen(RANDOM_HIGH_PORT, function () {
-        callback(this.address().port, function () {
+        var port = this.address().port
+        configuration.base = 'http://localhost:' + port + '/'
+        callback(port, function () {
           server.close(function () {
             rimraf.sync(directory)
           })

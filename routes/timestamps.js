@@ -23,7 +23,7 @@ module.exports = function (request, response, configuration) {
   if (request.method === 'GET') {
     var digest = request.params.digest
     if (!encoding.isDigest(digest)) {
-      notFound(request, response)
+      notFound(request, response, configuration)
     } else {
       var directory = configuration.directory
       readTimestamps(directory, digest, function (error, _, publicKeys) {

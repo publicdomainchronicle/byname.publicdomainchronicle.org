@@ -29,7 +29,7 @@ module.exports = function (request, response, configuration) {
       !encoding.isDigest(publication) ||
       !encoding.isDigest(attachment)
     ) {
-      notFound(request, response)
+      notFound(request, response, configuration)
     } else {
       var file = path.join(
         configuration.directory, 'publications', publication, attachment

@@ -58,7 +58,7 @@ tape('GET /publications/{created} JSON', function (test) {
                 'responds 201'
               )
               test.assert(
-                response.headers.location.startsWith('/publications/'),
+                response.headers.location.includes('/publications/'),
                 'sets Location'
               )
               location = response.headers.location
@@ -105,7 +105,7 @@ tape('GET /publications/{created} HTML', function (test) {
                 'responds 201'
               )
               test.assert(
-                response.headers.location.startsWith('/publications/'),
+                response.headers.location.includes('/publications/'),
                 'sets Location'
               )
               location = response.headers.location
@@ -152,7 +152,7 @@ tape('GET /publications/{created} XML', function (test) {
                 'responds 201'
               )
               test.assert(
-                response.headers.location.startsWith('/publications/'),
+                response.headers.location.includes('/publications/'),
                 'sets Location'
               )
               location = response.headers.location

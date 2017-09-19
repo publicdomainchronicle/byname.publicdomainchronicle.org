@@ -1,11 +1,9 @@
 var escape = require('../escape')
 var html = require('../html')
 
-var BASE_HREF = process.env.BASE_HREF
-
-module.exports = function (subtitle) {
+module.exports = function (configuration, subtitle) {
   return html`
-${BASE_HREF && `<base href="${BASE_HREF}">`}
+${configuration.base && `<base href="${configuration.base}">`}
 <title>Public Domain Chronicle${subtitle && ` / ${escape(subtitle)}`}</title>
 <link href=normalize.css rel=stylesheet>
 <link href=styles.css rel=stylesheet>
