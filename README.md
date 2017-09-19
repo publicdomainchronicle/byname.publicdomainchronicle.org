@@ -1,5 +1,17 @@
 # Public Domain Chronicle
 
+Node.js application for running a [Public Domain Chronicle](https://publicdomainchronicle.org) server to accept contributions to the public domain.
+
+If you're interested in:
+
+1. running a server for your company, university, department, or lab
+
+2. modifying the server to make it easier for contributors in a particular scientific discipline
+
+3. mirroring and searching PDC data from the network
+
+Get in touch with [@kemitchell](https://kemitchell.com) directly.  Let's talk.  I can help.
+
 ## Data Storage
 
 The server reads and stores all information to disk, within the directory specified in the `DIRECTORY` environment variable.
