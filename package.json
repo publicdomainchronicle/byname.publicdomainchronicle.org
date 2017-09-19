@@ -48,7 +48,7 @@
     "lint-staged": "^4.2.1",
     "nsp": "^2.6.3",
     "rimraf": "^2.6.1",
-    "standard": "^10.0.2",
+    "standard": "^10.0.3",
     "string-to-stream": "^1.1.0",
     "tape": "^4.6.3",
     "webdriverio": "^4.2.3"
