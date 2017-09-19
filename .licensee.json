@@ -29,6 +29,7 @@
     "ms": "0.7.1",
     "node-ninja": "1.0.2",
     "nopt": "1.0.10",
+    "normalize-path": "1.0.0 || 2.1.1",
     "numpad": "0.0.1",
     "optimist": "0.6.1",
     "prelude-ls": "1.1.2",
