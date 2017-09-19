@@ -28,7 +28,7 @@ main {
   text-align: left;
 }
 
-main p {
+main p, main li {
   color: rgb(102, 102, 102);
   font-family: "PT Sans", Helvetica, Arial, Lucida, sans-serif;
 }
