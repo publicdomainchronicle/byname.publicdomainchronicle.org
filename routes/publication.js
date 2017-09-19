@@ -179,15 +179,28 @@ module.exports = function (request, response, configuration, log) {
       <h2>Metadata</h2>
 
       <ul id=journals>
-      ${data.metadata.journals && data.metadata.journals.map(function (journal) {
-        return html`<li>Related Journal: ${escape(journal)}</li>`
-      })}
+      ${
+        data.metadata &&
+        data.metadata.journals &&
+        data.metadata.journals.map(function (journal) {
+          return html`<li>Related Journal: ${escape(journal)}</li>`
+        })
+      }
       </ul>
 
       <ul id=classifications>
-      ${data.metadata.classifications && data.metadata.classifications.map(function (ipc) {
-        return html`<li>International Patent Classification: ${escape(ipc)}</li>`
-      })}
+      ${
+        data.metadata &&
+        data.metadata.classifications &&
+        data.metadata.classifications.map(function (ipc) {
+          return html`
+            <li>
+              International Patent Classification:
+              ${escape(ipc)}
+            </li>
+          `
+        })
+      }
       </ul>
 
       <ul id=links>
