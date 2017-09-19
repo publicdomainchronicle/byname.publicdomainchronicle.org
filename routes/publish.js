@@ -557,7 +557,7 @@ function template (data) {
     ${nav()}
     ${footer()}
 
-    <script src=/publish.js></script>
+    <script src=publish.js></script>
     <script src=https://www.google.com/recaptcha/api.js></script>
   </body>
 </html>
