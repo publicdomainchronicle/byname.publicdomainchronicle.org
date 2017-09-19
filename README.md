@@ -12,6 +12,19 @@ If you're interested in:
 
 Get in touch with [@kemitchell](https://kemitchell.com) directly.  Let's talk.  I can help.
 
+## Up and Running
+
+```shell
+# Clone the source code.
+git clone https://github.com/biobricks/public-domain-chronicle pdc
+cd pdc
+# Clone submodules.
+git submodule update --init
+# With Node.js and npm installed
+npm install
+npm run testserver
+```
+
 ## Data Storage
 
 The server reads and stores all information to disk, within the directory specified in the `DIRECTORY` environment variable.
