@@ -71,11 +71,11 @@ module.exports = {
     },
     declaration: {
       type: 'string',
-      enum: Object.keys(require('../../documents/declaration.json'))
+      enum: Object.keys(require('../../documents/declaration/declaration.json'))
     },
     license: {
       type: 'string',
-      enum: Object.keys(require('../../documents/license.json'))
+      enum: Object.keys(require('../../documents/license/license.json'))
     }
   },
   required: [

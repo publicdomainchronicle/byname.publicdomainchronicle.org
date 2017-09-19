@@ -42,7 +42,7 @@ module.exports = function (name) {
         response.statusCode = 415
         response.end()
       } else {
-        var json = path.join(documents, name + '.json')
+        var json = path.join(documents, name, name + '.json')
         fs.readFile(json, 'utf8', function (error, json) {
           /* istanbul ignore if */
           if (error) {

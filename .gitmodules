@@ -1,0 +1,6 @@
+[submodule "documents/declaration"]
+	path = documents/declaration
+	url = git@github.com:biobricks/pdc-declaration
+[submodule "documents/license"]
+	path = documents/license
+	url = git@github.com:biobricks/pdc-license

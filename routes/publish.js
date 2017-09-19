@@ -32,8 +32,8 @@ var head = require('./partials/head')
 var header = require('./partials/header')
 var nav = require('./partials/nav')
 
-var declaration = latest(require('../documents/declaration.json'))
-var license = latest(require('../documents/license.json'))
+var declaration = latest(require('../documents/declaration/declaration.json'))
+var license = latest(require('../documents/license/license.json'))
 
 var JOURNALS = require('pct-minimum-documentation')
   .map(function (element) {
