@@ -14,6 +14,10 @@ Get in touch with [@kemitchell](https://kemitchell.com) directly.  Let's talk.  
 
 ## Up and Running
 
+The software is written in Node.js, with npm for package management.
+
+If you're not a Node.js person, don't sweat.  We've kept the project intentionally small and light, and folks are here to help.
+
 ```shell
 # Clone the source code.
 git clone https://github.com/biobricks/public-domain-chronicle pdc
