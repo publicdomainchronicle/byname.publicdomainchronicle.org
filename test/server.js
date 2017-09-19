@@ -31,6 +31,7 @@ module.exports = function (callback) {
       var configuration = {
         version: VERSION,
         hostname: 'testserver',
+        base: 'http://testserver/',
         timeout: 5000,
         directory: directory,
         keypair: keypair,

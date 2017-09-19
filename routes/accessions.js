@@ -57,10 +57,7 @@ module.exports = function (request, response, configuration) {
             var split = line.split(',')
             var date = rfc822(new Date(split[0]))
             var digest = split[1]
-            var link = (
-              'https://' + configuration.hostname +
-              '/publications/' + digest
-            )
+            var link = configuration.base + 'publications/' + digest
             var file = path.join(
               configuration.directory, 'publications', digest + '.json'
             )
@@ -170,7 +167,7 @@ module.exports = function (request, response, configuration) {
               <td>${escape(accession.number)}</td>
               <td>${escape(accession.timestamp)}</td>
               <td>
-                <a href=/publications/${escape(accession.digest)}>
+                <a href=publications/${escape(accession.digest)}>
                   <code>${accession.formattedDigest}</code>
                 </a>
               </td>

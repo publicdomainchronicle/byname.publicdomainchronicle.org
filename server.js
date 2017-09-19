@@ -42,6 +42,7 @@ var STAMPERY_PASSWORD = ENV.STAMPERY_PASSWORD
 
 var HOSTNAME = ENV.HOSTNAME || require('os').hostname()
 var DIRECTORY = ENV.DATA || NAME
+var BASE_HREF = ENV.BASE_HREF || ('https://' + HOSTNAME  + '/')
 
 var REPLICATION_INTERVAL = ENV.REPLICATION_INTERVAL
   ? parseInt(ENV.REPLICATION_INTERVAL)
@@ -56,6 +57,7 @@ initialize(DIRECTORY, function (error, keypair) {
     var configuration = {
       version: VERSION,
       hostname: HOSTNAME,
+      base: BASE_HREF,
       timeout: TIMEOUT,
       directory: DIRECTORY,
       keypair: keypair,
