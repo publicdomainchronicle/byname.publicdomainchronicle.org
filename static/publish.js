@@ -206,7 +206,7 @@ function configurePatentSearch () {
         })
       })
       request.open(
-        'GET', '/ipc?search=' + encodeURIComponent(searchBox.value)
+        'GET', 'ipc?search=' + encodeURIComponent(searchBox.value)
       )
       request.send()
     }
