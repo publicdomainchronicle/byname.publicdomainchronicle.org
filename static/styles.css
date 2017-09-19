@@ -63,8 +63,20 @@ nav a {
   text-transform: uppercase;
 }
 
-nav a:hover {
-  color: rgb(88, 175, 54);
+nav li:nth-of-type(4n+1) a:hover {
+  color: rgb(114, 179, 32);
+}
+
+nav li:nth-of-type(4n+2) a:hover {
+  color: rgb(255, 156, 81);
+}
+
+nav li:nth-of-type(4n+3) a:hover {
+  color: rgb(0, 156, 156);
+}
+
+nav li:nth-of-type(4n+4) a:hover {
+  color: rgb(255, 218, 81);
 }
 
 header, nav {
