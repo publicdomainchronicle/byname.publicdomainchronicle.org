@@ -153,6 +153,7 @@ module.exports = function (request, response, configuration) {
   ${head(data.title)}
   <body>
     ${header()}
+    ${nav()}
     <main>
       <table>
         <thead>
@@ -179,7 +180,6 @@ module.exports = function (request, response, configuration) {
         </tbody>
       </table>
     </main>
-    ${nav()}
     ${footer()}
   </body>
 </html>

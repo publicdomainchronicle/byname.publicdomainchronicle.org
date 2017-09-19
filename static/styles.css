@@ -1,6 +1,12 @@
 /* TODO: restyle <nav> like publicdomainchronicle.org */
 
+html, body {
+  height: 100%;
+}
+
 body {
+  display: flex;
+  flex-direction: column;
   font-family: "Open Sans", Arial, sans-serif;
   font-family: sans-serif;
   font-weight: 500;
@@ -8,16 +14,18 @@ body {
   text-align: center;
 }
 
-main {
-  border-right: 1px solid #eee;
-  color: rgb(102, 102, 102);
-  display: inline-block;
-  margin: 0 auto;
+main,
+footer[role=contentinfo] section {
   max-width: 40rem;
+}
+
+main {
+  display: inline-block;
+  flex: 1 0 auto;
+  margin: 0 auto;
   padding-bottom: 5rem;
-  padding-top: 2rem;
+  padding-top: 0.5rem;
   text-align: left;
-  vertical-align: top;
 }
 
 main p {
@@ -26,16 +34,28 @@ main p {
 }
 
 nav {
-  display: inline-block;
-  height: 100%;
-  max-width: 10rem;
-  text-align: left;
+  margin: 0 auto;
+  text-align: center;
   vertical-align: top;
+  width: 100%;
 }
 
 nav ul {
   list-style-type: none;
-  padding: 1rem 0 1rem 2rem;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+nav ul li {
+  display: inline;
+}
+
+nav ul li {
+  margin-left: 1rem;
+}
+
+nav ul li:first-child:before {
+  padding-left: 0;
 }
 
 nav a {
@@ -47,8 +67,11 @@ nav a:hover {
   color: rgb(88, 175, 54);
 }
 
-header {
+header, nav {
   border-bottom: 1px solid #eee;
+}
+
+header {
   padding: 0.5rem 0;
   text-align: center;
   width: 100%;

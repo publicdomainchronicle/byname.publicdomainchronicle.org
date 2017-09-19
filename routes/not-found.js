@@ -30,10 +30,10 @@ module.exports = function (request, response) {
   ${head('Not Found')}
   <body>
     ${header()}
+    ${nav()}
     <main>
       <p>Not Found</p>
     </main>
-    ${nav()}
     ${footer()}
   </body>
 </html>

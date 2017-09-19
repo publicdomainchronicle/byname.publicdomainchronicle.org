@@ -13,13 +13,13 @@ module.exports = function (request, response) {
   ${head()}
   <body>
     ${header()}
+    ${nav()}
     <main>
       <h1>Public Domain Chronicle (PDC)</h1>
       <p class=lead>
         Public Domain Chronicle is a fast, easy, and free way to secure scientific methods and findings for the public domain.
       </p>
     </main>
-    ${nav()}
     ${footer()}
   </body>
 </html>

@@ -236,6 +236,7 @@ function template (data) {
   ${head('Publish')}
   <body>
     ${header()}
+    ${nav()}
 
     <main>
       <p>
@@ -554,7 +555,6 @@ function template (data) {
       </form>
     </main>
 
-    ${nav()}
     ${footer()}
 
     <script src=publish.js></script>

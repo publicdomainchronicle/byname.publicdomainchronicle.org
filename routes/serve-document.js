@@ -86,6 +86,7 @@ module.exports = function (name) {
   ${head(vars.title)}
   <body>
     ${header()}
+    ${nav()}
     <main>
       <h1>${escape(vars.title)}</h1>
       <p>Version ${escape(vars.version)}</p>
@@ -98,7 +99,6 @@ module.exports = function (name) {
       <p>${escape(vars.copyright)}</p>
       <p>${escape(vars.license)}</p>
     </main>
-    ${nav()}
     ${footer()}
   </body>
 </html>

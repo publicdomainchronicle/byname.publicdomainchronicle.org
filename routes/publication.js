@@ -127,7 +127,8 @@ module.exports = function (request, response, configuration, log) {
 <html lang=en>
   ${head(data.title)}
   <body>
-    ${header('Publication')}
+    ${header()}
+    ${nav()}
     <main>
       <h1>${escape(data.title)}</h1>
 
@@ -228,7 +229,6 @@ module.exports = function (request, response, configuration, log) {
       })}
       </ul>
     </main>
-    ${nav()}
     ${footer()}
   </body>
 </html>
