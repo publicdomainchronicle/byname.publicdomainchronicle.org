@@ -69,7 +69,7 @@ tape('GET /license JSON', function (test) {
 tape('GET /license?version={valid} JSON', function (test) {
   server(function (port, done) {
     var request = {
-      path: '/license?version=0.0.0',
+      path: '/license?version=1.0.0',
       port: port,
       headers: {
         accept: 'application/json'
