@@ -4,7 +4,7 @@
   "author": "Kyle E. Mitchell <kyle@kemitchell.com> (https://kemitchell.com/)",
   "license": "Apache-2.0",
   "dependencies": {
-    "ajv": "^5.1.5",
+    "ajv": "^5.2.2",
     "busboy": "^0.2.14",
     "concat-stream": "^1.6.0",
     "english-months": "^1.0.3",
