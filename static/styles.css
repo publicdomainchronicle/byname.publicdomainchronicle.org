@@ -120,7 +120,7 @@ td {
 }
 
 .listOfCheckBoxes {
-  height: 10rem;
+  height: 15rem;
   list-style-type: none;
   overflow-y: scroll;
   padding: 0;
