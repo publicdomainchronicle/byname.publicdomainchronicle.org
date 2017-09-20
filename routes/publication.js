@@ -188,6 +188,26 @@ module.exports = function (request, response, configuration) {
       }
       </ul>
 
+      <ul id=aaasaffiliates>
+      ${
+        data.metadata &&
+        data.metadata.aaasaffiliates &&
+        data.metadata.aaasaffiliates.map(function (affiliate) {
+          return html`<li>AAAS Affiliate: ${escape(affiliate)}</li>`
+        })
+      }
+      </ul>
+
+      <ul id=gordonresearchconferences>
+      ${
+        data.metadata &&
+        data.metadata.gordonresearchconferences &&
+        data.metadata.gordonresearchconferences.map(function (topic) {
+          return html`<li>GRC topic: ${escape(topic)}</li>`
+        })
+      }
+      </ul>
+
       <ul id=classifications>
       ${
         data.metadata &&

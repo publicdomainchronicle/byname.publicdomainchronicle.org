@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
+var GRC_TOPICS = require('gordon-research-conference-topics')
 var Busboy = require('busboy')
 var FormData = require('form-data')
 var concat = require('concat-stream')
@@ -41,11 +42,22 @@ var JOURNALS = require('pct-minimum-documentation')
   })
   .sort()
 
+var AAAS_AFFILIATES = require('aaas-affiliates')
+
+var TOPICS = []
+Object.keys(GRC_TOPICS).forEach(function (year) {
+  GRC_TOPICS[year].forEach(function (topic) {
+    if (!TOPICS.includes(topic)) TOPICS.push(topic)
+  })
+})
+
 function get (request, response, configuration, errors) {
   response.setHeader('Content-Type', 'text/html; charset=UTF-8')
   response.end(
     template(configuration, {
       journals: JOURNALS,
+      aaas: AAAS_AFFILIATES,
+      grc: TOPICS,
       RECAPTCHA_PUBLIC: configuration.recaptcha.public,
       errors: errors,
       license: license,
@@ -198,7 +210,12 @@ function redirectTo (location) {
 
 var DELETE_IF_EMPTY = ['name', 'affiliation', 'safety']
 
-var ARRAYS = ['journals', 'classifications']
+var ARRAYS = [
+  'journals',
+  'classifications',
+  'gordonresearchconferences',
+  'aaasaffiliates'
+]
 
 var NORMALIZE_LINES = ['finding', 'safety']
 
@@ -418,6 +435,60 @@ function template (configuration, data) {
                         type=checkbox
                         value="${escape(journal)}">
                     ${escape(journal)}
+                  </label>
+                </li>
+                `
+              })}
+            </ul>
+          </section>
+
+          <section>
+            <h2>AAAS Affiliates</h2>
+
+            <p>
+              Which American Association for the Advancement of
+              Science affiliate organizations are most relevant
+              to the field of your contribution?
+              Usually, one or two are enough.
+            </p>
+
+            <!-- TODO: filter search box for lists of checkboxes -->
+            <ul id=aaasaffiliates class=listOfCheckBoxes>
+              ${data.aaas.map(function (affiliate) {
+                return html`
+                <li>
+                  <label>
+                    <input
+                        name=aaasaffiliates[]
+                        type=checkbox
+                        value="${escape(affiliate)}">
+                    ${escape(affiliate)}
+                  </label>
+                </li>
+                `
+              })}
+            </ul>
+          </section>
+
+          <section>
+            <h2>Gordon Research Conferences Topics</h2>
+
+            <p>
+              Which Gordon Research Conferences topics
+              are most relevant to the field of your contribution?
+              Usually, two or three are enough.
+            </p>
+
+            <ul id=gordonresearchconferences class=listOfCheckBoxes>
+              ${data.grc.map(function (topic) {
+                return html`
+                <li>
+                  <label>
+                    <input
+                        name=gordonresearchconferences[]
+                        type=checkbox
+                        value="${escape(topic)}">
+                    ${escape(topic)}
                   </label>
                 </li>
                 `

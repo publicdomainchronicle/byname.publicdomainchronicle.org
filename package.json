@@ -4,6 +4,7 @@
   "author": "Kyle E. Mitchell <kyle@kemitchell.com> (https://kemitchell.com/)",
   "license": "Apache-2.0",
   "dependencies": {
+    "aaas-affiliates": "^1.0.0",
     "ajv": "^5.2.2",
     "busboy": "^0.2.14",
     "concat-stream": "^1.6.0",
@@ -11,6 +12,7 @@
     "flush-write-stream": "^1.0.2",
     "form-data": "^2.3.1",
     "glob": "^7.1.2",
+    "gordon-research-conference-topics": "^1.0.0",
     "html-entities": "^1.2.1",
     "http-hash": "^2.0.0",
     "http-https": "^1.0.0",
@@ -61,7 +63,7 @@
     "nsp": "nsp check",
     "coverage": "NODE_ENV=test istanbul cover -- tape test/*.test.js",
     "test": "NODE_ENV=test tape test/*.test.js",
-    "testserver": "NODE_ENV=test RECAPTCHA_PUBLIC=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI RECAPTCHA_SECRET=6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe node server.js | tee server.log",
+    "testserver": "NODE_ENV=test BASE_HREF=http://localhost:8080/ RECAPTCHA_PUBLIC=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI RECAPTCHA_SECRET=6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe node server.js | tee server.log",
     "licenses": "licensee --errors-only",
     "precommit": "lint-staged"
   },
