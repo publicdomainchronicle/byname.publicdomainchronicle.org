@@ -23,15 +23,6 @@ module.exports = function (configuration, log) {
   var pino = pinoHTTP({logger: log})
   return function (request, response) {
     pino(request, response)
-    response.setTimeout(
-      configuration.timeout,
-      /* istanbul ignore next */ function () {
-        response.log.error({event: 'timeout'})
-        response.statusCode = 408
-        response.removeAllListeners()
-        response.end()
-      }
-    )
     var parsed = url.parse(request.url, true)
     request.query = parsed.query
     request.pathname = parsed.pathname

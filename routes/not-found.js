@@ -19,7 +19,6 @@ var html = require('./html')
 var footer = require('./partials/footer')
 var head = require('./partials/head')
 var header = require('./partials/header')
-var nav = require('./partials/nav')
 
 module.exports = function (request, response, configuration) {
   response.statusCode = 404
@@ -30,7 +29,6 @@ module.exports = function (request, response, configuration) {
   ${head(configuration, 'Not Found')}
   <body>
     ${header()}
-    ${nav()}
     <main>
       <p>Not Found</p>
     </main>

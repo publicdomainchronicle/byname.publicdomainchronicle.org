@@ -14,7 +14,78 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-var withVersion = require('./with-version')
-
 module.exports = {
-  '1.0.0': withVersion('1.0.0', require('./publication/1.0.0')) }
+  $schema: 'http://json-schema.org/draft-06/schema#',
+  type: 'object',
+  properties: {
+    name: {
+      type: 'string',
+      maxLength: 256
+    },
+    affiliation: {
+      type: 'string',
+      maxLength: 256
+    },
+    title: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 256
+    },
+    finding: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 28000
+    },
+    safety: {
+      type: 'string',
+      maxLength: 28000
+    },
+    attachments: {
+      type: 'array',
+      items: {
+        $ref: '#/definitions/digest'
+      },
+      uniqueItems: true
+    },
+    metadata: {
+      type: 'object',
+      patternProperties: {
+        '^[a-z]+$': {
+          type: 'array',
+          items: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 256
+          },
+          uniqueItems: true
+        }
+      },
+      additionalProperties: false
+    },
+    links: {
+      type: 'array',
+      items: {
+        $ref: '#/definitions/digest'
+      },
+      uniqueItems: true
+    },
+    declaration: {
+      type: 'string',
+      enum: ['1.0.0']
+    },
+    license: {
+      type: 'string',
+      enum: ['1.0.0']
+    }
+  },
+  required: [
+    'title',
+    'finding',
+    'declaration',
+    'license'
+  ],
+  additionalProperties: false,
+  definitions: {
+    digest: require('./digest')
+  }
+}
