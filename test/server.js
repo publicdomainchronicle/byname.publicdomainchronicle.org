@@ -18,7 +18,6 @@ var devNull = require('dev-null')
 var fs = require('fs')
 var http = require('http')
 var makeHandler = require('../')
-var path = require('path')
 var pino = require('pino')
 var rimraf = require('rimraf')
 
@@ -27,14 +26,10 @@ var RANDOM_HIGH_PORT = 0
 module.exports = function (callback) {
   fs.mkdtemp('/tmp/', function (ignore, directory) {
     var configuration = {
-      file: path.join(directory, 'replication.log'),
+      directory: directory,
       pdc: {
         host: 'publicdomainchronicle.org',
         path: '/server/'
-      },
-      solr: {
-        host: 'localhost',
-        port: 8983
       }
     }
     var log = pino({}, devNull())

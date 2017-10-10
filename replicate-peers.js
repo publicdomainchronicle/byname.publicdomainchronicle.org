@@ -14,25 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-var AJV = require('ajv')
 var JSONfile = require('jsonfile')
-var concat = require('concat-stream')
-var encoding = require('./encoding')
 var flushWriteStream = require('flush-write-stream')
 var fs = require('fs')
-var http = require('http-https')
 var https = require('https')
 var parse = require('json-parse-errback')
+var path = require('path')
 var pump = require('pump')
 var runSeries = require('run-series')
 var simpleConcat = require('simple-concat')
-var sodium = require('sodium-native')
 var split2 = require('split2')
-var stringify = require('json-stable-stringify')
 var through2 = require('through2')
 
 module.exports = function (configuration, log) {
   var last = -1
+  var file = path.join(configuration.directory, 'replication.log')
 
   readProgress(function (error, lastReplicated) {
     if (error) return log.error(error)
@@ -48,11 +44,11 @@ module.exports = function (configuration, log) {
   })
 
   function readProgress (done) {
-    JSONfile.readFile(configuration.file, done)
+    JSONfile.readFile(file, done)
   }
 
   function writeProgress (done) {
-    JSONfile.writeFile(configuration.file, last, done)
+    JSONfile.writeFile(file, last, done)
   }
 
   function replicate (done) {
@@ -126,26 +122,16 @@ module.exports = function (configuration, log) {
     }
 
     function indexPublication (done) {
-      http.request({
-        method: 'POST',
-        host: configuration.solr.host,
-        port: configuration.solr.port,
-        path: '/solr/pdc/update/json/docs?commit=true',
-        headers: {'Content-Type': 'application/json'}
-      })
-        .once('error', function (error) {
-          done(error)
-        })
-        .once('response', function (response) {
-          var status = response.statusCode
-          if (status === 200) {
-            log.info('indexed')
-            done()
-          } else {
-            done(new Error('SOLR responded ' + status))
-          }
-        })
-        .end(JSON.stringify(publication))
+      fs.appendFile(
+        path.join(configuration.directory, 'index.ndjson'),
+        JSON.stringify({
+          name: publication.name,
+          affiliation: publication.affiliation,
+          title: publication.title,
+          digest: digest
+        }) + '\n',
+        done
+      )
     }
   }
 }

@@ -12,26 +12,24 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- */
+*/
 
 var http = require('http')
 var server = require('./server')
 var tape = require('tape')
 
-tape('GET /', function (test) {
-  server(function (port, done) {
-    var request = {path: '/', port: port}
-    http.get(request, function (response) {
+tape.test('GET /nonexistent', function (test) {
+  server(function (port, close) {
+    http.get({
+      port: port,
+      path: '/nonexistent'
+    }, function (response) {
       test.equal(
-        response.statusCode, 200,
-        'responds 200'
+        response.statusCode, 404,
+        'responds 404'
       )
-      test.equal(
-        response.headers['content-type'], 'text/html; charset=UTF-8',
-        'Content-Type: text/html; charset=UTF-8'
-      )
-      done()
       test.end()
+      close()
     })
   })
 })

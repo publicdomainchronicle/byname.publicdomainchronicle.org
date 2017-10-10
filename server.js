@@ -26,16 +26,10 @@ var REPLICATION_INTERVAL = process.env.REPLICATION_INTERVAL
 var log = pino()
 
 var configuration = {
-  file: process.env.FILE || 'replication.log',
+  directory: process.env.DIRECTORY || 'byname.data',
   pdc: {
     host: process.env.PDC_HOST || 'localhost',
     path: process.env.PDC_PATH || '/'
-  },
-  solr: {
-    host: process.env.SOLR_HOST || 'localhost',
-    port: process.env.SOLR_PORT
-      ? parseInt(process.env.SOLR_PORT)
-      : 8983
   }
 }
 var requestHandler = makeHandler(configuration, log)

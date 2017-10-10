@@ -12,16 +12,25 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- */
+*/
 
-var glob = require('glob')
-var path = require('path')
-var serveFile = require('./serve-file')
+var http = require('http')
+var server = require('./server')
+var tape = require('tape')
 
-module.exports = function (routes, extension) {
-  glob.sync(path.join(__dirname, '..', 'static', '*.' + extension))
-    .forEach(function (match) {
-      match = path.basename(match)
-      routes.set('/' + match, serveFile(match))
+tape.test('GET /', function (test) {
+  server(function (port, close) {
+    http.get({port: port}, function (response) {
+      test.equal(
+        response.statusCode, 200,
+        'responds 200'
+      )
+      test.equal(
+        response.headers['content-type'], 'text/plain',
+        'text/plain'
+      )
+      test.end()
+      close()
     })
-}
+  })
+})

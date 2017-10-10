@@ -13,11 +13,50 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-var serveAllFiles = require('./serve-all-files')
+
+var fs = require('fs-extra')
+var meta = require('../package.json')
+var path = require('path')
+var pump = require('pump')
+var split2 = require('split2')
+var through2 = require('through2')
 
 var routes = module.exports = require('http-hash')()
 
-routes.set('/', require('./homepage'))
+routes.set('/', function (request, response, configuration) {
+  var q = request.query.q
+  if (!q) {
+    response.setHeader('Content-Type', 'text/plain')
+    return response.end('pdc-byname-api')
+  }
 
-serveAllFiles(routes, 'png')
-serveAllFiles(routes, 'css')
+  response.setHeader('Content-Type', 'application/x-ndjson')
+  var file = path.join(configuration.directory, 'index.ndjson')
+  fs.ensureFile(file, function (error) {
+    /* istanbul ignore if */
+    if (error) {
+      response.statusCode = 500
+      return response.end()
+    }
+    pump(
+      fs.createReadStream(file),
+      split2(JSON.parse),
+      through2.obj(function (object, _, done) {
+        if (matches(object)) {
+          return done(null, JSON.stringify(object) + '\n')
+        }
+        done()
+      }),
+      response
+    )
+  })
+
+  function matches (object) {
+    return q
+      .toLowerCase()
+      .split(/\s+/)
+      .every(function (word) {
+        return object.name.toLowerCase().indexOf(word) !== -1
+      })
+  }
+})

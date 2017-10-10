@@ -26,10 +26,6 @@ tape('GET /nonexistent', function (test) {
         response.statusCode, 404,
         'responds 404'
       )
-      test.equal(
-        response.headers['content-type'], 'text/html; charset=UTF-8',
-        'Content-Type: text/html; charset=UTF-8'
-      )
       done()
       test.end()
     })

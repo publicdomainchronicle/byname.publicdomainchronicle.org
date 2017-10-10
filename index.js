@@ -17,7 +17,6 @@ limitations under the License.
 var pinoHTTP = require('pino-http')
 var url = require('url')
 var routes = require('./routes')
-var notFound = require('./routes/not-found')
 
 module.exports = function (configuration, log) {
   var pino = pinoHTTP({logger: log})
@@ -31,7 +30,8 @@ module.exports = function (configuration, log) {
       request.params = route.params
       route.handler(request, response, configuration)
     } else {
-      notFound(request, response, configuration)
+      response.statusCode = 404
+      response.end()
     }
   }
 }

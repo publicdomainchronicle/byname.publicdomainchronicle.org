@@ -12,9 +12,29 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- */
+*/
 
-module.exports = function (response) {
-  response.statusCode = 405
-  response.end()
-}
+var concat = require('concat-stream')
+var http = require('http')
+var server = require('./server')
+var tape = require('tape')
+
+tape('GET /?q={}', function (test) {
+  server(function (port, close) {
+    http.get({
+      port: port,
+      path: '/?q=' + encodeURIComponent('kyle')
+    }, function (response) {
+      test.equal(
+        response.statusCode, 200,
+        'responds 200'
+      )
+      test.equal(
+        response.headers['content-type'], 'application/x-ndjson',
+        'ndjson'
+      )
+      test.end()
+      close()
+    })
+  })
+})
